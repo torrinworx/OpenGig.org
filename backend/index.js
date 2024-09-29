@@ -1,9 +1,9 @@
 import path from 'path';
 import http from 'http';
+import webpack from 'webpack';
 import express from 'express';
 import { config } from 'dotenv';
-import { WebSocketServer } from 'ws'; // Corrected import statement
-import webpack from 'webpack';
+import { WebSocketServer } from 'ws';
 
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
@@ -11,7 +11,6 @@ import webpackHotMiddleware from 'webpack-hot-middleware';
 import { Jobs } from './jobs.js';
 import webpackConfig from '../webpack.config.js';
 
-// Load environment variables
 config();
 const app = express();
 app.use(express.json());
@@ -49,31 +48,23 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 const port = process.env.PORT || process.env.BACKEND_PORT || 5000;
-// Create an HTTP server and wrap the Express app
 const server = http.createServer(app);
-
-// Initialize WebSocket server instance
-const wss = new WebSocketServer({ server }); // Use WebSocketServer instead of WebSocket.Server
+const wss = new WebSocketServer({ server });
 
 wss.on('connection', (ws) => {
   console.log('New client connected');
-  // Send a welcome message to the client
   ws.send('Welcome to the WebSocket server!');
 
-  // Handle incoming messages from clients
   ws.on('message', (message) => {
     console.log(`Received message: ${message}`);
-    // Echo the message back to the client
     ws.send(`You said: ${message}`);
   });
 
-  // Handle client disconnection
   ws.on('close', () => {
     console.log('Client disconnected');
   });
 });
 
-// Start the server
 server.listen(port, () => {
   console.log(`Serving on port ${port}`);
 });
