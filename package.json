@@ -1,0 +1,24 @@
+{
+  "name": "opengig.org",
+  "version": "1.0.0",
+  "description": "An open source gig platform.",
+  "main": "./backend/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node ./backend/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/torrinworx/OpenGig.org.git"
+  },
+  "author": "Torrin Leonard",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/torrinworx/OpenGig.org/issues"
+  },
+  "homepage": "https://github.com/torrinworx/OpenGig.org#readme",
+  "dependencies": {
+    "destam": "^0.3.2",
+    "destam-dom": "^0.8.7"
+  }
+}
