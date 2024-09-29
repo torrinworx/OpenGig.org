@@ -1,5 +1,7 @@
 import { OObject, OArray, Observer } from 'destam';
 
+import {Jobs, JobRequest } from './jobs.js';
+
 const state = OObject({
 	name: 'John Doe',
 	address: 'Tokyo',
@@ -11,5 +13,15 @@ state.observer.path('address').watch(delta => {
 
 state.address = 'Toronto';
 
-console.log("Hi there")
 
+(async () => {
+    const jobs = new Jobs('./backend/jobs');    
+
+    const jobRequest = new JobRequest('example', { args: 'example' });
+    try {
+        const result = await jobs.router(jobRequest);
+        console.log('Job result:', result);
+    } catch (error) {
+        console.error('Job execution error:', error);
+    }
+})();

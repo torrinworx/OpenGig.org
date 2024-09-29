@@ -9,25 +9,35 @@ class JobRequest {
 }
 
 class Jobs {
-    constructor(directory = path.resolve('./jobs')) {
+    constructor(directory) {
+        this.directory = path.resolve(directory || './jobs');
+        console.log(this.directory);
         if (!Jobs.instance) {
             Jobs.instance = this;
             this.jobs = new Map();
-            this.directory = directory;
-            this._getJobs();
+            Jobs.instance.ready = this._getJobs().then(() => {
+                console.log('Jobs loaded');
+            });
         }
         return Jobs.instance;
     }
 
     async _getJobs() {
         const jobFiles = await this._findJobFiles(this.directory);
-        for (const filePath of jobFiles) {
-            await this._loadJobsFromFile(filePath);
-        }
+        console.log('Loaded job files:', jobFiles);
+
+        const jobPromises = jobFiles.map(filePath => this._loadJobsFromFile(filePath));
+
+        return Promise.all(jobPromises).then(() => {
+            console.log('All jobs are loaded');
+        }).catch(error => {
+            console.error('Error loading jobs:', error);
+        });
     }
 
     async _findJobFiles(dir) {
         const entries = await fs.readdir(dir, { withFileTypes: true });
+        console.log('Entries:', entries);
         const files = await Promise.all(entries.map(async entry => {
             const fullPath = path.join(dir, entry.name);
             if (entry.isDirectory()) {
@@ -57,6 +67,8 @@ class Jobs {
     }
 
     async router(jobRequest) {
+        await Jobs.instance.ready;
+
         const jobFunc = this.jobs.get(jobRequest.name);
 
         if (!jobFunc) {
