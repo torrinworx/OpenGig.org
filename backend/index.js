@@ -1,27 +1,77 @@
-import { OObject, OArray, Observer } from 'destam';
+import path from 'path';
+import http from 'http';
+import Websocket from 'ws';
+import webpack from 'webpack';
+import express from 'express';
+import { config } from 'dotenv';
 
-import {Jobs, JobRequest } from './jobs.js';
+import webpackDevMiddleware from 'webpack-dev-middleware';
+import webpackHotMiddleware from 'webpack-hot-middleware';
 
-const state = OObject({
-	name: 'John Doe',
-	address: 'Tokyo',
-});
-
-state.observer.path('address').watch(delta => {
-	console.log(`${delta.getParent().name}'s address changed to ${delta.value}`);
-});
-
-state.address = 'Toronto';
+import { Jobs } from './jobs.js';
+import webpackConfig from '../webpack.config.js';
 
 
+
+// Placeholder for the instantiation of Jobs module and related logic
 (async () => {
     const jobs = new Jobs('./backend/jobs');    
 
-    const jobRequest = new JobRequest('example', { args: 'example' });
-    try {
-        const result = await jobs.router(jobRequest);
-        console.log('Job result:', result);
-    } catch (error) {
-        console.error('Job execution error:', error);
-    }
+    // const jobRequest = new JobRequest('example', { args: 'example' });
+    // try {
+    //     const result = await jobs.router(jobRequest);
+    //     console.log('Job result:', result);
+    // } catch (error) {
+    //     console.error('Job execution error:', error);
+    // }
 })();
+
+config();
+const app = express();
+
+// Handle JSON
+app.use(express.json());
+
+// Helper functions to replace __dirname and __filename
+const __filename = new URL(import.meta.url).pathname;
+const __dirname = path.dirname(__filename);
+
+// Check node environment
+if (process.env.NODE_ENV === 'production') {
+  // In production, serve static files from the React app's build folder
+  app.use(express.static(path.join(__dirname, '../build')));
+  // The "catchall" handler: for any request that doesn't match one above,
+  // send back React's index.html file.
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '../build', 'index.html'));
+  });
+} else {
+
+  const compiler = webpack(webpackConfig);
+
+  app.use(
+    webpackDevMiddleware(compiler, {
+      publicPath: webpackConfig.output.publicPath,
+    })
+  );
+
+  app.use(webpackHotMiddleware(compiler));
+
+  app.get('*', (req, res, next) => {
+    const filename = path.join(compiler.outputPath, 'index.html');
+    compiler.outputFileSystem.readFile(filename, (err, result) => {
+      if (err) {
+        return next(err);
+      }
+      res.set('content-type', 'text/html');
+      res.send(result);
+      res.end();
+    });
+  });
+}
+
+// Use API routes
+// app.use('/api', apiRoutes);
+
+const port = process.env.PORT || process.env.BACKEND_PORT || 5000;
+app.listen(port, () => console.log(`Serving on port ${port}`));
