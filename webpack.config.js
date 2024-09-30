@@ -22,7 +22,7 @@ const getWebpackConfig = async () => {
     entry: {
       opengig_org: [
         'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000&reload=true',
-        './frontend/index.js'
+        './frontend/index.jsx'
       ],
     },
     output: {

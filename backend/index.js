@@ -3,13 +3,13 @@ import http from 'http';
 import webpack from 'webpack';
 import express from 'express';
 import { config } from 'dotenv';
+import { Observer } from 'destam';
 import { WebSocketServer } from 'ws';
 
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 
 import { Jobs } from './jobs.js';
-import { ws_server } from '../common/websocket.js';
 import webpackConfig from '../webpack.config.js';
 
 config();
@@ -51,8 +51,40 @@ if (process.env.NODE_ENV === 'production') {
 const port = process.env.PORT || process.env.BACKEND_PORT || 5000;
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
+const OServer = Observer.mutable('Hello World!');
 
-wss.on('connection', (ws) => ws_server(ws));
+wss.on('connection', (ws) => {
+  ws.send(JSON.stringify(OServer.get()));
+
+  const prevMsg = Observer.mutable(false);
+
+  OServer.watch(d => {
+      console.log(d.value)
+      if (!prevMsg.get()) {
+          ws.send(JSON.stringify(d));
+      }
+      prevMsg.set(false);
+  });
+
+  ws.on('message', (msg) => {
+      const message = msg.toString('utf-8');
+
+      try {
+          const data = JSON.parse(message);
+          if (!prevMsg.get()) {
+              prevMsg.set(true);
+              OServer.set(data.value);
+          }
+      } catch (error) {
+          console.error('Failed to parse message as JSON:', error);
+      }
+  });
+
+  ws.on('close', () => {
+      console.log('Client disconnected');
+  });
+});
+
 
 server.listen(port, () => {
   console.log(`Serving on port ${port}`);
