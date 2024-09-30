@@ -9,6 +9,7 @@ import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 
 import { Jobs } from './jobs.js';
+import { ws_server } from '../common/websocket.js';
 import webpackConfig from '../webpack.config.js';
 
 config();
@@ -51,19 +52,7 @@ const port = process.env.PORT || process.env.BACKEND_PORT || 5000;
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 
-wss.on('connection', (ws) => {
-  console.log('New client connected');
-  ws.send('Welcome to the WebSocket server!');
-
-  ws.on('message', (message) => {
-    console.log(`Received message: ${message}`);
-    ws.send(`You said: ${message}`);
-  });
-
-  ws.on('close', () => {
-    console.log('Client disconnected');
-  });
-});
+wss.on('connection', (ws) => ws_server(ws));
 
 server.listen(port, () => {
   console.log(`Serving on port ${port}`);

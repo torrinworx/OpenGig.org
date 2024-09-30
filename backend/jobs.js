@@ -15,9 +15,7 @@ class Jobs {
         if (!Jobs.instance) {
             Jobs.instance = this;
             this.jobs = new Map();
-            Jobs.instance.ready = this._getJobs().then(() => {
-                console.log('Jobs loaded');
-            });
+            Jobs.instance.ready = this._getJobs()
         }
         return Jobs.instance;
     }
@@ -37,7 +35,6 @@ class Jobs {
 
     async _findJobFiles(dir) {
         const entries = await fs.readdir(dir, { withFileTypes: true });
-        console.log('Entries:', entries);
         const files = await Promise.all(entries.map(async entry => {
             const fullPath = path.join(dir, entry.name);
             if (entry.isDirectory()) {
