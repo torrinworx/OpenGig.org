@@ -18,3 +18,6 @@ Philosophy:
 
 -https://www.youtube.com/watch?v=Y6ZHV0RH0fQ 
 > What would happen if we just open sourced everything? If we put it all in a public repo with an open license like MIT, our investors would probably have thought that we'd gone crazy. But other than that, what direct impact would that have had on our company?
+
+The value of a project or a company isn't it's source code, its the brains behind it, the people who make it, who can update it, who can improve it. And that isn't something you can hack into and download and easily reproduce.
+
