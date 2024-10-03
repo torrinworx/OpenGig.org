@@ -1,4 +1,4 @@
-import { h, mount, Observer } from 'destam-dom';
+import { h, mount, Observer, OObject } from 'destam-dom';
 import { Button } from 'destamatic-ui';
 
 const ws = new WebSocket(`ws://${window.location.hostname}:${window.location.port}`);
@@ -38,12 +38,13 @@ window.addEventListener('load', () => {
     remove = mount(document.body,
         <div>
             Hello World
-
+            <br />
+            {OClient.get() ? OClient.get() : "null"}
             <Button
                 label='Click'
                 onMouseDown={() => {
                     counter.set(counter.get() + 1);
-                    OClient.set(`click # ${counter.get()}`);
+                    OClient.set(OObject({"test": `click # ${counter.get()}`}));
                 }}
             />
         </div>
