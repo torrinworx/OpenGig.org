@@ -23,6 +23,8 @@
     "destamatic-ui": "file:destamatic-ui",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
+    "flatted": "^3.3.1",
+    "msgpack-lite": "^0.1.26",
     "ws": "^8.18.0"
   },
   "devDependencies": {
