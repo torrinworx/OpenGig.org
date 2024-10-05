@@ -21,3 +21,11 @@ https://www.theverge.com/2024/2/8/24065999/uber-earnings-profitable-year-net-inc
 
 The value of a project or a company isn't it's source code, its the brains behind it, the people who make it, who can update it, who can improve it. And that isn't something you can hack into and download and easily reproduce.
 
+The gig economy and gig platforms are fundamentally unethical, 
+They derive themselves from a manipulative and subversive tactic
+to undermine a value of human labour. 
+
+It is necessary to provide people the means and ability to profit
+ from their labour, which is why these platforms are necessary.
+However, what is unethical about these platforms is that they are 
+designed for profit rather than public good.
