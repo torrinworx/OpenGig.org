@@ -3,10 +3,8 @@ import http from 'http';
 import webpack from 'webpack';
 import express from 'express';
 import { config } from 'dotenv';
-import { OObject, createNetwork } from 'destam';
+import { OObject, createNetwork, clone, stringify, parse } from 'destam';
 import { WebSocketServer } from 'ws';
-import { encode, decode } from 'msgpack-lite';
-import { stringify, parse } from 'flatted';
 
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
@@ -54,30 +52,32 @@ const port = process.env.PORT || process.env.BACKEND_PORT || 5000;
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 
-const OServer = OObject({});
+const OServer = OObject({test: "Hello world"});
 const network = createNetwork(OServer.observer);
 const fromClient = {};
 
 wss.on('connection', (ws) => {
-	network.digest(async commit => {
-		try {
-            ws.send(encode(stringify(commit)))
-		} catch (e) {
-            console.log(e)
-        }
-	}, 1000 / 30, arg => arg === fromClient);
+    // Send the initial state of OServer to the client
+	ws.send(stringify(clone(OServer)));
 
-	ws.on('message', (e) => {
-        const changes = decode(new Uint8Array(e));
-        console.log(parse(changes));
-		network.apply(parse(changes), fromClient);
-	});
+    network.digest(commit => {
+		const decoded = stringify(clone(commit));
+        ws.send(decoded);
+    }, 1000 / 30, arg => arg === fromClient);
 
-	ws.on('close', () => {
+    ws.on('message', (e) => {
+        const parsedCommit = parse(e);
+        console.log(parsedCommit);
+        network.apply(parsedCommit, fromClient);
+        console.log("Current Server State:", OServer);
+    });
+
+    ws.on('close', () => {
         network.remove();
-		console.log('Client disconnected');
-	});
+        console.log('Client disconnected');
+    });
 });
+
 
 
 server.listen(port, () => {

@@ -1,66 +1,72 @@
-import { Observer, OObject, OArray, createNetwork } from 'destam';
+import { h, mount } from 'destam-dom';
+import { Button } from 'destamatic-ui';
+import { OObject, clone, stringify, parse, createNetwork } from 'destam';
 
-const initialState = {};
+const ws = new WebSocket(`ws://${window.location.hostname}:${window.location.port}`);
+let remove;
 
-const stateClient = OObject({});
-const networkClient = createNetwork(stateClient.observer);
+window.addEventListener('load', () => {
+    let OClient;
 
-const serverState = OObject({});
+    
+    ws.addEventListener('message', (e) => {
+        const incomingData = parse(e.data);
+        console.log('Received from server:', incomingData);
 
-networkClient.digest((commit, regFunc) => {
-    console.log(regFunc)
-    console.log('Digest invoked with commit:', commit);
+        if (!OClient) {
+            if (!Array.isArray(incomingData)) {
+                OClient = incomingData; // Clone of OServer
+                console.log(OClient);
+            } else {
+                console.error("First message should establish OClient, received an array instead.");
+            }
+            init();
+        } else {
+            network.apply(incomingData, fromServer);
+        }
+    });
 
-    // Check if commit has events
-    if (commit && commit.length > 0) {
-        console.log('Applying commit events:', commit);
+    ws.addEventListener('close', () => {
+        if (network) network.remove();
+        console.log('WebSocket connection closed.');
+    });
 
-        // Perform expected operations or log it happening
-    } else {
-        console.log('No events to process.');
+    ws.addEventListener('error', (error) => {
+        console.error('WebSocket error:', error.message);
+    });
+
+    const init = () => {
+        const network = createNetwork(OClient.observer);
+        const fromServer = {};
+
+        network.digest((changes, observerRefs) => {
+            const encodedChanges = stringify(clone(
+                changes,
+                { observerRefs: observerRefs, observerNetwork: network }
+            ));
+            console.log('Sending to server:', encodedChanges);
+            ws.send(encodedChanges);
+        }, 1000 / 30, arg => arg === fromServer);
+
+        const counter = OClient.observer.path('counter').def(0);
+        remove = mount(document.body,
+            <div>
+                Hello World
+                <br />
+                {counter}
+                <Button
+                    label='Click'
+                    onMouseDown={() => {
+                        counter.set(counter.get() + 1);
+                    }}
+                />
+            </div>
+        );
+
+        window.addEventListener('unload', () => {
+            if (remove) remove();
+            if (ws) ws.close();
+            network.remove();
+        });
     }
-}, 1000/30);
-
-stateClient.name = 'test Doe';
-
-stateClient.projects = OObject({});
-console.log("hi there")
-
-// stateTree.projects.push({ title: 'Another project'});
-
-console.log(stateClient)
-console.log(serverState)
-
-
-
-
-// import { Observer, OObject, OArray, createNetwork } from 'destam';
-
-// const initialState = {};
-
-// const stateClient = OObject(initialState);
-// const stateServer = OObject(initialState);
-
-// const networkClient = createNetwork(stateClient.observer);
-// const networkServer = createNetwork(stateServer.observer);
-
-// const fromClient = {};
-// const fromServer = {};
-
-// networkClient.digest(async commit => {
-// 	const cloned = commit;
-// 	networkServer.apply(cloned);
-// }, 1000 / 30, arg => arg === fromClient);
-
-// networkServer.digest(async commit => {
-// 	const cloned = commit; // main issue, how do we clone something like this?
-// 	// Need a custom serialize/deserialzier?
-// 	networkClient.apply(cloned);
-// }, 1000 / 30, arg => arg === fromClient);
-
-// stateClient.name = 'test Doe';
-
-// stateClient.projects = OObject({});
-
-// console.log(stateClient);
-// console.log(stateServer);
+});

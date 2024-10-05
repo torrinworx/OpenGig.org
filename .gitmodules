@@ -1,3 +1,6 @@
 [submodule "destamatic-ui"]
 	path = destamatic-ui
 	url = https://github.com/torrinworx/destamatic-ui
+[submodule "destam"]
+	path = destam
+	url = https://github.com/Equator-Studios/destam.git

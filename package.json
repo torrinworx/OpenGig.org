@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/torrinworx/OpenGig.org#readme",
   "dependencies": {
-    "destam": "^0.3.2",
+    "destam": "file:destam/destam",
     "destam-dom": "^0.8.7",
     "destamatic-ui": "file:destamatic-ui",
     "dotenv": "^16.4.5",
