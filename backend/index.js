@@ -60,10 +60,13 @@ wss.on('connection', (ws) => {
     // Send the initial state of OServer to the client
 	ws.send(stringify(clone(OServer)));
 
-    network.digest(commit => {
-		const decoded = stringify(clone(commit));
-        ws.send(decoded);
-    }, 1000 / 30, arg => arg === fromClient);
+	network.digest(async (changes, observerRefs) => {
+		const encodedChanges = stringify(clone(
+			changes,
+			{ observerRefs: observerRefs, observerNetwork: network }
+		));
+		ws.send(encodedChanges);
+	}, 1000 / 30, arg => arg === fromClient);
 
     ws.on('message', (e) => {
         const parsedCommit = parse(e);

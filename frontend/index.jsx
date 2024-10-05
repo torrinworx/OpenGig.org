@@ -39,7 +39,7 @@ window.addEventListener('load', () => {
         const network = createNetwork(OClient.observer);
         const fromServer = {};
 
-        network.digest((changes, observerRefs) => {
+        network.digest(async (changes, observerRefs) => {
             const encodedChanges = stringify(clone(
                 changes,
                 { observerRefs: observerRefs, observerNetwork: network }
