@@ -22,8 +22,6 @@ class Jobs {
 
     async _getJobs() {
         const jobFiles = await this._findJobFiles(this.directory);
-        console.log('Loaded job files:', jobFiles);
-
         const jobPromises = jobFiles.map(filePath => this._loadJobsFromFile(filePath));
 
         return Promise.all(jobPromises).then(() => {
@@ -53,6 +51,7 @@ class Jobs {
             if (typeof module.default === 'function') {
                 this.jobs.set(jobName, module.default);
             }
+            console.log(`Job "${jobName}" loaded`)
         } catch (e) {
             console.error(`Failed to load module from ${filePath}: ${e}`);
         }

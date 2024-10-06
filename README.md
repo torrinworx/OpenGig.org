@@ -13,7 +13,6 @@ https://companiesmarketcap.com/uber/marketcap
 https://www.theverge.com/2024/2/8/24065999/uber-earnings-profitable-year-net-income
 
 
-
 # Philosophy:
 
 -https://www.youtube.com/watch?v=Y6ZHV0RH0fQ 
@@ -25,7 +24,4 @@ The gig economy and gig platforms are fundamentally unethical,
 They derive themselves from a manipulative and subversive tactic
 to undermine a value of human labour. 
 
-It is necessary to provide people the means and ability to profit
- from their labour, which is why these platforms are necessary.
-However, what is unethical about these platforms is that they are 
-designed for profit rather than public good.
+It is necessary to provide people the means and ability to profit from their labour, which is why these platforms are necessary. However, what is unethical about these platforms is that they are designed for profit rather than public good.

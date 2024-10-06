@@ -48,17 +48,22 @@ if (process.env.NODE_ENV === 'production') {
 	});
 }
 
-const port = process.env.PORT || process.env.BACKEND_PORT || 5000;
+const port = process.env.PORT || process.env.BACKEND_PORT || 3000;
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 
-const OServer = OObject({test: "Hello world"});
-const network = createNetwork(OServer.observer);
-const fromClient = {};
-
 wss.on('connection', (ws) => {
+	const OServer = OObject(); // TODO: Load state from mongodb instead of declaring empty oobject
+	const network = createNetwork(OServer.observer);
+	const fromClient = {};
+
     // Send the initial state of OServer to the client
 	ws.send(stringify(clone(OServer)));
+
+	// Watcher to store data in db
+	OServer.observer.watch(delta => {
+		console.log(delta.value);
+	})
 
 	network.digest(async (changes, observerRefs) => {
 		const encodedChanges = stringify(clone(
@@ -70,9 +75,8 @@ wss.on('connection', (ws) => {
 
     ws.on('message', (e) => {
         const parsedCommit = parse(e);
-        console.log(parsedCommit);
+		// TODO: validate changes follow the validator/schema
         network.apply(parsedCommit, fromClient);
-        console.log("Current Server State:", OServer);
     });
 
     ws.on('close', () => {
@@ -81,10 +85,8 @@ wss.on('connection', (ws) => {
     });
 });
 
-
-
 server.listen(port, () => {
-	console.log(`Serving on port ${port}`);
+	console.log(`Serving on http://localhost:${port}/`);
 });
 
 (async () => {
