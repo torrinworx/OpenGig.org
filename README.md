@@ -1,5 +1,5 @@
 # OpenGig.org
-An open source gig platform.
+An Open Source Service gig platform.
 
 Companies like Uber take obsurd amounts of money from the contractors on their app. They treat their drivers like trash, and overcharge both the drivers and the customers, and utilize dark patterns to do so. They are able to accumulate so much wealth with this aweful greedy system, they started an autonomous driving division, a wasteful failure that ended with them having to sell it off due to financial challenges. Since it's founding in 2009, Uber has never been profitable, they have been coasting off of investor money, and have been sucking the money out of drivers and customer pockets along the way. They reported their first profit in the second quarter of 2023, 14 years after their founding, with a total profit of $1.8 Billion for that year. The company is valued at $152.27 Billion as of writing on September 16th, 2024. This is obsurd, a failure of our governments and social safety nets.
 
