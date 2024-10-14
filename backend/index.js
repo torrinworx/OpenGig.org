@@ -9,7 +9,6 @@ import { WebSocketServer } from 'ws';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 
-import { Jobs } from './jobs.js';
 import webpackConfig from '../webpack.config.js';
 
 config();
@@ -26,24 +25,21 @@ if (process.env.NODE_ENV === 'production') {
 	});
 } else {
 	const compiler = webpack(webpackConfig);
-	
+
 	app.use(
 		webpackDevMiddleware(compiler, {
 			publicPath: webpackConfig.output.publicPath,
 		})
 	);
-	
+
 	app.use(webpackHotMiddleware(compiler));
-	
+
 	app.get('*', (req, res, next) => {
 		const filename = path.join(compiler.outputPath, 'index.html');
 		compiler.outputFileSystem.readFile(filename, (err, result) => {
-			if (err) {
-				return next(err);
-			}
+			if (err) return next(err);
 			res.set('content-type', 'text/html');
 			res.send(result);
-			res.end();
 		});
 	});
 }
@@ -57,32 +53,30 @@ wss.on('connection', (ws) => {
 	const network = createNetwork(OServer.observer);
 	const fromClient = {};
 
-    // Send the initial state of OServer to the client
 	ws.send(stringify(clone(OServer)));
 
-	// Watcher to store data in db
-	OServer.observer.watch(delta => {
+	// Watcher to validate and store data in db
+	OServer.observer.watch((delta) => {
 		console.log(delta.value);
-	})
+	});
 
 	network.digest(async (changes, observerRefs) => {
-		const encodedChanges = stringify(clone(
-			changes,
-			{ observerRefs: observerRefs, observerNetwork: network }
-		));
+		const encodedChanges = stringify(
+			clone(changes, { observerRefs: observerRefs, observerNetwork: network })
+		);
 		ws.send(encodedChanges);
-	}, 1000 / 30, arg => arg === fromClient);
+	}, 1000 / 30, (arg) => arg === fromClient);
 
-    ws.on('message', (e) => {
-        const parsedCommit = parse(e);
+	ws.on('message', (e) => {
+		const parsedCommit = parse(e);
 		// TODO: validate changes follow the validator/schema
-        network.apply(parsedCommit, fromClient);
-    });
+		network.apply(parsedCommit, fromClient);
+	});
 
-    ws.on('close', () => {
-        network.remove();
-        console.log('Client disconnected');
-    });
+	ws.on('close', () => {
+		network.remove();
+		console.log('Client disconnected');
+	});
 });
 
 server.listen(port, () => {

@@ -19,16 +19,12 @@ const getWebpackConfig = async () => {
     stats: 'minimal',
     devtool: 'source-map',
     mode: env,
-    entry: {
-      opengig_org: [
-        'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000&reload=true',
-        './frontend/index.jsx'
-      ],
-    },
+    entry: './frontend/index.jsx',
     output: {
       path: path.resolve(__dirname, 'build'),
       publicPath: '/',
       filename: 'index.js',
+      publicPath: '/',
     },
     resolve: {
       extensions: ['.html', '.css', '.js', '.jsx'],
