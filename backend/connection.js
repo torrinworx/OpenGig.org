@@ -3,7 +3,6 @@ import { OObject, createNetwork, clone, stringify, parse } from 'destam';
 
 export default (server) => {
     const wss = new WebSocketServer({ server });
-    const history = [];
 
     wss.on('connection', (ws) => {
         const OServer = OObject(); // TODO: Load state from mongodb instead of declaring empty oobject
@@ -16,11 +15,6 @@ export default (server) => {
         OServer.observer.watchCommit((delta) => {
             console.log(delta);
         });
-
-        network.digest(async (commit) => {
-            history.push(clone(commit));
-            console.log(history)
-        }, 0);
 
         network.digest(async (changes, observerRefs) => {
             const encodedChanges = stringify(

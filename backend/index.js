@@ -3,8 +3,6 @@ import http from 'http';
 import webpack from 'webpack';
 import express from 'express';
 import { config } from 'dotenv';
-import { OObject, createNetwork, clone, stringify, parse } from 'destam';
-import { WebSocketServer } from 'ws';
 
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
@@ -46,7 +44,7 @@ if (process.env.NODE_ENV === 'production') {
 	});
 }
 
-const port = process.env.PORT || process.env.BACKEND_PORT || 3000;
+const port = process.env.PORT || 3000;
 const server = http.createServer(app);
 connection(server);
 
