@@ -8,7 +8,7 @@ export default (server) => {
         const OServer = OObject(); // TODO: Load state from mongodb instead of declaring empty oobject
         const network = createNetwork(OServer.observer);
         const fromClient = {};
-    
+
         ws.send(stringify(clone(OServer)));
     
         // Watcher to validate and store data in db

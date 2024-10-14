@@ -23,6 +23,7 @@ window.addEventListener('load', () => {
 
         if (!OClient) {
             if (!Array.isArray(incomingData)) {
+                console.log(stringify(incomingData))
                 OClient = incomingData; // Clone of OServer
                 init();
             } else {
