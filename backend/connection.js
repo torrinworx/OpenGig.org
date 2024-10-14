@@ -3,7 +3,6 @@ import { createNetwork, clone, stringify, parse } from 'destam';
 
 import ODB from './db.js';
 
-
 export default (server) => {
     const wss = new WebSocketServer({ server });
 
