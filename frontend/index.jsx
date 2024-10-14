@@ -1,5 +1,5 @@
-import { h, mount } from 'destam-dom';
-import { Theme, Button, Router } from 'destamatic-ui';
+import { mount } from 'destam-dom';
+import { h, Router } from 'destamatic-ui';
 import { clone, stringify, parse, createNetwork } from 'destam';
 
 import Home from './pages/Home';

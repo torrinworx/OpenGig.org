@@ -1,5 +1,6 @@
-import { h, Theme, Button, Typography } from 'destamatic-ui';
+import { h, Markdown, Button, Typography } from 'destamatic-ui';
 import { Observer } from 'destam-dom';
+import readmeContent from '../../README.md'; // Adjust the path as necessary
 
 const isMobile = () => {
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
@@ -8,7 +9,6 @@ const isMobile = () => {
 
 const Header = ({}) => {
     const hover = Observer.mutable(false);
-
     return <div style={{
             position: 'sticky',
             top: 0,
@@ -48,10 +48,12 @@ const Header = ({}) => {
     </div>;
 }
 
-const Landing = ({OClient}) => {
+const Landing = ({ OClient }) => {
+    console.log(readmeContent);
+
     return <div>
         <Header />
-        This is the landing page
+        <Markdown markdown={readmeContent} />
     </div>;
 };
 
