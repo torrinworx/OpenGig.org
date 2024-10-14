@@ -9,6 +9,7 @@ import { WebSocketServer } from 'ws';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 
+import { Jobs } from './jobs.js';
 import webpackConfig from '../webpack.config.js';
 
 config();
