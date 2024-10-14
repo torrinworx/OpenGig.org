@@ -11,6 +11,7 @@ import webpackHotMiddleware from 'webpack-hot-middleware';
 
 import { Jobs } from './jobs.js';
 import webpackConfig from '../webpack.config.js';
+import connection from './connection.js';
 
 config();
 const app = express();
@@ -47,38 +48,7 @@ if (process.env.NODE_ENV === 'production') {
 
 const port = process.env.PORT || process.env.BACKEND_PORT || 3000;
 const server = http.createServer(app);
-const wss = new WebSocketServer({ server });
-
-wss.on('connection', (ws) => {
-	const OServer = OObject(); // TODO: Load state from mongodb instead of declaring empty oobject
-	const network = createNetwork(OServer.observer);
-	const fromClient = {};
-
-	ws.send(stringify(clone(OServer)));
-
-	// Watcher to validate and store data in db
-	OServer.observer.watch((delta) => {
-		console.log(delta.value);
-	});
-
-	network.digest(async (changes, observerRefs) => {
-		const encodedChanges = stringify(
-			clone(changes, { observerRefs: observerRefs, observerNetwork: network })
-		);
-		ws.send(encodedChanges);
-	}, 1000 / 30, (arg) => arg === fromClient);
-
-	ws.on('message', (e) => {
-		const parsedCommit = parse(e);
-		// TODO: validate changes follow the validator/schema
-		network.apply(parsedCommit, fromClient);
-	});
-
-	ws.on('close', () => {
-		network.remove();
-		console.log('Client disconnected');
-	});
-});
+connection(server);
 
 server.listen(port, () => {
 	console.log(`Serving on http://localhost:${port}/`);
