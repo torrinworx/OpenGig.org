@@ -1,21 +1,20 @@
 import { WebSocketServer } from 'ws';
-import { OObject, createNetwork, clone, stringify, parse } from 'destam';
+import { createNetwork, clone, stringify, parse } from 'destam';
+
+import ODB from './db.js';
+
 
 export default (server) => {
     const wss = new WebSocketServer({ server });
 
-    wss.on('connection', (ws) => {
-        const OServer = OObject(); // TODO: Load state from mongodb instead of declaring empty oobject
+    wss.on('connection', async (ws) => {
+        const OServer = await ODB('test');
         const network = createNetwork(OServer.observer);
         const fromClient = {};
 
+        // Push init state to client
         ws.send(stringify(clone(OServer)));
     
-        // Watcher to validate and store data in db
-        OServer.observer.watchCommit((delta) => {
-            console.log(delta);
-        });
-
         network.digest(async (changes, observerRefs) => {
             const encodedChanges = stringify(
                 clone(changes, { observerRefs: observerRefs, observerNetwork: network })
