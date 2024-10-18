@@ -23,7 +23,6 @@ window.addEventListener('load', () => {
 
         if (!OClient) {
             if (!Array.isArray(incomingData)) {
-                console.log(stringify(incomingData))
                 OClient = incomingData; // Clone of OServer
                 init();
             } else {
@@ -36,7 +35,6 @@ window.addEventListener('load', () => {
 
     ws.addEventListener('close', () => {
         if (network) network.remove();
-        console.log('WebSocket connection closed.');
     });
 
     ws.addEventListener('error', (error) => {
@@ -56,9 +54,12 @@ const init = () => {
         ws.send(encodedChanges);
     }, 1000 / 30, arg => arg === fromServer);
 
-    remove = mount(document.body, <div>
-        <Router currentRoute={currentRoute} routes={routes} NotFound={NotFound} OClient={OClient} />
-    </div>);
+    remove = mount(document.body, <Router
+        currentRoute={currentRoute}
+        routes={routes}
+        NotFound={NotFound}
+        OClient={OClient}
+    />);
 
     window.addEventListener('unload', () => {
         if (remove) remove();

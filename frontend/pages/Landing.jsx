@@ -1,11 +1,6 @@
 import { h, Markdown, Button, Typography } from 'destamatic-ui';
 import { Observer } from 'destam-dom';
-import readmeContent from '../../README.md'; // Adjust the path as necessary
-
-const isMobile = () => {
-    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    return /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
-};
+import readmeContent from '../../README.md';
 
 const Header = ({}) => {
     const hover = Observer.mutable(false);
@@ -13,7 +8,6 @@ const Header = ({}) => {
             position: 'sticky',
             top: 0,
             backgroundColor: 'white',
-            zIndex: 1000,
             padding: '10px',
             display: 'flex',
             justifyContent: 'space-between',
@@ -26,7 +20,7 @@ const Header = ({}) => {
           <div
             style={{
               backgroundColor: "black",
-              width: hover.map(h => isMobile() || h ? '100%' : '0%'),
+              width: hover.map(h => h ? '100%' : '0%'),
               height: '4px',
               position: 'absolute',
               bottom: '-2px',

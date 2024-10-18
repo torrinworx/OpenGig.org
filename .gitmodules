@@ -4,3 +4,6 @@
 [submodule "destam"]
 	path = destam
 	url = https://github.com/Equator-Studios/destam.git
+[submodule "destam-dom"]
+	path = destam-dom
+	url = https://github.com/Nefsen402/destam-dom
