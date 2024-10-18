@@ -1,5 +1,4 @@
-import { promises as fs } from 'fs';
-import path from 'path';
+import { join, resolve, relative } from "https://deno.land/std/path/mod.ts";
 
 class JobRequest {
     constructor(name, args = {}) {
@@ -10,7 +9,7 @@ class JobRequest {
 
 class Jobs {
     constructor(directory) {
-        this.directory = path.resolve(directory || './jobs');
+        this.directory = resolve(directory || './jobs');
         console.log(this.directory);
         if (!Jobs.instance) {
             Jobs.instance = this;
@@ -32,21 +31,20 @@ class Jobs {
     }
 
     async _findJobFiles(dir) {
-        const entries = await fs.readdir(dir, { withFileTypes: true });
-        const files = await Promise.all(entries.map(async entry => {
-            const fullPath = path.join(dir, entry.name);
-            if (entry.isDirectory()) {
-                return this._findJobFiles(fullPath);
-            } else if (entry.name.endsWith('.js')) {
-                return fullPath;
+        for await (const entry of Deno.readDir(dir)) {
+            const fullPath = join(dir, entry.name);
+            if (entry.isDirectory) {
+                await this._findJobFiles(fullPath);
+            } else if (entry.name.endsWith(".js")) {
+                this.jobs.set(fullPath, fullPath);
             }
-        }));
-        return files.flat().filter(Boolean);
+        }
+        return Array.from(this.jobs.keys());
     }
 
     async _loadJobsFromFile(filePath) {
         try {
-            const module = await import(filePath);
+            const module = await import(`file://${filePath}`);
             const jobName = this._generateJobName(filePath);
             if (typeof module.default === 'function') {
                 this.jobs.set(jobName, module.default);
@@ -58,7 +56,7 @@ class Jobs {
     }
 
     _generateJobName(filePath) {
-        const relativePath = path.relative(this.directory, filePath);
+        const relativePath = relative(this.directory, filePath);
         return relativePath.replace(/[/\\]/g, '_').replace(/\.js$/, '');
     }
 
@@ -82,20 +80,19 @@ class Jobs {
 
 export { JobRequest, Jobs };
 
-
 /*
 
 Example:
 
 (async () => {
-	const jobs = new Jobs('./backend/jobs');
-	
-	const jobRequest = new JobRequest('example', { args: 'example' });
-	try {
-	    const result = await jobs.router(jobRequest);
-	    console.log('Job result:', result);
-	} catch (error) {
-	    console.error('Job execution error:', error);
-	}
+    const jobs = new Jobs('./backend/jobs');
+    
+    const jobRequest = new JobRequest('example', { args: 'example' });
+    try {
+        const result = await jobs.router(jobRequest);
+        console.log('Job result:', result);
+    } catch (error) {
+        console.error('Job execution error:', error);
+    }
 })();
 */
