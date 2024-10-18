@@ -1,0 +1,9 @@
+{
+  "tasks": {
+    "start": "deno run --allow-net --allow-read --allow-env ./backend/index.js"
+  },
+  "nodeModulesDir": "auto",
+  "imports": {
+    "mongodb": "npm:mongodb@^6.9.0"
+  }
+}

@@ -1,65 +1,27 @@
-import path from 'path';
-import http from 'http';
-import webpack from 'webpack';
-import express from 'express';
-import { config } from 'dotenv';
+import { Application, send } from "https://deno.land/x/oak/mod.ts";
 
-import webpackDevMiddleware from 'webpack-dev-middleware';
-import webpackHotMiddleware from 'webpack-hot-middleware';
+const env = Deno.env.toObject();
+const app = new Application();
 
-import { Jobs } from './jobs.js';
-import webpackConfig from '../webpack.config.js';
-import connection from './connection.js';
-
-config();
-const app = express();
-app.use(express.json());
-
-const __filename = new URL(import.meta.url).pathname;
-const __dirname = path.dirname(__filename);
-
-if (process.env.NODE_ENV === 'production') {
-	app.use(express.static(path.join(__dirname, '../build')));
-	app.get('*', (_req, res) => {
-		res.sendFile(path.resolve(__dirname, '../build', 'index.html'));
-	});
-} else {
-	const compiler = webpack(webpackConfig);
-
-	app.use(
-		webpackDevMiddleware(compiler, {
-			publicPath: webpackConfig.output.publicPath,
-		})
-	);
-
-	app.use(webpackHotMiddleware(compiler));
-
-	app.get('*', (req, res, next) => {
-		const filename = path.join(compiler.outputPath, 'index.html');
-		compiler.outputFileSystem.readFile(filename, (err, result) => {
-			if (err) return next(err);
-			res.set('content-type', 'text/html');
-			res.send(result);
-		});
-	});
-}
-
-const port = process.env.PORT || 3000;
-const server = http.createServer(app);
-connection(server);
-
-server.listen(port, () => {
-	console.log(`Serving on http://localhost:${port}/`);
+app.use(async (context) => {
+  const path = context.request.url.pathname;
+  
+  if (path.startsWith("/")) {
+    await send(context, path, {
+      root: `${Deno.cwd()}/../build`,
+      index: "index.html",
+    });
+  } else {
+    await send(context, '/index.html', {
+      root: `${Deno.cwd()}/../build`,
+    });
+  }
 });
 
-(async () => {
-	const jobs = new Jobs('./backend/jobs');
-	
-	// const jobRequest = new JobRequest('example', { args: 'example' });
-	// try {
-	//     const result = await jobs.router(jobRequest);
-	//     console.log('Job result:', result);
-	// } catch (error) {
-	//     console.error('Job execution error:', error);
-	// }
-})();
+const port = env.PORT || 3000;
+
+console.log(`Serving on http://localhost:${port}/`);
+await app.listen({ port });
+
+import connection from './connection.js';
+connection(port);

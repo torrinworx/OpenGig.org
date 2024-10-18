@@ -81,3 +81,21 @@ class Jobs {
 }
 
 export { JobRequest, Jobs };
+
+
+/*
+
+Example:
+
+(async () => {
+	const jobs = new Jobs('./backend/jobs');
+	
+	const jobRequest = new JobRequest('example', { args: 'example' });
+	try {
+	    const result = await jobs.router(jobRequest);
+	    console.log('Job result:', result);
+	} catch (error) {
+	    console.error('Job execution error:', error);
+	}
+})();
+*/

@@ -1,16 +1,23 @@
-import { config } from 'dotenv';
 import { MongoClient } from 'mongodb';
-import { OObject, clone, stringify, parse } from 'destam';
-
-config();
+import { OObject, clone, stringify, parse } from '../destam/destam/index.js';
 
 const dbName = process.env.DB_TABLE;
 
 // Storing state, however it's not storing the deltas.
 // Manage state using MongoDB and destam
 export default async (collectionName) => {
-	const client = new MongoClient(process.env.DB);
-	await client.connect();
+	// TODO: Rethink this connection logic and how we setup and use a mongodb connection.
+	// probably a better way to do it. 
+	const client = new MongoClient(process.env.DB, {
+		serverSelectionTimeoutMS: 1000,
+	});
+
+	try {
+		await client.connect();
+	} catch (error) {
+		console.error('Failed to connect to MongoDB:', error.message);
+		throw new Error('Database connection failed');
+	}
 
 	const db = client.db(dbName);
 	const collection = db.collection(collectionName);
