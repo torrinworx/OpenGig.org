@@ -34,7 +34,7 @@ export default async (collectionName) => {
 			{ $set: { state: stringify(clone(state)) } },
 			{ upsert: true }
 		);
-	}, 1000 / 30);
+	});
 
 	return state;
 };

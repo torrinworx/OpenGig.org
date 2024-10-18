@@ -1,5 +1,5 @@
 import { WebSocketServer } from 'ws';
-import { createNetwork, clone, stringify, parse } from 'destam';
+import { createNetwork, stringify, parse } from 'destam';
 
 import ODB from './db.js';
 
@@ -12,11 +12,11 @@ export default (server) => {
         const fromClient = {};
 
         // Push init state to client
-        ws.send(stringify(clone(OServer)));
+        ws.send(stringify(OServer));
     
         network.digest(async (changes, observerRefs) => {
             const encodedChanges = stringify(
-                clone(changes, { observerRefs: observerRefs, observerNetwork: network })
+                changes, { observerRefs: observerRefs, observerNetwork: network }
             );
             ws.send(encodedChanges);
         }, 1000 / 30, (arg) => arg === fromClient);

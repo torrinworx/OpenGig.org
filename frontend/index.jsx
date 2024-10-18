@@ -49,10 +49,10 @@ const init = () => {
     const currentRoute = OClient.observer.path('currentRoute').def('/');
 
     network.digest(async (changes, observerRefs) => {
-        const encodedChanges = stringify(clone(
+        const encodedChanges = stringify(
             changes,
             { observerRefs: observerRefs, observerNetwork: network }
-        ));
+        );
         ws.send(encodedChanges);
     }, 1000 / 30, arg => arg === fromServer);
 
