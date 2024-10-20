@@ -1,10 +1,12 @@
 import fs from 'fs';
 import path from 'path';
-import express from 'express';
-import { createServer as createViteServer } from 'vite';
 import { fileURLToPath } from 'url';
+
+import express from 'express';
 import { config } from 'dotenv';
-import connection from './connection.js';
+import { createServer as createViteServer } from 'vite';
+
+import connection from './util/connection.js';
 
 config();
 const app = express();
@@ -44,5 +46,4 @@ const server = app.listen(port, () => {
 	console.log(`Serving on http://localhost:${port}/`);
 });
 
-// Attach any required socket or websocket connections
 connection(server);

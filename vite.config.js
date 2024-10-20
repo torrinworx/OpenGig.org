@@ -42,9 +42,6 @@ export default defineConfig({
 	},
 	base: '',
 	assetsInclude: ['**/*.md'],
-	build: {
-		sourcemap: true,
-	},
 	resolve: {
 		alias: {
 			'@destam': path.resolve(__dirname, './destam/destam'),

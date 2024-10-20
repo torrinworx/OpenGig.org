@@ -10,7 +10,7 @@ class JobRequest {
 
 class Jobs {
     constructor(directory) {
-        this.directory = path.resolve(directory || './jobs');
+        this.directory = path.resolve(directory || '../jobs');
         console.log(this.directory);
         if (!Jobs.instance) {
             Jobs.instance = this;

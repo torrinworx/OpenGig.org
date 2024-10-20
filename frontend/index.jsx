@@ -5,7 +5,7 @@ import { Router } from 'destamatic-ui';
 import Home from './pages/Home';
 import Landing from './pages/Landing';
 import NotFound from './pages/NotFound';
-import { stringify, parse } from '../backend/clone';
+import { stringify, parse } from '../backend/util/clone';
 
 const routes = {
     '/': Landing,
