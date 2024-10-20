@@ -1,7 +1,8 @@
 import { WebSocketServer } from 'ws';
-import { createNetwork, stringify, parse } from 'destam';
+import { createNetwork } from 'destam';
 
 import ODB from './db.js';
+import { stringify, parse } from './clone.js';
 
 export default (server) => {
     const wss = new WebSocketServer({ server });
@@ -29,7 +30,6 @@ export default (server) => {
     
         ws.on('close', () => {
             network.remove();
-            console.log('Client disconnected');
         });
     });
 }

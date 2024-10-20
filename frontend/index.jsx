@@ -1,10 +1,11 @@
 import { mount } from 'destam-dom';
 import { h, Router } from 'destamatic-ui';
-import { clone, stringify, parse, createNetwork } from 'destam';
+import { createNetwork } from 'destam';
 
 import Home from './pages/Home';
 import Landing from './pages/Landing';
 import NotFound from './pages/NotFound';
+import { stringify, parse } from '../backend/clone';
 
 const routes = {
     '/': Landing,
@@ -23,7 +24,6 @@ window.addEventListener('load', () => {
 
         if (!OClient) {
             if (!Array.isArray(incomingData)) {
-                console.log(stringify(incomingData))
                 OClient = incomingData; // Clone of OServer
                 init();
             } else {

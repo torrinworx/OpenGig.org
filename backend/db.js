@@ -1,6 +1,8 @@
 import { config } from 'dotenv';
 import { MongoClient } from 'mongodb';
-import { OObject, clone, stringify, parse } from 'destam';
+import { OObject } from 'destam';
+
+import { clone, stringify, parse } from './clone.js';
 
 config();
 
