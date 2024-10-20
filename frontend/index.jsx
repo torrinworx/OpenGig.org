@@ -1,6 +1,6 @@
 import { mount } from 'destam-dom';
-import { h, Router } from 'destamatic-ui';
 import { createNetwork } from 'destam';
+import { Router } from 'destamatic-ui';
 
 import Home from './pages/Home';
 import Landing from './pages/Landing';
