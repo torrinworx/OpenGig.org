@@ -1,4 +1,4 @@
-import { h, Button, Typography } from 'destamatic-ui';
+import { Button, Typography } from 'destamatic-ui';
 
 const Header = ({}) => {
     return <div style={{

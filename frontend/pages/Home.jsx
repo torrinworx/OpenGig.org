@@ -1,5 +1,4 @@
-import { h, Theme, Button } from 'destamatic-ui';
-
+import { Theme, Button } from 'destamatic-ui';
 
 const Home = Theme.use(theme => ({OClient}) => {
     const counter = OClient.observer.path('counter').def(0);
