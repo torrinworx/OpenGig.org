@@ -28,7 +28,7 @@ const Header = ({}) => {
     </div>;
 }
 
-const Landing = ({ OClient }) => {
+const Landing = ({ state }) => {
     return <div>
         <Header />
     </div>;

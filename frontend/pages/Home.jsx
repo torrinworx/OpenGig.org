@@ -2,16 +2,16 @@ import { h, Theme, Button, Shown } from 'destamatic-ui';
 import Auth from '../components/Auth';
 
 
-const Home = Theme.use(theme => ({OClient}) => {
-    const counter = OClient.observer.path('counter').def(0);
-    OClient.authenticated = false;
+const Home = Theme.use(theme => ({ state }) => {
+    const counter = state.observer.path([ 'stateSync', 'counter']).def(0);
+    state.stateClient.authenticated = false;
 
     return <div>
-        <Shown value={OClient.authenticated} invert>
-            <Auth Oclient={OClient} />
+        <Shown value={state.stateClient.authenticated} invert>
+            <Auth state={state} />
         </Shown>
 
-        <Shown value={OClient.authenticated}>
+        <Shown value={state.stateClient.authenticated}>
             Hello World
             <br />
             {counter}

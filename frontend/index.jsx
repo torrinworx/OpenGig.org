@@ -1,5 +1,5 @@
 import { mount } from 'destam-dom';
-import { createNetwork } from 'destam';
+import { createNetwork, OObject } from 'destam';
 import { Router } from 'destamatic-ui';
 
 import Home from './pages/Home';
@@ -16,18 +16,19 @@ const ws = new WebSocket(`ws://${window.location.hostname}:${window.location.por
 let remove;
 let network;
 const fromServer = {};
-let OClient;
+let stateSync;
+const stateClient = OObject({});
 
 window.addEventListener('load', () => {
     ws.addEventListener('message', (e) => {
         const incomingData = parse(e.data);
 
-        if (!OClient) {
+        if (!stateSync) {
             if (!Array.isArray(incomingData)) {
-                OClient = incomingData; // Clone of OServer
+                stateSync = incomingData; // Clone of OServer
                 init();
             } else {
-                console.error("First message should establish OClient, received an array instead.");
+                console.error("First message should establish stateSync, received an array instead.");
             }
         } else {
             network.apply(incomingData, fromServer);
@@ -45,8 +46,8 @@ window.addEventListener('load', () => {
 });
 
 const init = () => {
-    network = createNetwork(OClient.observer);
-    const currentRoute = OClient.observer.path('currentRoute').def('/');
+    network = createNetwork(stateSync.observer);
+    const currentRoute = stateSync.observer.path('currentRoute').def('/');
 
     network.digest(async (changes, observerRefs) => {
         const encodedChanges = stringify(
@@ -56,8 +57,14 @@ const init = () => {
         ws.send(encodedChanges);
     }, 1000 / 30, arg => arg === fromServer);
 
+    // We split state here so that we don't send needless updates back and
+    // forth to the server and client.
+    const state = OObject({
+        stateSync: stateSync, // State synced with the server
+        stateClient: stateClient // Global state only present on client
+    })
     remove = mount(document.body, <div>
-        <Router currentRoute={currentRoute} routes={routes} NotFound={NotFound} OClient={OClient} />
+        <Router currentRoute={currentRoute} routes={routes} NotFound={NotFound} state={state} />
     </div>);
 
     window.addEventListener('unload', () => {
