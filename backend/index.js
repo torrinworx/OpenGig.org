@@ -6,9 +6,12 @@ import express from 'express';
 import { config } from 'dotenv';
 import { createServer as createViteServer } from 'vite';
 
+import ODB from './util/db.js';
 import connection from './util/connection.js';
 
 config();
+
+const state = await ODB('test');
 const app = express();
 app.use(express.json());
 
@@ -46,4 +49,4 @@ const server = app.listen(port, () => {
 	console.log(`Serving on http://localhost:${port}/`);
 });
 
-connection(server);
+connection(server, state);

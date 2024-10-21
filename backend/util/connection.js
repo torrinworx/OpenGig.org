@@ -1,19 +1,17 @@
 import { WebSocketServer } from 'ws';
 import { createNetwork } from 'destam';
 
-import ODB from './db.js';
 import { stringify, parse } from './clone.js';
 
-export default (server) => {
+export default (server, state) => {
     const wss = new WebSocketServer({ server });
 
     wss.on('connection', async (ws) => {
-        const OServer = await ODB('test');
-        const network = createNetwork(OServer.observer);
+        const network = createNetwork(state.observer);
         const fromClient = {};
 
         // Push init state to client
-        ws.send(stringify(OServer));
+        ws.send(stringify(state));
     
         network.digest(async (changes, observerRefs) => {
             const encodedChanges = stringify(
