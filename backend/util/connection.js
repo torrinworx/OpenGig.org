@@ -3,17 +3,18 @@ import { createNetwork } from 'destam';
 
 import { stringify, parse } from './clone.js';
 
-export default (server, state) => {
+export default (server, syncState) => {
     const wss = new WebSocketServer({ server });
 
     wss.on('connection', async (ws) => {
-        const network = createNetwork(state.observer);
+        const network = createNetwork(syncState.observer);
         const fromClient = {};
 
         // Push init state to client
-        ws.send(stringify(state));
+        ws.send(stringify(syncState));
     
         network.digest(async (changes, observerRefs) => {
+            console.log(changes)
             const encodedChanges = stringify(
                 changes, { observerRefs: observerRefs, observerNetwork: network }
             );

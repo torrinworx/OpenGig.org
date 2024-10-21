@@ -31,6 +31,16 @@ const Header = ({}) => {
 const Landing = ({ state }) => {
     return <div>
         <Header />
+        <Button
+            label='msg'
+            type='outlined'
+            onMouseDown={() => {
+                state.stateSync.notifications.push({
+                    content: 'this is from the landing page',
+                    type: 'error'
+                });
+            }}
+        />
     </div>;
 };
 

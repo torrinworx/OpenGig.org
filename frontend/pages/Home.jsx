@@ -22,7 +22,6 @@ const Home = Theme.use(theme => ({ state }) => {
                 }}
             />
         </Shown>
-
     </div>;
 });
 

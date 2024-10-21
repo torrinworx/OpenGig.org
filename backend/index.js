@@ -8,10 +8,11 @@ import { createServer as createViteServer } from 'vite';
 
 import ODB from './util/db.js';
 import connection from './util/connection.js';
+import { OArray } from 'destam';
 
 config();
 
-const state = await ODB('test');
+const syncState = await ODB('test');
 const app = express();
 app.use(express.json());
 
@@ -49,4 +50,12 @@ const server = app.listen(port, () => {
 	console.log(`Serving on http://localhost:${port}/`);
 });
 
-connection(server, state);
+if (!syncState.notifications) {
+	syncState.notifications = OArray([]);
+	syncState.notifications.push({
+		content: "This is an error from the server",
+		type: "ok"
+	})
+}
+
+connection(server, syncState);

@@ -1,11 +1,12 @@
 import { mount } from 'destam-dom';
 import { createNetwork, OObject } from 'destam';
-import { Router } from 'destamatic-ui';
+import { Router, Button } from 'destamatic-ui';
 
 import Home from './pages/Home';
 import Landing from './pages/Landing';
 import NotFound from './pages/NotFound';
 import { stringify, parse } from '../backend/util/clone';
+import Notifications from './components/Notifications';
 
 const routes = {
     '/': Landing,
@@ -62,8 +63,41 @@ const init = () => {
     const state = OObject({
         stateSync: stateSync, // State synced with the server
         stateClient: stateClient // Global state only present on client
-    })
+    });
+    const counter = state.observer.path([ 'stateSync', 'counter']).def(0);
+
     remove = mount(document.body, <div>
+        <Button
+            label='error'
+            type='contained'
+            onMouseDown={() => {
+                stateSync.notifications.push({
+                    content: 'this is from the landing page',
+                    type: 'error'
+                });
+            }}
+        />
+        <Button
+            label='warning'
+            type='contained'
+            onMouseDown={() => {
+                stateSync.notifications.push({
+                    content: 'this is from the landing page',
+                    type: 'warning'
+                });
+            }}
+        />
+        <Button
+            label='ok'
+            type='contained'
+            onMouseDown={() => {
+                stateSync.notifications.push({
+                    content: 'this is from the landing page',
+                    type: 'ok'
+                });
+            }}
+        />
+        <Notifications state={state} />
         <Router currentRoute={currentRoute} routes={routes} NotFound={NotFound} state={state} />
     </div>);
 
