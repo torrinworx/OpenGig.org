@@ -37,7 +37,6 @@ const Notifications = ({ state }) => {
         right: 0,
         zIndex: 1,
         display: 'flex',
-        flexDirection: 'column',
         alignItems: 'center',
         flexDirection: 'column-reverse',
         padding: '10px',
