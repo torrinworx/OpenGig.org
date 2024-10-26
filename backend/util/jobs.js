@@ -1,13 +1,6 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 
-class JobRequest {
-    constructor(name, args = {}) {
-        this.name = name;
-        this.args = args;
-    }
-}
-
 class Jobs {
     constructor(directory) {
         this.directory = path.resolve(directory || '../jobs');
@@ -80,4 +73,4 @@ class Jobs {
     }
 }
 
-export { JobRequest, Jobs };
+export default Jobs;
