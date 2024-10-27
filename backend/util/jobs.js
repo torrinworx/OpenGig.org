@@ -1,14 +1,14 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 
-class Jobs {
+export default class Jobs {
     constructor(directory) {
         this.directory = path.resolve(directory || '../jobs');
         console.log(this.directory);
         if (!Jobs.instance) {
             Jobs.instance = this;
             this.jobs = new Map();
-            Jobs.instance.ready = this._getJobs()
+            Jobs.instance.ready = this._getJobs();
         }
         return Jobs.instance;
     }
@@ -44,7 +44,7 @@ class Jobs {
             if (typeof module.default === 'function') {
                 this.jobs.set(jobName, module.default);
             }
-            console.log(`Job "${jobName}" loaded`)
+            console.log(`Job "${jobName}" loaded`);
         } catch (e) {
             console.error(`Failed to load module from ${filePath}: ${e}`);
         }
@@ -55,22 +55,52 @@ class Jobs {
         return relativePath.replace(/[/\\]/g, '_').replace(/\.js$/, '');
     }
 
-    async router(jobRequest) {
+    async setupHandlers(syncState, ws) {
         await Jobs.instance.ready;
 
-        const jobFunc = this.jobs.get(jobRequest.name);
-
-        if (!jobFunc) {
-            throw new Error(`The job '${jobRequest.name}' was not found.`);
+        this.handlers = {};
+        for (const [jobName, jobFactory] of this.jobs.entries()) {
+            this.handlers[jobName] = jobFactory({ syncState, ws });
         }
+    }
 
-        const result = jobFunc(jobRequest.args);
-        if (result && typeof result[Symbol.asyncIterator] === 'function') {
-            return result;
-        } else {
-            return await result;
+    connection() {
+        for (const handler of Object.values(this.handlers)) {
+            if (typeof handler.connection === 'function') {
+                handler.connection();
+            }
+        }
+    }
+
+    message(msg) {
+        try {
+            const parsedMessage = JSON.parse(msg);
+            const name = parsedMessage.name;
+            const handler = this.handlers[name];
+
+            if (handler && typeof handler.message === 'function') {
+                handler.message(parsedMessage);
+            } else {
+                console.error(`Handler not found for job: ${name}`);
+            }
+        } catch (e) {
+            console.error('Error processing message:', e);
+        }
+    }
+
+    close() {
+        for (const handler of Object.values(this.handlers)) {
+            if (typeof handler.close === 'function') {
+                handler.close();
+            }
+        }
+    }
+
+    error(e) {
+        for (const handler of Object.values(this.handlers)) {
+            if (typeof handler.error === 'function') {
+                handler.error(e);
+            }
         }
     }
 }
-
-export default Jobs;

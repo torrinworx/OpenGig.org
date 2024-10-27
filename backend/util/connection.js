@@ -1,34 +1,19 @@
 import { WebSocketServer } from 'ws';
-import { createNetwork } from 'destam';
 
-import { stringify, parse } from './clone.js';
+import Jobs from './jobs.js';
+
+const jobsSystem = new Jobs('./backend/jobs');
 
 export default (server, syncState) => {
     const wss = new WebSocketServer({ server });
 
     wss.on('connection', async (ws) => {
-        const network = createNetwork(syncState.observer);
-        const fromClient = {};
+        await jobsSystem.setupHandlers(syncState, ws);
 
-        // Push init state to client
-        ws.send(stringify(syncState));
-    
-        network.digest(async (changes, observerRefs) => {
-            console.log(changes)
-            const encodedChanges = stringify(
-                changes, { observerRefs: observerRefs, observerNetwork: network }
-            );
-            ws.send(encodedChanges);
-        }, 1000 / 30, (arg) => arg === fromClient);
-    
-        ws.on('message', (e) => {
-            const parsedCommit = parse(e);
-            // TODO: validate changes follow the validator/schema
-            network.apply(parsedCommit, fromClient);
-        });
-    
-        ws.on('close', () => {
-            network.remove();
-        });
+        jobsSystem.connection();
+
+        ws.on('message', msg => jobsSystem.message(msg));
+        ws.on('close', () => jobsSystem.close());
+        ws.on('error', e => jobsSystem.error(e));
     });
 }

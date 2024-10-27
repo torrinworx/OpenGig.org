@@ -7,11 +7,13 @@ import { config } from 'dotenv';
 import { createServer as createViteServer } from 'vite';
 
 import ODB from './util/db.js';
+import Jobs from './util/jobs.js';
 import connection from './util/connection.js';
 import { OArray } from 'destam';
 
 config();
 
+const jobs = new Jobs('./backend/jobs');
 const syncState = await ODB('test');
 const app = express();
 app.use(express.json());
@@ -58,4 +60,4 @@ if (!syncState.notifications) {
 	})
 }
 
-connection(server, syncState);
+connection(server, syncState, jobs);
