@@ -1,19 +1,15 @@
 import { WebSocketServer } from 'ws';
 
-import Jobs from './jobs.js';
-
-const jobsSystem = new Jobs('./backend/jobs');
-
-export default (server, syncState) => {
+export default (server, syncState, jobs) => {
     const wss = new WebSocketServer({ server });
 
     wss.on('connection', async (ws) => {
-        await jobsSystem.setupHandlers(syncState, ws);
+        await jobs.setupHandlers(syncState, ws);
 
-        jobsSystem.connection();
+        jobs.connection();
 
-        ws.on('message', msg => jobsSystem.message(msg));
-        ws.on('close', () => jobsSystem.close());
-        ws.on('error', e => jobsSystem.error(e));
+        ws.on('message', msg => jobs.message(msg));
+        ws.on('close', () => jobs.close());
+        ws.on('error', e => jobs.error(e));
     });
-}
+};

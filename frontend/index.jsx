@@ -20,6 +20,17 @@ const fromServer = {};
 let stateSync;
 const stateClient = OObject({});
 
+const jobRequest = (name, params) => {
+    if (ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+            name: name,
+            ...params
+        }));
+    } else {
+        console.error('WebSocket is not open. Ready state is:', ws.readyState);
+    }
+};
+
 window.addEventListener('load', () => {
     ws.addEventListener('message', (e) => {
         const incomingData = parse(e.data);
@@ -55,7 +66,7 @@ const init = () => {
             changes,
             { observerRefs: observerRefs, observerNetwork: network }
         );
-        ws.send(encodedChanges);
+        jobRequest('syncState', {encodedChanges: encodedChanges})
     }, 1000 / 30, arg => arg === fromServer);
 
     // We split state here so that we don't send needless updates back and
@@ -64,7 +75,8 @@ const init = () => {
         stateSync: stateSync, // State synced with the server
         stateClient: stateClient // Global state only present on client
     });
-    const counter = state.observer.path([ 'stateSync', 'counter']).def(0);
+
+    window.state = state;
 
     remove = mount(document.body, <div>
         <Button

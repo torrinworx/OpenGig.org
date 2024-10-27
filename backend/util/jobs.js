@@ -1,5 +1,7 @@
-import { promises as fs } from 'fs';
 import path from 'path';
+import { promises as fs } from 'fs';
+
+import { parse } from './clone.js';
 
 export default class Jobs {
     constructor(directory) {
@@ -74,14 +76,13 @@ export default class Jobs {
 
     message(msg) {
         try {
-            const parsedMessage = JSON.parse(msg);
-            const name = parsedMessage.name;
-            const handler = this.handlers[name];
+            msg = parse(msg);
+            const handler = this.handlers[msg.name];
 
             if (handler && typeof handler.message === 'function') {
-                handler.message(parsedMessage);
+                handler.message(msg);
             } else {
-                console.error(`Handler not found for job: ${name}`);
+                console.error(`Handler not found for job: ${msg.name}`);
             }
         } catch (e) {
             console.error('Error processing message:', e);

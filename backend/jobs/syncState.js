@@ -19,7 +19,7 @@ export default ({ syncState, ws }) => {
             }, 1000 / 30, (arg) => arg === fromClient);
         },
         message: (msg) => {
-            const parsedCommit = parse(msg);
+            const parsedCommit = parse(msg.encodedChanges);
             // TODO: validate changes follow the validator/schema
             network.apply(parsedCommit, fromClient);
         },
