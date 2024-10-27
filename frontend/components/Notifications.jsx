@@ -1,10 +1,16 @@
-const Notification = ({ each: msg }) => {
+import { Button, Icon } from "destamatic-ui";
+
+const Notification = ({ each: msg, notifications }) => {
     const msgStyle = {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
         padding: '10px',
         margin: '5px 0',
         color: 'white',
         borderRadius: '5px',
         pointerEvents: 'auto',
+        maxWidth: '300px',
         backgroundColor: (() => {
             if (msg.type === 'error') {
                 return 'red';
@@ -18,9 +24,18 @@ const Notification = ({ each: msg }) => {
     };
 
     return <div style={msgStyle}>
-        {msg.content}
+        <span style={{ flex: 1 }}>{msg.content}</span>
+        <Button
+            Icon={<Icon size='20' libraryName='feather' iconName='x' style={{ color: 'black' }} />}
+            style={{ flexShrink: 0, marginLeft: 'auto' }}
+            type='icon'
+            onMouseDown={() => {
+                notifications.splice(notifications.indexOf(msg), 1);
+            }}
+        />
     </div>;
 };
+
 
 const Notifications = ({ state }) => {
     const notifications = state.stateSync.notifications;
@@ -42,7 +57,7 @@ const Notifications = ({ state }) => {
         padding: '10px',
         pointerEvents: 'none'
     }}>
-        <Notification each={notifications} />
+        <Notification each={notifications} notifications={notifications} />
     </div>;
 };
 
