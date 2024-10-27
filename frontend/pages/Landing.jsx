@@ -35,7 +35,7 @@ const Landing = ({ state }) => {
             label='msg'
             type='outlined'
             onMouseDown={() => {
-                state.stateSync.notifications.push({
+                state.sync.notifications.push({
                     content: 'this is from the landing page',
                     type: 'error'
                 });

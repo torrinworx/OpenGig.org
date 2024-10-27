@@ -1,7 +1,7 @@
 import { Observer } from "destam";
 import { TextField, Button, Typography } from 'destamatic-ui';
 
-const SignUp = ({ authenticated, login }) => {
+const SignUp = ({ login }) => {
 	const email = Observer.mutable('');
 	const password = Observer.mutable('');
 
@@ -32,7 +32,7 @@ const Login = ({ login }) => {
 };
 
 const Auth = ({ state }) => {
-	const authenticated = state.observer.path(['stateClient', 'authenticated']);
+	const authenticated = state.observer.path(['client', 'authenticated']);
 	const login = Observer.mutable(false);
 
 	return login.map(l => {

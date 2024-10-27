@@ -3,15 +3,15 @@ import Auth from '../components/Auth';
 
 
 const Home = Theme.use(theme => ({ state }) => {
-    const counter = state.observer.path([ 'stateSync', 'counter']).def(0);
-    state.stateClient.authenticated = false;
+    const counter = state.observer.path([ 'sync', 'counter']).def(0);
+    state.client.authenticated = false;
 
     return <div>
-        <Shown value={state.stateClient.authenticated} invert>
+        <Shown value={state.client.authenticated} invert>
             <Auth state={state} />
         </Shown>
 
-        <Shown value={state.stateClient.authenticated}>
+        <Shown value={state.client.authenticated}>
             Hello World
             <br />
             {counter}
