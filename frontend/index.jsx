@@ -8,11 +8,6 @@ import NotFound from './pages/NotFound';
 import { stringify, parse } from '../backend/util/clone';
 import Notifications from './components/Notifications';
 
-const routes = {
-    '/': Landing,
-    '/home': Home,
-};
-
 const ws = new WebSocket(`ws://${window.location.hostname}:${window.location.port}`);
 let remove;
 let network;
@@ -110,7 +105,12 @@ const init = () => {
             }}
         />
         <Notifications state={state} />
-        <Router currentRoute={currentRoute} routes={routes} NotFound={NotFound} state={state} />
+        <Router
+            currentRoute={currentRoute}
+            routes={{'/': Landing, '/home': Home }}
+            NotFound={NotFound}
+            state={state}
+        />
     </div>);
 
     window.addEventListener('unload', () => {

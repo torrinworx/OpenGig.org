@@ -10,7 +10,7 @@ const Notification = ({ each: msg, notifications }) => {
         color: 'white',
         borderRadius: '5px',
         pointerEvents: 'auto',
-        maxWidth: '300px',
+        width: '500px',
         backgroundColor: (() => {
             if (msg.type === 'error') {
                 return 'red';
@@ -35,6 +35,7 @@ const Notification = ({ each: msg, notifications }) => {
         />
     </div>;
 };
+
 
 
 const Notifications = ({ state }) => {
