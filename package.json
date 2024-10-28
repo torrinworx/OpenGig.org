@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/torrinworx/OpenGig.org#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "destam": "^0.3.2",
     "destam-dom": "^0.8.7",
     "destamatic-ui": "file:destamatic-ui",

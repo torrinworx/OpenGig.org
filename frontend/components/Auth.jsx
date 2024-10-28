@@ -1,11 +1,15 @@
 import { Observer } from "destam";
 import { TextField, Button, Typography } from 'destamatic-ui';
 
+import { jobRequest } from "../ws";
+
 const SignUp = ({ login }) => {
 	const email = Observer.mutable('');
 	const password = Observer.mutable('');
 
-	const handleSignUp = () => { };
+	const handleSignUp = () => {
+		jobRequest('signup', {email: email.get(), password: password.get()});
+	};
 
 	return <div style={{ padding: '20px', marginBottom: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 		<Typography type="h3">Sign Up</Typography>
