@@ -80,7 +80,8 @@ export default class Jobs {
             const handler = this.handlers[msg.name];
 
             if (handler && typeof handler.message === 'function') {
-                handler.message(msg);
+                const { name, ...msgWithoutName } = msg;
+                handler.message(msgWithoutName);
             } else {
                 console.error(`Handler not found for job: ${msg.name}`);
             }
