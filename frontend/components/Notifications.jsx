@@ -41,11 +41,6 @@ const Notification = ({ each: msg, notifications }) => {
 const Notifications = ({ state }) => {
     const notifications = state.sync.notifications;
 
-    notifications.push({
-        content: "This is a test",
-        type: 'warning'
-    });
-
     return <div style={{
         position: 'fixed',
         top: 0,

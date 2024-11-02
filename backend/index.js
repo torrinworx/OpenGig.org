@@ -52,12 +52,12 @@ const server = app.listen(port, () => {
 	console.log(`Serving on http://localhost:${port}/`);
 });
 
-if (!syncState.notifications) {
-	syncState.notifications = OArray([]);
-	syncState.notifications.push({
-		content: "This is an error from the server",
-		type: "ok"
-	})
-}
+// if (!syncState.notifications) {
+// 	syncState.notifications = OArray([]);
+// 	syncState.notifications.push({
+// 		content: "This is an error from the server",
+// 		type: "ok"
+// 	})
+// }
 
 connection(server, syncState, jobs);
