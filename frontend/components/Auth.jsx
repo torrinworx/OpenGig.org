@@ -11,7 +11,7 @@ const SignUp = ({ login }) => {
 		jobRequest('signup', {email: email.get(), password: password.get()});
 	};
 
-	return <div style={{ padding: '20px', marginBottom: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+return <div style={{ padding: '20px', marginBottom: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 		<Typography type="h3">Sign Up</Typography>
 		<TextField value={email} placeholder="Email" style={{ marginBottom: '10px' }} />
 		<TextField type="password" value={password} placeholder="Password" style={{ marginBottom: '10px' }} />

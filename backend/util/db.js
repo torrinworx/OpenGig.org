@@ -1,5 +1,4 @@
 import { config } from 'dotenv';
-import { MongoClient } from 'mongodb';
 import { OObject } from 'destam';
 
 import { clone, stringify, parse } from './clone.js';
@@ -8,16 +7,7 @@ config();
 
 const dbName = process.env.DB_TABLE;
 
-export default async (collectionName, defaultValue = OObject({})) => {
-    const client = new MongoClient(process.env.DB, { serverSelectionTimeoutMS: 1000 });
-
-    try {
-        await client.connect();
-    } catch (error) {
-        console.error('Failed to connect to MongoDB:', error);
-        process.exit(1);
-    }
-
+export default async (client, collectionName, defaultValue = OObject({})) => {
     const db = client.db(dbName);
     const collection = db.collection(collectionName);
 

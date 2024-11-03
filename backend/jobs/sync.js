@@ -2,14 +2,14 @@ import { createNetwork } from "destam";
 
 import {  stringify, parse } from "../util/clone.js";
 
-export default ({ syncState, ws }) => {
+export default ({ sync, ws }) => {
     let network;
     const fromClient = {};
 
     return {
         connection: () => {
-            network = createNetwork(syncState.observer);
-            ws.send(stringify(syncState));
+            network = createNetwork(sync.observer);
+            ws.send(stringify(sync));
 
             network.digest(async (changes, observerRefs) => {
                 const encodedChanges = stringify(
@@ -30,4 +30,4 @@ export default ({ syncState, ws }) => {
             console.log(e);
         }
     };
-}
+};

@@ -4,17 +4,25 @@ import { fileURLToPath } from 'url';
 
 import express from 'express';
 import { config } from 'dotenv';
+import { MongoClient } from 'mongodb';
 import { createServer as createViteServer } from 'vite';
 
 import ODB from './util/db.js';
 import Jobs from './util/jobs.js';
 import connection from './util/connection.js';
-import { OArray } from 'destam';
 
 config();
 
+const client = new MongoClient(process.env.DB, { serverSelectionTimeoutMS: 1000 });
+try {
+	await client.connect();
+} catch (error) {
+	console.error('Failed to connect to MongoDB:', error);
+	process.exit(1);
+}
+
 const jobs = new Jobs('./backend/jobs');
-const syncState = await ODB('test');
+const sync = await ODB(client, 'test');
 const app = express();
 app.use(express.json());
 
@@ -52,12 +60,4 @@ const server = app.listen(port, () => {
 	console.log(`Serving on http://localhost:${port}/`);
 });
 
-// if (!syncState.notifications) {
-// 	syncState.notifications = OArray([]);
-// 	syncState.notifications.push({
-// 		content: "This is an error from the server",
-// 		type: "ok"
-// 	})
-// }
-
-connection(server, syncState, jobs);
+connection(server, sync, client, jobs);

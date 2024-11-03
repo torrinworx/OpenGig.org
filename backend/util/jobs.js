@@ -57,12 +57,12 @@ export default class Jobs {
         return relativePath.replace(/[/\\]/g, '_').replace(/\.js$/, '');
     }
 
-    async setupHandlers(syncState, ws) {
+    async setupHandlers(props) {
         await Jobs.instance.ready;
 
         this.handlers = {};
         for (const [jobName, jobFactory] of this.jobs.entries()) {
-            this.handlers[jobName] = jobFactory({ syncState, ws });
+            this.handlers[jobName] = jobFactory(props);
         }
     }
 

@@ -4,10 +4,10 @@ import bcryptjs from 'bcryptjs';
 import ODB from '../util/db.js';
 
 
-export default ({ syncState, ws }) => {
+export default ({ client }) => {
     let users;
     (async () => {
-        users = await ODB('users', OArray([]));
+        users = await ODB(client, 'users', OArray([]));
     })();
 
     return {

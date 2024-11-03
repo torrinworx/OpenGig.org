@@ -1,10 +1,10 @@
 import { WebSocketServer } from 'ws';
 
-export default (server, syncState, jobs) => {
+export default (server, sync, client, jobs) => {
     const wss = new WebSocketServer({ server });
 
     wss.on('connection', async (ws) => {
-        await jobs.setupHandlers(syncState, ws);
+        await jobs.setupHandlers({sync, client, ws});
 
         jobs.connection();
 
