@@ -74,14 +74,20 @@ export default class Jobs {
         }
     }
 
-    message(msg) {
+    async message(msg) {
         try {
             msg = parse(msg);
             const handler = this.handlers[msg.name];
 
             if (handler && typeof handler.message === 'function') {
-                const { name, ...msgWithoutName } = msg;
-                handler.message(msgWithoutName);
+                const { name, id, ...msgWithout } = msg;
+                // TODO: Maybe make a system where job() {} is a new function rather than message
+                // explicetly configure it so that it doesn't need to return something for it to get through.
+                // A default confirmation value that the job succeded with it's result. Something like that?
+                // So handler.job if the ws has a job parameter rather than a ws thing. could be overengineered stupidnes though.
+                const result = await handler.message(msgWithout);
+
+                return { id, result };
             } else {
                 console.error(`Handler not found for job: ${msg.name}`);
             }
@@ -105,4 +111,4 @@ export default class Jobs {
             }
         }
     }
-}
+};

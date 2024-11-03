@@ -1,22 +1,30 @@
 import { Observer } from "destam";
-import { TextField, Button, Typography } from 'destamatic-ui';
+import { TextField, Button, Typography, Shown, LoadingDots } from 'destamatic-ui';
 
 import { jobRequest } from "../ws";
 
 const SignUp = ({ login }) => {
 	const email = Observer.mutable('');
 	const password = Observer.mutable('');
+	const loading = Observer.mutable(false);
 
-	const handleSignUp = () => {
-		jobRequest('signup', {email: email.get(), password: password.get()});
+	const handleSignUp = async () => {
+		loading.set(true)
+		const progress = await jobRequest('signup', { email: email.get(), password: password.get() });
+		if (progress.result.status === 'success') login.set(true);
 	};
 
-return <div style={{ padding: '20px', marginBottom: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+	return <div style={{ padding: '20px', marginBottom: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 		<Typography type="h3">Sign Up</Typography>
 		<TextField value={email} placeholder="Email" style={{ marginBottom: '10px' }} />
 		<TextField type="password" value={password} placeholder="Password" style={{ marginBottom: '10px' }} />
-		<Button label="Sign Up" onClick={handleSignUp} type="contained" style={{ marginBottom: '10px' }} />
-		<Button label="Already have an account? Log in" onClick={() => login.set(true)} type="text" />
+		<Shown value={loading} invert>
+			<Button label="Sign Up" onClick={handleSignUp} type="contained" style={{ marginBottom: '10px' }} />
+			<Button label="Already have an account? Log in" onClick={() => login.set(true)} type="text" />
+		</Shown>
+		<Shown value={loading} >
+			<LoadingDots />
+		</Shown>
 	</div>;
 };
 

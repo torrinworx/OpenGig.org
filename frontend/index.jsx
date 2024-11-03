@@ -34,7 +34,6 @@ const Mount = ({ state }) => {
 window.addEventListener('load', () => {
     ws.addEventListener('message', (e) => {
         const incomingData = parse(e.data);
-
         if (!sync) {
             if (!Array.isArray(incomingData)) {
                 sync = incomingData; // Clone of OServer
@@ -67,7 +66,9 @@ window.addEventListener('load', () => {
                 console.error("First message should establish sync, received an array instead.");
             }
         } else {
-            network.apply(incomingData, fromServer);
+            if (Array.isArray(incomingData)) {
+                network.apply(incomingData, fromServer);
+            }
         }
     });
 

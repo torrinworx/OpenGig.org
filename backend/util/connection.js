@@ -8,7 +8,10 @@ export default (server, sync, client, jobs) => {
 
         jobs.connection();
 
-        ws.on('message', msg => jobs.message(msg));
+        ws.on('message', async msg => {
+            const result = await jobs.message(msg);
+            if (result.result) ws.send(JSON.stringify(result));
+        });
         ws.on('close', () => jobs.close());
         ws.on('error', e => jobs.error(e));
     });
