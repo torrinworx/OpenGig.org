@@ -1,5 +1,5 @@
 import { Theme, Button, Typography, Icon } from 'destamatic-ui';
-import Logo from '../../OpenGig.svg';
+import Logo from '/OpenGig.svg';
 
 Theme.define({
 	header: {

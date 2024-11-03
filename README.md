@@ -1,5 +1,5 @@
 <div align="center">
-<img src="./OpenGig.svg" alt="OpenGig Logo" style="height: 30%; width: auto;">
+<img src="./frontend/public/OpenGig.svg" alt="OpenGig Logo" style="height: 30%; width: auto;">
 
 An Open Source Service gig platform.
 
