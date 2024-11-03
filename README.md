@@ -1,15 +1,33 @@
-# OpenGig.org
+<div align="center">
+<img src="./OpenGig.svg" alt="OpenGig Logo" style="height: 30%; width: auto;">
+
 An Open Source Service gig platform.
 
+[Documentation](https://example.com) | [OpenGig.org](https://opengig.org)
+</div>
+
+---
+<br/>
 Companies like Uber take obsurd amounts of money from the contractors on their app. They treat their drivers like trash, and overcharge both the drivers and the customers, and utilize dark patterns to do so. They are able to accumulate so much wealth with this aweful greedy system, they started an autonomous driving division, a wasteful failure that ended with them having to sell it off due to financial challenges. Since it's founding in 2009, Uber has never been profitable, they have been coasting off of investor money, and have been sucking the money out of drivers and customer pockets along the way. They reported their first profit in the second quarter of 2023, 14 years after their founding, with a total profit of $1.8 Billion for that year. The company is valued at $152.27 Billion as of writing on September 16th, 2024. This is obsurd, a failure of our governments and social safety nets.
 
 Dark patterns:
 - Uber knowingly pays drivers below minimum wage.
 - The fluctuate their payouts to drivers to force them to work overtime to make ends meet.
 
+https://www.youtube.com/shorts/EMX-uLq7oRo
+
+https://www.youtube.com/watch?v=jFrGhodqC08
+
+https://www.youtube.com/watch?v=7VSVfQcaxFY
+
+https://www.youtube.com/watch?v=hE2NZ0PM0EA
+
 https://www.youtube.com/watch?v=HG8uLKfZAh8
+
 https://www.youtube.com/watch?v=OEXJmNj6SPk
+
 https://companiesmarketcap.com/uber/marketcap
+
 https://www.theverge.com/2024/2/8/24065999/uber-earnings-profitable-year-net-income
 
 "Shit startups," I like being insulting, I guess "unicorn" is also an insult, implying that the company is ficticous and a completely made up fairy tail designed and pitched to playcate the imaginations and hype prommised to children *cough *cough, I mean the investors who fund these delusional spending pits. Shit Startups have multiple characteristics that differentiate themselves form legitimate business and startups:
@@ -72,3 +90,9 @@ Things to work on:
 - There is an assumption that open-source equates to societal benefit without addressing potential challenges, such as funding and sustaining the platform while maintaining the quality of service.
 
 Dive into the payment and donation model ideas and how we could develop a fair community donation method. Since we would have transactions happening on the platform, we could be transparent during transactions "This is how much the resources you've used cost, please consider donating a portion of your transaction to the community (both to contractos/drivers/gig works and users) because both sides use up resources. It should be raw and bare metal as possible, showing the direct electrical, hosting, salary, and what ever other costs, all automatically calculated to get the most real amount.
+
+---
+<br />
+> They say, "Jump" And ya say, "How high?"
+
+*-- Rage Against the Machine*
