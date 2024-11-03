@@ -32,7 +32,7 @@ window.addEventListener('load', () => {
                         changes,
                         { observerRefs: observerRefs, observerNetwork: network }
                     );
-                    jobRequest('syncState', { encodedChanges: encodedChanges })
+                    jobRequest('sync', { encodedChanges: encodedChanges })
                 }, 1000 / 30, arg => arg === fromServer);
 
                 // We split state here so that we don't send needless updates back and

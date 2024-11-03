@@ -14,7 +14,8 @@ export default OObject({
     },
     secondary: {
         $color: '#00c1ff',  // Vomit blue
-        $color_hover: 'rgba(94, 188, 255, .2)'
+        $color_hover: 'rgba(94, 188, 255, .2)',
+        $color_top: 'white',
     },
     radius: {
         borderRadius: 8,
@@ -37,6 +38,17 @@ export default OObject({
         position: 'relative',
         overflow: 'clip',
         color: 'black',
+    },
+    button_icon: {
+        color: '$color',
+        width: 'auto',
+        backgroundColor: 'transparent',
+    },
+    button_icon_hovered: {
+        extends: 'secondary',
+        background: 'transparent',
+        width: 'auto',
+        color: '$color',
     },
     button_text: {
         width: "auto",
@@ -84,20 +96,30 @@ export default OObject({
     typography_italic: { fontStyle: 'italic' },
 
     // Custom:
-    header: {
+    page: {
+        padding: '40px',
+        gap: '20px',
+        display: 'flex',
+        flexDirection: 'column',
+    },
+    pageSection: {
+        extends: ['secondary', 'radius'],
+
+        backgroundColor: '$color',
+        padding: '20px',
+        color: '$color_top',
+    },
+    pageSection_inset: {
+        extends: ['secondary', 'radius'],
+        padding: '20px',
+        color: '$color',
         backgroundColor: 'white',
-        boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
-        borderRadius: '20px',
-        position: 'sticky',
-        top: '20px',
-        height: '75px',
+    },
+    header: {
+        // height: '75px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: '5px 20px',
-        gap: '10px',
-        margin: '0px 20px 40px 20px ',
-        zIndex: 1
     },
     notifications: {
         position: 'fixed',
