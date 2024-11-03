@@ -1,8 +1,7 @@
-import { h, Theme, Button, Shown } from 'destamatic-ui';
+import { Button, Shown } from 'destamatic-ui';
 import Auth from '../components/Auth';
 
-
-const Home = Theme.use(theme => ({ state }) => {
+export default ({ state }) => {
     const counter = state.observer.path([ 'sync', 'counter']).def(0);
     state.client.authenticated = false;
 
@@ -23,6 +22,4 @@ const Home = Theme.use(theme => ({ state }) => {
             />
         </Shown>
     </div>;
-});
-
-export default Home;
+};;

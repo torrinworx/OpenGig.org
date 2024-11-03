@@ -1,6 +1,6 @@
 import { mount } from 'destam-dom';
+import { Router, Theme } from 'destamatic-ui';
 import { createNetwork, OObject } from 'destam';
-import { Router, Theme, Button, Typography } from 'destamatic-ui';
 
 import Home from './pages/Home';
 import Landing from './pages/Landing';
@@ -17,6 +17,20 @@ let network;
 const fromServer = {};
 let sync;
 
+const Mount = ({ state }) => {
+    const currentRoute = sync.observer.path('currentRoute').def('/');
+
+    return <Theme value={state.client.theme}>
+        <Notifications state={state} />
+        <Router
+            currentRoute={currentRoute}
+            routes={{ '/': Landing, '/home': Home }}
+            NotFound={NotFound}
+            state={state}
+        />
+    </Theme >;
+};
+
 window.addEventListener('load', () => {
     ws.addEventListener('message', (e) => {
         const incomingData = parse(e.data);
@@ -25,7 +39,6 @@ window.addEventListener('load', () => {
             if (!Array.isArray(incomingData)) {
                 sync = incomingData; // Clone of OServer
                 network = createNetwork(sync.observer);
-                const currentRoute = sync.observer.path('currentRoute').def('/');
 
                 network.digest(async (changes, observerRefs) => {
                     const encodedChanges = stringify(
@@ -43,16 +56,7 @@ window.addEventListener('load', () => {
                 });
 
                 window.state = state;
-                remove = mount(document.body, <Theme value={state.client.theme}>
-                   <Notifications state={state} />
-                    <Router
-                        currentRoute={currentRoute}
-                        routes={{ '/': Landing, '/home': Home }}
-                        NotFound={NotFound}
-                        state={state}
-                    />
-                </Theme >
-                );
+                remove = mount(document.body, <Mount state={state} />);
 
                 window.addEventListener('unload', () => {
                     if (remove) remove();
