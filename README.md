@@ -70,19 +70,3 @@ The cost to run the platform is directly dictated by these factors:
 - [ ] Freelance tasks: Enable customers to post freelance tasks workers can apply to, workers to post free lance services customers can search for and request. https://github.com/torrinworx/OpenGig.org/issues/6
 
 - [ ] Community Participation and Voting System: Create a community communication platform for member interaction and updates on platform development (similar to Discord). Incorporate a democratic voting system for platform decisions, aligning with the Open Structure principle.
-
-### Types of Advancements
-
-- **Fundamental:**
-	- Establishing database structures for users.
-	- Developing community communication and voting platforms.
-	- Creating an open statistics dashboard accessible to the public.
-
-- **Services:**
-	- Freelance tasks.
-	- Ride-sharing services.
-	- Food delivery services.
-	- BnB hosting options.
-
-These items provide a structured approach to developing the OpenGig platform while focusing on fundamental aspects and expanding service offerings over time.
-
