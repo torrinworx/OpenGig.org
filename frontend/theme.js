@@ -1,5 +1,6 @@
 import { OObject } from "destam-dom";
 
+// https://coolors.co/f83a3a-fffc47-3aff8c-00c1ff-a683ec
 export default OObject({
     '*': {
         fontFamily: 'IBM Plex Sans',
