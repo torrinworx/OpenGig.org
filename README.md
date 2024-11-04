@@ -3,7 +3,7 @@
 
 A platform built for gig workers and customers.
 
-[Documentation](https://example.com) | [OpenGig.org](https://opengig.org)
+[Docs](./docs/index.md) | [OpenGig.org](https://opengig.org)
 </div>
 
 ---
