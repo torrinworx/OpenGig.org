@@ -75,6 +75,10 @@ window.addEventListener('load', () => {
     ws.addEventListener('close', () => {
         if (network) network.remove();
         console.log('WebSocket connection closed.');
+        sync.notifications.push({
+            type: 'error',
+            content: 'Connection to server lost.'
+        })
     });
 
     ws.addEventListener('error', (error) => {
