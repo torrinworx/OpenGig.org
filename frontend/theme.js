@@ -94,4 +94,18 @@ export default OObject({
     typography_regular: { fontStyle: 'normal' },
     typography_bold: { fontWeight: 'bold' },
     typography_italic: { fontStyle: 'italic' },
+
+    focus: {
+        border: 0,
+        extends: ['primary', 'radius'],
+		transitionDuration: '0.3s',
+		transitionProperty: 'border-color, background-color, box-shadow',
+		padding: 10,
+		marginTop: 10,
+		marginBottom: 10,
+		alignItems: 'center',
+		background: 'white',
+        boxShadow: 'rgba(0, 0, 0, 0.16) 0px 1px 4px'
+
+    },
 });
