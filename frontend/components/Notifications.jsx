@@ -47,7 +47,7 @@ Theme.define({
     },
     notificationButton_hovered: {
         extends: ['primary', 'button_icon_hovered'],
-        color: '$color'
+        color: '$color',
     },
 });
 
@@ -57,11 +57,14 @@ const Notification = ({ each: msg, notifications }) => {
     setTimeout(() => {
         opacity.set(0);
         setTimeout(() => {
-            notifications.splice(notifications.indexOf(msg), 1);
+            const index = notifications.indexOf(msg);
+            if (index !== -1) {
+                notifications.splice(index, 1);
+            }
         }, 3000);
     }, 5000);
 
-    return <div theme={`notification_${msg.type || 'default'}`} style={{ opacity: opacity }}>
+    return <div theme={`notification_${msg.type || 'default'}`} style={{ opacity: opacity.map(o => o) }}>
         <span style={{ flex: 1 }}>{msg.content}</span>
         <Button
             theme='notificationButton'
@@ -69,7 +72,10 @@ const Notification = ({ each: msg, notifications }) => {
             style={{ flexShrink: 0, marginLeft: 'auto' }}
             type='icon'
             onMouseDown={() => {
-                notifications.splice(notifications.indexOf(msg), 1);
+                const index = notifications.indexOf(msg);
+                if (index !== -1) {
+                    notifications.splice(index, 1);
+                }
             }}
         />
     </div>;
