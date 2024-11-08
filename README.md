@@ -42,7 +42,7 @@ What makes an organization an Open Source Service?
 
 3. **Open Structure.** The orgnaizational structure of an **Open Source Service** is publicly visible and up to date. Functionally a workers coop, with government-like stickyness to change, communal voting and agreement. The community, developers and users, are all apart of the organization, because they all have a vested interest in its operations, contributinos, and success. Not just the founder, not just the developers, or managers.
 
-4. **Open Cost.** An **Open Source Service** operates at-cost. Every expense, from maintaining the platform to paying equitable wages to those who contribute to the project, is openly tracked and reported. Our commitment is to provide a system where everyone is compensated fairly, whether they are gig workers, developers, or project maintainers, ensuring that the focus remains on serving the community rather than generating excess profits.
+4. **Open Cost.** An **Open Source Service** operates at-cost. Every expense, from maintaining the platform to paying equitable wages to those who contribute to the project, is openly tracked and reported. Open Cost provides checks and balances, ensuring that the focus remains on serving the community rather than generating excess profits.
 
 OpenGig.org is an Open Source Service.
 
@@ -51,13 +51,19 @@ TODO: More details and guildines for the above points should be laid out.
 # Monitary Outline
 The cost to run the platform is directly dictated by these factors:
 
-1. **Hardware.** The pysical hardware needed to host the platform, this can be either in the form of a physical one time purchas (including upgrades, part replacement and repairs), or a recuring rental fee in the case of a service such as DigitalOcean 
-2. **Domains.** The cost to rent a top level domain for ease of use and access for users. Typically a small yearly or bi-yearly fee.
-3. **Software Development.** Compensation for the team responsible for coding, maintaining, and improving the platform. This includes frontend and backend developers, UI/UX designers, and quality assurance testers.
-4. **Payment Processing.** Fees associated with transaction processing within the platform, including payments to gig workers and handling consumer payments.
-5. **Outreach and Awareness.** Resources dedicated to spreading awareness and the principles of the OpenGig platform. This includes initiatives for sharing our mission and values through marketing content, community-building activities, and meaningful interactions with gig workers and customers.
-6. **Legal and Compliance.** Costs associated with adhering to local and international laws and regulations. This includes hiring legal advisors and ensuring compliance with data protection regulations like GDPR.
-7. **Customer Support.** Providing assistance to users through a dedicated support team, ensuring seamless interaction and satisfaction on the platform.
+**Hardware.** The pysical hardware needed to host the platform, this can be either in the form of a physical one time purchas (including upgrades, part replacement and repairs), or a recuring rental fee in the case of a service such as DigitalOcean
+
+**Domains.** The cost to rent a top level domain for ease of use and access for users. Typically a small yearly or bi-yearly fee.
+
+**Software Development.** Compensation for the team responsible for coding, maintaining, and improving the platform. This includes frontend and backend developers, UI/UX designers, and quality assurance testers.
+
+**Payment Processing.** Fees associated with transaction processing within the platform, including payments to gig workers and handling consumer payments.
+
+**Outreach and Awareness.** Resources dedicated to spreading awareness and the principles of the OpenGig platform. This includes initiatives for sharing our mission and values through marketing content, community-building activities, and meaningful interactions with gig workers and customers.
+
+**Legal and Compliance.** Costs associated with adhering to local and international laws and regulations. This includes hiring legal advisors and ensuring compliance with data protection regulations like GDPR.
+
+**Customer Support.** Providing assistance to users through a dedicated support team, ensuring seamless interaction and satisfaction on the platform.
 
 # Roadmap
 
