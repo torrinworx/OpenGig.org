@@ -67,7 +67,7 @@ The cost to run the platform is directly dictated by these factors:
 
 # Roadmap
 
-- [ ] Secure live landing page: Develop a locked-down and secure landing page to address any concerns with the current setup and ensure db data is protected from non-signed in users. https://github.com/torrinworx/OpenGig.org/issues/3
+- [x] Secure live landing page: Develop a locked-down and secure landing page to address any concerns with the current setup and ensure db data is protected from non-signed in users. https://github.com/torrinworx/OpenGig.org/issues/3
 
 - [ ] Deployment and CI/CD: Automatic building and deployment of the OpenGig.org platform to DigitalOcean. This includes the deployment of a MongoDB server, data storage with DO s3, and networking. https://github.com/torrinworx/OpenGig.org/issues/4
 
