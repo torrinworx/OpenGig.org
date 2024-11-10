@@ -1,8 +1,6 @@
 import { Observer } from "destam";
 import { TextField, Button, Typography, Shown, LoadingDots } from 'destamatic-ui';
 
-import { jobRequest } from "../ws";
-import { getCookie } from "../util";
 import Home from "../pages/Home";
 
 import { define } from "../theme";
