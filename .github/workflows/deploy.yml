@@ -28,16 +28,20 @@ jobs:
           with:
               ssh-private-key: ${{ secrets.SSH_KEY }}
 
-        - name: Deploy application
-          env:
-              DROPLET_ID: ${{ secrets.DROPLET_ID }}
-          run: |
-              ssh -o "StrictHostKeyChecking=no" \
-              root@$(doctl compute droplet get $DROPLET_ID --format PublicIPv4 --no-header) "
-                  cd /root/OpenGig.org
-                  git pull origin main
-                  git submodule update --init --recursive
-                  npm install
-                  npm run build
-                  npm start
-              "
+		- name: Deploy application
+		  env:
+		      DROPLET_ID: ${{ secrets.DROPLET_ID }}
+		  run: |
+		      ssh -o "StrictHostKeyChecking=no" \
+		      root@$(doctl compute droplet get $DROPLET_ID --format PublicIPv4 --no-header) "
+		          cd /root/OpenGig.org
+		          git pull origin main
+		          git submodule update --init --recursive
+		          npm install
+		          npm run build
+		          
+		          # Kill existing process on port 3000
+		          fuser -k 3000/tcp || echo 'No process found on port 3000'
+
+		          npm start
+		      "
