@@ -7,4 +7,4 @@ const connection = async (ws, req) => {
     return
 };
 
-coreServer('./backend/jobs', connection);
+coreServer('./backend/jobs', './frontend/build', connection);
