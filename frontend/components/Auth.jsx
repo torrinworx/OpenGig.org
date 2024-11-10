@@ -23,10 +23,14 @@ define({
 		alignItems: 'center',
 		height: '200px',
 		gap: '10px'
+	},
+	authError: {
+		extends: 'error',
+		color: '$color'
 	}
 })
 
-const SignUp = ({ state, login }) => {
+const SignUp = ({ login }) => {
 	const error = Observer.mutable('');
 	const email = Observer.mutable('');
 	const password = Observer.mutable('');
@@ -54,6 +58,7 @@ const SignUp = ({ state, login }) => {
 			<TextField style={{ margin: '10px 0px' }} disabled={loading} type="password" value={password} placeholder="Password" />
 
 			<div theme='authButtonContainer'>
+				<Typography theme='authError' type='h4'>{error}</Typography>
 				<Shown value={loading} invert>
 					<Button label="Sign Up" onMouseDown={handleSignUp} type="contained" />
 					<Button label="Already have an account? Log in" onMouseDown={() => login.set(true)} type="text" />
@@ -89,8 +94,6 @@ const Login = ({ state, login }) => {
 		state.client.observer.path('authenticated').set(true);
 	};
 
-	error.watch(d => console.log(d.value));
-
 	return <div theme='authPage'>
 		<div theme='authForm'>
 			<Typography type="h3">Login</Typography>
@@ -98,6 +101,7 @@ const Login = ({ state, login }) => {
 			<TextField style={{ margin: '10px 0px' }} disabled={loading} type="password" value={password} placeholder="Password" />
 
 			<div theme='authButtonContainer'>
+				<Typography theme='authError' type='p1'>{error}</Typography>
 				<Shown value={loading} invert>
 					<Button label="Login" onMouseDown={handleLogin} type="contained" />
 					<Button label="New user? Sign Up" onMouseDown={() => login.set(false)} type="text" />
@@ -111,7 +115,7 @@ const Login = ({ state, login }) => {
 };
 
 const Auth = ({ state }) => {
-	const login = Observer.mutable(false);	
+	const login = Observer.mutable(false);
 
 	return state.observer.path('sync').shallow().ignore().map((s) => {
 		if (s) {

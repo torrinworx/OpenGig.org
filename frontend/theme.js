@@ -20,6 +20,15 @@ const theme = OObject({
         $color_hover: 'rgba(94, 188, 255, .2)',
         $color_top: 'white',
     },
+    error: {
+        $color: '#F83A3A'
+    },
+    warning: {
+        $color: '#FFFC47'
+    },
+    default: {
+        $color: '#A683EC'
+    },
     radius: {
         borderRadius: 8,
     },
