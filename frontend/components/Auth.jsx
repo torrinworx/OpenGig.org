@@ -1,8 +1,8 @@
-import { Observer } from "destam";
+import { Observer } from 'destam-dom';
+import { jobRequest } from "web-core/client";
 import { TextField, Button, Typography, Shown, LoadingDots } from 'destamatic-ui';
 
 import Home from "../pages/Home";
-
 import { define } from "../theme";
 
 define({
@@ -27,30 +27,36 @@ define({
 })
 
 const SignUp = ({ state, login }) => {
+	const error = Observer.mutable('');
 	const email = Observer.mutable('');
 	const password = Observer.mutable('');
 	const loading = Observer.mutable(false);
 
 	const handleSignUp = async () => {
 		loading.set(true)
-		const progress = await jobRequest('signup', { email: email.get(), password: password.get() });
-		console.log(progress)
-		if (progress.result.status === 'success') {
-
+		const response = await jobRequest('signup', { email: email.get(), password: password.get() });
+		if (response.result.error) {
+			error.set(response.result.error);
+			loading.set(false)
+			return;
+		};
+		if (response.result.status === 'success') {
 			login.set(true);
 		};
 	};
 
+	error.watch(d => console.log(d.value));
+
 	return <div theme='authPage'>
 		<div theme='authForm'>
 			<Typography type="h3">Sign Up</Typography>
-			<TextField style={{margin: '10px 0px'}} disabled={loading} value={email} placeholder="Email" />
-			<TextField style={{margin: '10px 0px'}} disabled={loading} type="password" value={password} placeholder="Password" />
+			<TextField style={{ margin: '10px 0px' }} disabled={loading} value={email} placeholder="Email" />
+			<TextField style={{ margin: '10px 0px' }} disabled={loading} type="password" value={password} placeholder="Password" />
 
 			<div theme='authButtonContainer'>
 				<Shown value={loading} invert>
-					<Button label="Sign Up" onClick={handleSignUp} type="contained" />
-					<Button label="Already have an account? Log in" onClick={() => login.set(true)} type="text" />
+					<Button label="Sign Up" onMouseDown={handleSignUp} type="contained" />
+					<Button label="Already have an account? Log in" onMouseDown={() => login.set(true)} type="text" />
 				</Shown>
 				<Shown value={loading}>
 					<LoadingDots />
@@ -60,43 +66,41 @@ const SignUp = ({ state, login }) => {
 	</div>;
 };
 
-const Login = ({ state, authenticated, login }) => {
+const Login = ({ state, login }) => {
+	const error = Observer.mutable('');
 	const email = Observer.mutable('');
 	const password = Observer.mutable('');
 	const loading = Observer.mutable(false);
 
 	const handleLogin = async () => {
-		const progress = await jobRequest('login', { email: email.get(), password: password.get() });
-		if (progress.result.status === 'success') {
-			const sessionToken = progress.result.sessionToken;
-			const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
-			document.cookie = `opengigSessionToken=${sessionToken}; expires=${expires}; path=/; SameSite=Lax`;
-	
-			// Log cookies to verify they are being set correctly
-			console.log(document.cookie);
-	
-			authenticated.set(true);
-			console.log('Login successful, session token stored in cookies.', sessionToken);
+		loading.set(true)
+		const response = await jobRequest('login', { email: email.get(), password: password.get() });
+		if (response.result.error) {
+			error.set(response.result.error);
+			loading.set(false)
+			return;
+		};
+		const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
+		const sessionToken = response.result.sessionToken;
+		document.cookie = `webCore=${sessionToken}; expires=${expires}; path=/; SameSite=Lax`;
 
-			jobRequest('sync', { init: true })
-
-			console.log(authenticated);
-
-		} else {
-			console.log('Login failed.');
-		}
+		await jobRequest('sync');
+		loading.set(false)
+		state.client.observer.path('authenticated').set(true);
 	};
-	
+
+	error.watch(d => console.log(d.value));
+
 	return <div theme='authPage'>
 		<div theme='authForm'>
 			<Typography type="h3">Login</Typography>
-			<TextField style={{margin: '10px 0px'}} disabled={loading} value={email} placeholder="Email" />
-			<TextField style={{margin: '10px 0px'}} disabled={loading} type="password" value={password} placeholder="Password" />
+			<TextField style={{ margin: '10px 0px' }} disabled={loading} value={email} placeholder="Email" />
+			<TextField style={{ margin: '10px 0px' }} disabled={loading} type="password" value={password} placeholder="Password" />
 
 			<div theme='authButtonContainer'>
 				<Shown value={loading} invert>
-					<Button label="Login" onClick={handleLogin} type="contained" />
-					<Button label="New user? Sign Up" onClick={() => login.set(false)} type="text" />
+					<Button label="Login" onMouseDown={handleLogin} type="contained" />
+					<Button label="New user? Sign Up" onMouseDown={() => login.set(false)} type="text" />
 				</Shown>
 				<Shown value={loading}>
 					<LoadingDots />
@@ -107,19 +111,20 @@ const Login = ({ state, authenticated, login }) => {
 };
 
 const Auth = ({ state }) => {
-	const authenticated = state.observer.path(['client', 'authenticated']).def(false);
-	const login = Observer.mutable(false);
+	const login = Observer.mutable(false);	
 
-	if (authenticated && state.sync) {
-		return <Home state={state} />
-	} else return <>
-		<Shown value={login} invert>
-			<SignUp state={state} login={login} />
-		</Shown>
-		<Shown value={login} >
-			<Login state={state} authenticated={authenticated} login={login} />
-		</Shown>
-	</>;
+	return state.observer.path('sync').shallow().ignore().map((s) => {
+		if (s) {
+			return <Home state={state} />
+		} else return <>
+			<Shown value={login} invert>
+				<SignUp state={state} login={login} />
+			</Shown>
+			<Shown value={login} >
+				<Login state={state} login={login} />
+			</Shown>
+		</>;
+	});
 };
 
 export default Auth;

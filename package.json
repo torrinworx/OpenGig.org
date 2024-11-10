@@ -6,7 +6,7 @@
 	"type": "module",
 	"scripts": {
 		"start": "node ./backend/index.js",
-		"dev": "nodemon --watch ./backend --exec node ./backend/index.js",
+		"dev": "nodemon --watch ./web-core/server --watch ./backend --exec node ./backend/index.js",
 		"build": "npx vite build"
 	},
 	"repository": {

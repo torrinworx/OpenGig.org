@@ -1,5 +1,4 @@
-import { OObject } from "destam";
-
+import { OObject } from "destam"
 import { ODB, coreServer } from "web-core/server";
 
 

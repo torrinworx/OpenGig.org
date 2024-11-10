@@ -1,4 +1,4 @@
-import { Button, Shown } from 'destamatic-ui';
+import { Button } from 'destamatic-ui';
 
 export default ({ state }) => {
     const counter = state?.sync.observer.path('counter').def(0);

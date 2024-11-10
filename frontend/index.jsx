@@ -1,5 +1,5 @@
 import { OObject } from 'destam-dom';
-import { coreClient } from 'web-core/client';
+import { coreClient, jobRequest, getCookie } from 'web-core/client';
 import { Shown, Theme, Typography } from 'destamatic-ui';
 
 import theme from './theme';
@@ -7,10 +7,17 @@ import Landing from './pages/Landing';
 // import Notifications from './components/Notifications';
 
 const App = ({ state }) => {
-    console.log(state);
     state.client = OObject({
+        authenticated: false,
         openPage: { page: Landing }
     })
+
+    const token = getCookie('webCore') || '';
+	if (token) {
+        (async () => await jobRequest('sync'))();
+        state.client.observer.path('authenticated').set(true)
+    };
+
     return <Theme value={theme}>
         {/* <Notifications state={state} /> */}
         <Shown value={state.client.observer.path('openPage')}>
@@ -19,7 +26,7 @@ const App = ({ state }) => {
                 if (Page) return <Page {...{ state, ...p.props }} />;
             })}
         </Shown>
-    </Theme >
+    </Theme>;
 };
 
 const NotFound = () => <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
