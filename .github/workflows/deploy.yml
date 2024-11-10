@@ -38,5 +38,6 @@ jobs:
                   git pull origin main
                   git submodule update --init --recursive
                   npm install --omit=dev
+                  npm run build
                   npm start
               "
