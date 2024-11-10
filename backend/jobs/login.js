@@ -1,13 +1,7 @@
 import bcryptjs from 'bcryptjs';
 import { randomUUID } from 'crypto';
-import ODB from '../util/db.js';
 
-export default ({ sync, client }) => {
-	let users;
-	(async () => {
-		users = await ODB(client, 'users');
-	})();
-
+export default ({ users }) => {
 	return {
 		message: async (msg) => {
 			try {
@@ -17,26 +11,15 @@ export default ({ sync, client }) => {
 					if (validPassword) {
 						const sessionToken = randomUUID();
 						user.sessions.push(sessionToken);
-						
-						sync.notifications.push({
-							type: 'ok',
-							content: 'Login successful!'
-						});
 						return { status: 'success', sessionToken };
 					}
 				}
 
-				sync.notifications.push({
-					type: 'error',
-					content: 'Invalid email or password'
-				});
-				return { status: 'error' };
+				return { status: 'error', error: 'Invalid email or password' };
 			} catch (error) {
-				sync.notifications.push({
-					type: 'error',
-					content: error.message || 'An unexpected error occurred during login'
-				});
 				console.error('Error during login process', error);
+				return { status: 'error', error: error };
+
 			}
 		},
 	};

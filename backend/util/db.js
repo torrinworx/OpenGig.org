@@ -7,27 +7,27 @@ config();
 
 const dbName = process.env.DB_TABLE;
 
-export default async (client, collectionName, defaultValue = OObject({})) => {
-    const db = client.db(dbName);
-    const collection = db.collection(collectionName);
+export default async (client, collectionName, userId, defaultValue = OObject({})) => {
+	const db = client.db(dbName);
+	const collection = db.collection(collectionName);
 
-    let dbDocument = await collection.findOne({ _id: 1 });
+	let dbDocument = await collection.findOne({ userId: userId });
 
-    if (!dbDocument) {
-        const initialEmptyState = { _id: 1, state: stringify(defaultValue) };
-        await collection.insertOne(initialEmptyState);
-        dbDocument = initialEmptyState;
-    }
+	if (!dbDocument) {
+		const initialEmptyState = { userId: userId, state: stringify(defaultValue) };
+		await collection.insertOne(initialEmptyState);
+		dbDocument = initialEmptyState;
+	}
 
-    let state = parse(dbDocument.state);
+	let state = parse(dbDocument.state);
 
-    state.observer.watchCommit(async () => {
-        await collection.updateOne(
-            { _id: 1 },
-            { $set: { state: stringify(clone(state)) } },
-            { upsert: true }
-        );
-    });
+	state.observer.watchCommit(async () => {
+		await collection.updateOne(
+			{ userId: userId },
+			{ $set: { state: stringify(clone(state)) } },
+			{ upsert: true }
+		);
+	});
 
-    return state;
+	return state;
 };

@@ -7,8 +7,6 @@ import { config } from 'dotenv';
 import { MongoClient } from 'mongodb';
 import { createServer as createViteServer } from 'vite';
 
-import ODB from './util/db.js';
-import Jobs from './util/jobs.js';
 import connection from './util/connection.js';
 
 config();
@@ -21,8 +19,6 @@ try {
 	process.exit(1);
 }
 
-const jobs = new Jobs('./backend/jobs');
-const sync = await ODB(client, 'test');
 const app = express();
 app.use(express.json());
 
@@ -60,4 +56,4 @@ const server = app.listen(port, () => {
 	console.log(`Serving on http://localhost:${port}/`);
 });
 
-connection(server, sync, client, jobs);
+connection(server, client);

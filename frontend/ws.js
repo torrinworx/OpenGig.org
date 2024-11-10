@@ -1,8 +1,19 @@
+import { getCookie } from "./util";
 let ws;
 
-export const initWS = () => ws = new WebSocket(`ws://${window.location.hostname}:${window.location.port}`);
+export const initWS = () => {
+	const tokenValue = getCookie('opengigSessionToken') || '';
+	const wsURL = tokenValue
+		? `ws://${window.location.hostname}:${window.location.port}/?sessionToken=${encodeURIComponent(tokenValue)}`
+		: `ws://${window.location.hostname}:${window.location.port}`;
+
+	ws = new WebSocket(wsURL);
+	return ws;
+};
 
 export const jobRequest = (name, params) => {
+	const sessionToken = getCookie('opengigSessionToken');
+
 	return new Promise((resolve, reject) => {
 		const msgID = crypto.randomUUID();
 
@@ -23,6 +34,7 @@ export const jobRequest = (name, params) => {
 		if (ws.readyState === WebSocket.OPEN) {
 			ws.send(JSON.stringify({
 				name: name,
+				sessionToken: sessionToken,
 				id: msgID,
 				...params
 			}));

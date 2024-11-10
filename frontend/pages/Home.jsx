@@ -1,25 +1,17 @@
 import { Button, Shown } from 'destamatic-ui';
-import Auth from '../components/Auth';
 
 export default ({ state }) => {
-    const counter = state.observer.path([ 'sync', 'counter']).def(0);
-    state.client.authenticated = false;
+    const counter = state?.sync.observer.path('counter').def(0);
 
     return <div>
-        <Shown value={state.client.authenticated} invert>
-            <Auth state={state} />
-        </Shown>
-
-        <Shown value={state.client.authenticated}>
-            Hello World
-            <br />
-            {counter}
-            <Button
-                label='Click'
-                onMouseDown={() => {
-                    counter.set(counter.get() + 1);
-                }}
-            />
-        </Shown>
+        Hello World
+        <br />
+        {counter}
+        <Button
+            label='Click'
+            onMouseDown={() => {
+                counter.set(counter.get() + 1);
+            }}
+        />
     </div>;
-};;
+};

@@ -1,5 +1,6 @@
 import { Theme, Button, Typography, Icon } from 'destamatic-ui';
 import Logo from '/OpenGig.svg';
+import Auth from '../components/Auth';
 
 Theme.define({
 	header: {
@@ -40,19 +41,19 @@ Theme.define({
 	},
 })
 
-const Header = ({ state }) => <span theme="header">
+const Header = ({ client }) => <span theme="header">
 	<img src={Logo} style={{ height: '75px', userSelect: 'none' }} />
 	<div style={{ display: 'flex', gap: '15px' }}>
 		<Button
 			label="Signup or Login"
 			type="contained"
-			onMouseDown={() => state.sync.observer.path('currentRoute').set('/home')}
+			onMouseDown={() => client.observer.path('openPage').set({ page: Auth })}
 		/>
 	</div>
 </span>;
 
 export default ({ state }) => <div theme="page">
-	<Header state={state} />
+	<Header client={state.client} />
 	<div theme="pageSection">
 		<Typography type="h1" >Join OpenGig</Typography>
 		<Typography type="p1">
@@ -62,7 +63,7 @@ export default ({ state }) => <div theme="page">
 			label="Join"
 			type="contained"
 			style={{ marginTop: '20px' }}
-			onMouseDown={() => state.sync.observer.path('currentRoute').set('/home')}
+			onMouseDown={() => state.client.observer.path('openPage').set({ page: Auth })}
 		/>
 	</div>
 	<div theme="pageSection_inset">

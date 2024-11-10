@@ -25,7 +25,13 @@ const createTransform = (name, transform, jsx, options) => ({
 const plugins = [];
 
 plugins.push(createTransform('transform-literal-html', compileHTMLLiteral, true, {
-	jsx_auto_import: { h: 'destamatic-ui' },
+	jsx_auto_import: {
+		h: 'destamatic-ui',
+		raw: {
+			name: 'h',
+			location: 'destam-dom'
+		}
+	},
 }));
 
 if (process.env.ENV === 'production') {

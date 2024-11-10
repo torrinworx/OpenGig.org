@@ -1,7 +1,9 @@
+import { atomic } from "destam/Network";
 import { OObject } from "destam-dom";
 
+
 // https://coolors.co/f83a3a-fffc47-3aff8c-00c1ff-a683ec
-export default OObject({
+const theme = OObject({
     '*': {
         fontFamily: 'IBM Plex Sans',
         fontWeight: 600,
@@ -38,7 +40,6 @@ export default OObject({
         textDecoration: 'none',
         position: 'relative',
         overflow: 'clip',
-        color: 'black',
     },
     button_icon: {
         color: '$color',
@@ -53,11 +54,13 @@ export default OObject({
     },
     button_text: {
         width: "auto",
+        boxShadow: 'none',
     },
     button_text_hovered: {
         extends: 'secondary',
         width: "auto",
         color: '$color',
+        boxShadow: 'none',
     },
     button_contained: {
         color: '$color_top',
@@ -96,17 +99,21 @@ export default OObject({
     typography_bold: { fontWeight: 'bold' },
     typography_italic: { fontStyle: 'italic' },
 
-    focus: {
+    focusable: {
         border: 0,
         extends: ['primary', 'radius'],
-		transitionDuration: '0.3s',
-		transitionProperty: 'border-color, background-color, box-shadow',
 		padding: 10,
-		marginTop: 10,
-		marginBottom: 10,
 		alignItems: 'center',
 		background: 'white',
         boxShadow: 'rgba(0, 0, 0, 0.16) 0px 1px 4px'
-
-    },
+	},
 });
+
+export const define = obj => atomic(() => {
+	for (const o in obj) {
+		if (o in theme) throw new Error("Theme.define: theme definition already exists: " + o);
+		theme[o] = obj[o];
+	}
+});
+
+export default theme;

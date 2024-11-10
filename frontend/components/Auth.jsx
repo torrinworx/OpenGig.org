@@ -1,9 +1,13 @@
 import { Observer } from "destam";
-import { Theme, TextField, Button, Typography, Shown, LoadingDots } from 'destamatic-ui';
+import { TextField, Button, Typography, Shown, LoadingDots } from 'destamatic-ui';
 
 import { jobRequest } from "../ws";
+import { getCookie } from "../util";
+import Home from "../pages/Home";
 
-Theme.define({
+import { define } from "../theme";
+
+define({
 	authPage: {
 		display: 'flex',
 		height: '100vh',
@@ -24,7 +28,7 @@ Theme.define({
 	}
 })
 
-const SignUp = ({ login }) => {
+const SignUp = ({ state, login }) => {
 	const email = Observer.mutable('');
 	const password = Observer.mutable('');
 	const loading = Observer.mutable(false);
@@ -32,14 +36,18 @@ const SignUp = ({ login }) => {
 	const handleSignUp = async () => {
 		loading.set(true)
 		const progress = await jobRequest('signup', { email: email.get(), password: password.get() });
-		if (progress.result.status === 'success') login.set(true);
+		console.log(progress)
+		if (progress.result.status === 'success') {
+
+			login.set(true);
+		};
 	};
 
 	return <div theme='authPage'>
 		<div theme='authForm'>
 			<Typography type="h3">Sign Up</Typography>
-			<TextField disabled={loading} value={email} placeholder="Email" />
-			<TextField disabled={loading} type="password" value={password} placeholder="Password" />
+			<TextField style={{margin: '10px 0px'}} disabled={loading} value={email} placeholder="Email" />
+			<TextField style={{margin: '10px 0px'}} disabled={loading} type="password" value={password} placeholder="Password" />
 
 			<div theme='authButtonContainer'>
 				<Shown value={loading} invert>
@@ -54,39 +62,38 @@ const SignUp = ({ login }) => {
 	</div>;
 };
 
-const setCookie = (name, value, days) => {
-	const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
-	document.cookie = `${name}=${value}; expires=${expires}; path=/`;
-};
-
-const getCookie = (name) => {
-	const value = `; ${document.cookie}`;
-	const parts = value.split(`; ${name}=`);
-	if (parts.length === 2) return parts.pop().split(';').shift();
-};
-
-const Login = ({ login }) => {
+const Login = ({ state, authenticated, login }) => {
 	const email = Observer.mutable('');
 	const password = Observer.mutable('');
 	const loading = Observer.mutable(false);
 
 	const handleLogin = async () => {
-		loading.set(true)
 		const progress = await jobRequest('login', { email: email.get(), password: password.get() });
 		if (progress.result.status === 'success') {
 			const sessionToken = progress.result.sessionToken;
-			setCookie('sessionToken', sessionToken, 30);
-			console.log('Login successful, session token stored in cookies.');
+			const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
+			document.cookie = `opengigSessionToken=${sessionToken}; expires=${expires}; path=/; SameSite=Lax`;
+	
+			// Log cookies to verify they are being set correctly
+			console.log(document.cookie);
+	
+			authenticated.set(true);
+			console.log('Login successful, session token stored in cookies.', sessionToken);
+
+			jobRequest('sync', { init: true })
+
+			console.log(authenticated);
+
 		} else {
 			console.log('Login failed.');
 		}
 	};
-
+	
 	return <div theme='authPage'>
 		<div theme='authForm'>
 			<Typography type="h3">Login</Typography>
-			<TextField disabled={loading} value={email} placeholder="Email" />
-			<TextField disabled={loading} type="password" value={password} placeholder="Password" />
+			<TextField style={{margin: '10px 0px'}} disabled={loading} value={email} placeholder="Email" />
+			<TextField style={{margin: '10px 0px'}} disabled={loading} type="password" value={password} placeholder="Password" />
 
 			<div theme='authButtonContainer'>
 				<Shown value={loading} invert>
@@ -102,23 +109,19 @@ const Login = ({ login }) => {
 };
 
 const Auth = ({ state }) => {
-	const authenticated = state.observer.path(['client', 'authenticated']);
+	const authenticated = state.observer.path(['client', 'authenticated']).def(false);
 	const login = Observer.mutable(false);
 
-	const initialToken = getCookie('sessionToken');
-	if (initialToken) {
-		console.log('Existing session token found');
-		// This could be a point to verify the token validity with the server
-		login.set(true); // Simulating successful authentication
-	}
-
-	return login.map(l => {
-		if (l) {
-			return <Login login={login} />
-		} else {
-			return <SignUp authenticated={authenticated} login={login} />
-		}
-	});
+	if (authenticated && state.sync) {
+		return <Home state={state} />
+	} else return <>
+		<Shown value={login} invert>
+			<SignUp state={state} login={login} />
+		</Shown>
+		<Shown value={login} >
+			<Login state={state} authenticated={authenticated} login={login} />
+		</Shown>
+	</>;
 };
 
 export default Auth;
