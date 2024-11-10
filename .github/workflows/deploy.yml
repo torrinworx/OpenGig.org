@@ -40,10 +40,7 @@ jobs:
                   npm install
                   npm run build
 
-                  # Kill existing process on port 3000
                   fuser -k 3000/tcp || echo 'No process found on port 3000'
 
-                  # Start application in the background
-                  npm start &
-                  exit
+                  npm start
               "
