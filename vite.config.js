@@ -1,3 +1,5 @@
+import path from 'path';
+
 import { defineConfig } from 'vite';
 import assertRemove from 'destam-dom/transform/assertRemove';
 import compileHTMLLiteral from 'destam-dom/transform/htmlLiteral';
@@ -39,13 +41,17 @@ export default defineConfig({
 	root: './frontend',
 	plugins,
 	esbuild: {
-		jsx: 'preserve',
+		jsx: 'transform', // Changed this setting
+		loader: 'jsx',
 	},
 	base: '',
 	resolve: {
 		alias: {
-			'web-core': './web-core'
+			'web-core': path.resolve(__dirname, './web-core'),
 		},
         extensions: ['.js', '.ts', '.tsx', '.jsx'],
+	},
+	optimizeDeps: {
+		include: ['web-core'] // Add more if needed
 	},
 });

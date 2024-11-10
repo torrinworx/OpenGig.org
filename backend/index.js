@@ -1,6 +1,7 @@
 import { OObject } from "destam";
 
-import { ODB, coreServer } from "web-core";
+import { ODB, coreServer } from "web-core/server";
+
 
 const connection = async (ws, req) => {
     const sessionToken = new URLSearchParams(req.url.split('?')[1]).get('sessionToken');

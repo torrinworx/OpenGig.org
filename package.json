@@ -36,6 +36,7 @@
 		"@babel/generator": "^7.25.6",
 		"@babel/parser": "^7.25.6",
 		"@babel/plugin-syntax-jsx": "^7.24.7",
+		"@vitejs/plugin-react": "^4.3.3",
 		"nodemon": "^3.1.7"
 	}
 }
