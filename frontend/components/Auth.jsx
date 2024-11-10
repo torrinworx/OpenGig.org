@@ -52,13 +52,16 @@ const SignUp = ({ login }) => {
 	error.watch(d => console.log(d.value));
 
 	return <div theme='authPage'>
+		<div style={{ position: 'absolute', top: '10px', left: '10px' }}>
+			<Button label="Back" type="text" onMouseDown={() => { }} />
+		</div>
 		<div theme='authForm'>
 			<Typography type="h3">Sign Up</Typography>
 			<TextField style={{ margin: '10px 0px' }} disabled={loading} value={email} placeholder="Email" />
 			<TextField style={{ margin: '10px 0px' }} disabled={loading} type="password" value={password} placeholder="Password" />
 
 			<div theme='authButtonContainer'>
-				<Typography theme='authError' type='h4'>{error}</Typography>
+				<Typography theme='authError' type='p1'>{error}</Typography>
 				<Shown value={loading} invert>
 					<Button label="Sign Up" onMouseDown={handleSignUp} type="contained" />
 					<Button label="Already have an account? Log in" onMouseDown={() => login.set(true)} type="text" />
@@ -95,6 +98,9 @@ const Login = ({ state, login }) => {
 	};
 
 	return <div theme='authPage'>
+		<div style={{ position: 'absolute', top: '10px', left: '10px' }}>
+			<Button label="Back" type="text" onMouseDown={() => { }} />
+		</div>
 		<div theme='authForm'>
 			<Typography type="h3">Login</Typography>
 			<TextField style={{ margin: '10px 0px' }} disabled={loading} value={email} placeholder="Email" />

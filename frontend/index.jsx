@@ -3,6 +3,7 @@ import { coreClient, jobRequest, getCookie } from 'web-core/client';
 import { Shown, Theme, Typography } from 'destamatic-ui';
 
 import theme from './theme';
+import Auth from './components/Auth';
 import Landing from './pages/Landing';
 // import Notifications from './components/Notifications';
 
@@ -15,7 +16,9 @@ const App = ({ state }) => {
     const token = getCookie('webCore') || '';
 	if (token) {
         (async () => await jobRequest('sync'))();
+        state.client.observer.path('openPage').set({page: Auth})
         state.client.observer.path('authenticated').set(true)
+
     };
 
     return <Theme value={theme}>
