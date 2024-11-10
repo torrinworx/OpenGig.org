@@ -1,59 +1,22 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { OObject } from "destam";
 
-import express from 'express';
-import { config } from 'dotenv';
-import { MongoClient } from 'mongodb';
-import { createServer as createViteServer } from 'vite';
+import { ODB, coreServer } from "web-core";
 
-import connection from './util/connection.js';
+const connection = async (ws, req) => {
+    const sessionToken = new URLSearchParams(req.url.split('?')[1]).get('sessionToken');
 
-config();
+    const user = await ODB('users', { "sessions": sessionToken });
+    let sync = await ODB('state', { userID: user.userID });
+    if (!sync) {
+        sync = await ODB('state', {}, OObject({
+            userID: user.userID,
+        }));
+    }
 
-const client = new MongoClient(process.env.DB, { serverSelectionTimeoutMS: 1000 });
-try {
-	await client.connect();
-} catch (error) {
-	console.error('Failed to connect to MongoDB:', error);
-	process.exit(1);
-}
+    return {
+        sync: sync,
+        user: user,
+    }
+};
 
-const app = express();
-app.use(express.json());
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-if (process.env.ENV === 'production') {
-	app.use(express.static(path.join(__dirname, '../build')));
-	app.get('*', (_req, res) => {
-		res.sendFile(path.resolve(__dirname, '../build', 'index.html'));
-	});
-} else {
-	const vite = await createViteServer({
-		server: { middlewareMode: 'html' }
-	});
-
-	app.use(vite.middlewares);
-
-	app.get('*', async (req, res, next) => {
-		try {
-			const url = req.originalUrl;
-			const template = fs.readFileSync(path.resolve(__dirname, 'index.html'), 'utf-8');
-			const html = await vite.transformIndexHtml(url, template);
-
-			res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
-		} catch (e) {
-			vite.ssrFixStacktrace(e);
-			next(e);
-		}
-	});
-}
-
-const port = process.env.PORT || 3000;
-const server = app.listen(port, () => {
-	console.log(`Serving on http://localhost:${port}/`);
-});
-
-connection(server, client);
+coreServer('./backend/jobs', connection);

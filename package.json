@@ -1,47 +1,41 @@
 {
-  "name": "opengig.org",
-  "version": "1.0.0",
-  "description": "An open source gig platform.",
-  "main": "./backend/index.js",
-  "type": "module",
-  "scripts": {
-    "start": "node ./backend/index.js",
-    "build": "npx vite build"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/torrinworx/OpenGig.org.git"
-  },
-  "author": "Torrin Leonard",
-  "license": "GPL-3.0",
-  "bugs": {
-    "url": "https://github.com/torrinworx/OpenGig.org/issues"
-  },
-  "homepage": "https://github.com/torrinworx/OpenGig.org#readme",
-  "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "destam": "^0.4.0",
-    "destam-dom": "^0.9.1",
-    "destamatic-ui": "file:destamatic-ui",
-    "dotenv": "^16.4.5",
-    "express": "^4.21.0",
-    "mongodb": "^6.9.0",
-    "vite-plugin-markdown": "^2.2.0",
-    "ws": "^8.18.0"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.25.2",
-    "@babel/generator": "^7.25.6",
-    "@babel/parser": "^7.25.6",
-    "@babel/plugin-syntax-jsx": "^7.24.7",
-    "@babel/preset-env": "^7.25.4",
-    "babel-loader": "^9.2.1",
-    "css-loader": "^7.1.2",
-    "html-webpack-plugin": "^5.6.0",
-    "raw-loader": "^4.0.2",
-    "style-loader": "^4.0.0",
-    "webpack": "^5.95.0",
-    "webpack-dev-middleware": "^7.4.2",
-    "webpack-hot-middleware": "^2.26.1"
-  }
+	"name": "opengig.org",
+	"version": "1.0.0",
+	"description": "An open source gig platform.",
+	"main": "./backend/index.js",
+	"type": "module",
+	"scripts": {
+		"start": "node ./backend/index.js",
+		"dev": "nodemon --watch ./backend --exec node ./backend/index.js",
+		"build": "npx vite build"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/torrinworx/OpenGig.org.git"
+	},
+	"author": "Torrin Leonard",
+	"license": "GPL-3.0",
+	"bugs": {
+		"url": "https://github.com/torrinworx/OpenGig.org/issues"
+	},
+	"homepage": "https://github.com/torrinworx/OpenGig.org#readme",
+	"dependencies": {
+		"bcryptjs": "^2.4.3",
+		"destam": "^0.4.0",
+		"destam-dom": "^0.9.1",
+		"destamatic-ui": "file:destamatic-ui",
+		"dotenv": "^16.4.5",
+		"express": "^4.21.0",
+		"mongodb": "^6.9.0",
+		"vite-plugin-markdown": "^2.2.0",
+		"web-core": "file:web-core",
+		"ws": "^8.18.0"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.25.2",
+		"@babel/generator": "^7.25.6",
+		"@babel/parser": "^7.25.6",
+		"@babel/plugin-syntax-jsx": "^7.24.7",
+		"nodemon": "^3.1.7"
+	}
 }
