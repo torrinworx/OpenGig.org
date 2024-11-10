@@ -37,7 +37,7 @@ jobs:
                   cd /root/OpenGig.org
                   git pull origin main
                   git submodule update --init --recursive
-                  npm install --omit=dev
+                  npm install
                   npm run build
                   npm start
               "
