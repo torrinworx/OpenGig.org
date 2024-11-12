@@ -84,6 +84,9 @@ jobs:
                       mkdir -p /home/www/deploying
                       unzip -o -qq /home/www/deploying/build.zip -d /home/www/deploying
 
+                      # Backup the .env file
+                      [ -f /home/www/build/.env ] && cp /home/www/build/.env /home/www/.env_backup
+
                       # Reload the user daemon
                       systemctl --user daemon-reload
 
@@ -103,6 +106,9 @@ jobs:
                       rm -rf /home/www/build.old
                       mv /home/www/build /home/www/build.old
                       mv /home/www/build.new /home/www/build
+
+                      # Restore the .env file
+                      [ -f /home/www/.env_backup ] && mv /home/www/.env_backup /home/www/build/.env
 
                       # Enable and start the service
                       systemctl --user enable --now opengig
