@@ -4,91 +4,92 @@ on:
     push:
         branches:
             - main
-    jobs:
-        build:
-            runs-on: ubuntu-latest
-            steps:
-                - name: Checkout code
-                  uses: actions/checkout@v4
-                  with:
-                      submodules: true
-                      fetch-depth: 0
 
-                - name: Set up Node.js
-                  uses: actions/setup-node@v4
-                  with:
-                      node-version: '20'
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  submodules: true
+                  fetch-depth: 0
 
-                - name: Execute build script
-                  run: |
-                      chmod +x ./build.sh
-                      ./build.sh
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '20'
 
-                - name: Upload Build Artifact
-                  uses: actions/upload-artifact@v4
-                  with:
-                      name: build-artifact
-                      path: ./build
+            - name: Execute build script
+              run: |
+                  chmod +x ./build.sh
+                  ./build.sh
 
-        deploy:
-            needs: build
-            runs-on: ubuntu-latest
-            steps:
-                - name: Checkout repository
-                  uses: actions/checkout@v4
+            - name: Upload Build Artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: build-artifact
+                  path: ./build
 
-                - name: Download Build Artifact
-                  uses: actions/download-artifact@v4
-                  with:
-                      name: build-artifact
-                      path: ./build-artifacts.zip
+    deploy:
+        needs: build
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
 
-                - name: Install doctl
-                  run: |
-                      sudo snap install doctl
+            - name: Download Build Artifact
+              uses: actions/download-artifact@v4
+              with:
+                  name: build-artifact
+                  path: ./build-artifacts.zip
 
-                - name: Authenticate DigitalOcean
-                  env:
-                      DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-                  run: |
-                      doctl auth init -t $DIGITALOCEAN_ACCESS_TOKEN
+            - name: Install doctl
+              run: |
+                  sudo snap install doctl
 
-                - name: Set up SSH
-                  uses: webfactory/ssh-agent@v0.9.0
-                  with:
-                      ssh-private-key: ${{ secrets.SSH_KEY }}
+            - name: Authenticate DigitalOcean
+              env:
+                  DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+              run: |
+                  doctl auth init -t $DIGITALOCEAN_ACCESS_TOKEN
 
-                - name: Deploy application
-                  env:
-                      DROPLET_ID: ${{ secrets.DROPLET_ID }}
-                  run: |
-                      ssh -o "StrictHostKeyChecking=no" \
-                      www@$(doctl compute droplet get $DROPLET_ID --format PublicIPv4 --no-header) "
-                          # Transfer the artifact onto the droplet
-                          mkdir -p /home/www/deploying
-                          scp -r build-artifacts.zip www@$(doctl compute droplet get $DROPLET_ID --format PublicIPv4 --no-header):/home/www/deploying/build-artifact.zip
-                          unzip -o -qq /home/www/deploying/build-artifact.zip -d /home/www/deploying
+            - name: Set up SSH
+              uses: webfactory/ssh-agent@v0.9.0
+              with:
+                  ssh-private-key: ${{ secrets.SSH_KEY }}
 
-                          # Reload the user daemon
-                          systemctl --user daemon-reload
+            - name: Deploy application
+              env:
+                  DROPLET_ID: ${{ secrets.DROPLET_ID }}
+              run: |
+                  ssh -o "StrictHostKeyChecking=no" \
+                  www@$(doctl compute droplet get $DROPLET_ID --format PublicIPv4 --no-header) "
+                      # Transfer the artifact onto the droplet
+                      mkdir -p /home/www/deploying
+                      scp -r build-artifacts.zip www@$(doctl compute droplet get $DROPLET_ID --format PublicIPv4 --no-header):/home/www/deploying/build-artifact.zip
+                      unzip -o -qq /home/www/deploying/build-artifact.zip -d /home/www/deploying
 
-                          # Move the build files
-                          mv /home/www/deploying/build /home/www/build.new
-                          rm -r /home/www/deploying
-                          cd /home/www/build.new/
+                      # Reload the user daemon
+                      systemctl --user daemon-reload
 
-                          # Install dependencies
-                          npm install
+                      # Move the build files
+                      mv /home/www/deploying/build /home/www/build.new
+                      rm -r /home/www/deploying
+                      cd /home/www/build.new/
 
-                          # Change run script permissions
-                          chmod +x /home/www/build/run.sh
+                      # Install dependencies
+                      npm install
 
-                          # Swap builds atomically
-                          systemctl --user stop opengig || echo 'Service not running'
-                          rm -rf /home/www/build.old
-                          mv /home/www/build /home/www/build.old
-                          mv /home/www/build.new /home/www/build
+                      # Change run script permissions
+                      chmod +x /home/www/build/run.sh
 
-                          # Enable and start the service
-                          systemctl --user enable --now opengig
-                      "
+                      # Swap builds atomically
+                      systemctl --user stop opengig || echo 'Service not running'
+                      rm -rf /home/www/build.old
+                      mv /home/www/build /home/www/build.old
+                      mv /home/www/build.new /home/www/build
+
+                      # Enable and start the service
+                      systemctl --user enable --now opengig
+                  "
