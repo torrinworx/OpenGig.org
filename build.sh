@@ -13,7 +13,7 @@ if [ -f "$ZIP_FILE" ]; then
 	rm -f "$ZIP_FILE"
 fi
 
-# Assumes git submodules are updated to the correct commit.
+# Assumes git submodules are updated to the correct commit
 npm i
 npx vite build
 
