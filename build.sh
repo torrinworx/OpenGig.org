@@ -32,7 +32,7 @@ cp ./package-lock.json "$BUILD_DIR"
 
 cat << 'EOF' > "$BUILD_DIR/run.sh"
 #!/bin/bash
-node ./backend/index.js
+node index.js
 EOF
 
 chmod +x "$BUILD_DIR/run.sh"
