@@ -13,6 +13,12 @@ jobs:
         - name: Checkout repository
           uses: actions/checkout@v4
 
+        - name: Download Build Artifact
+          uses: actions/download-artifact@v4
+          with:
+              name: build-artifact
+              path: ./build-artifacts.zip
+
         - name: Install doctl
           run: |
               sudo snap install doctl
@@ -33,6 +39,32 @@ jobs:
               DROPLET_ID: ${{ secrets.DROPLET_ID }}
           run: |
               ssh -o "StrictHostKeyChecking=no" \
-              root@$(doctl compute droplet get $DROPLET_ID --format PublicIPv4 --no-header) "
-                  # TODO: pull artifacts from gitlab main branch, pull the build folder to /home/www/build
+              www@$(doctl compute droplet get $DROPLET_ID --format PublicIPv4 --no-header) "
+                  # Transfer the artifact onto the droplet
+                  mkdir -p /home/www/deploying
+                  scp -r build-artifacts.zip www@$(doctl compute droplet get $DROPLET_ID --format PublicIPv4 --no-header):/home/www/deploying/build-artifact.zip
+                  unzip -o -qq /home/www/deploying/build-artifact.zip -d /home/www/deploying
+
+                  # Reload the user daemon
+                  systemctl --user daemon-reload
+
+                  # Move the build files
+                  mv /home/www/deploying/build /home/www/build.new
+                  rm -r /home/www/deploying
+                  cd /home/www/build.new/
+
+                  # Install dependencies
+                  npm install
+
+                  # Change run script permissions
+                  chmod +x /home/www/build/run.sh
+
+                  # Swap builds atomically
+                  systemctl --user stop opengig || echo 'Service not running'
+                  rm -rf /home/www/build.old
+                  mv /home/www/build /home/www/build.old
+                  mv /home/www/build.new /home/www/build
+
+                  # Enable and start the service
+                  systemctl --user enable --now opengig
               "
