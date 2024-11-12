@@ -26,13 +26,13 @@ jobs:
                   ./build.sh
 
             - name: Ensure build output exists
-              run: ls ./build
+              run: ls ./
 
             - name: Upload Build Artifact
               uses: actions/upload-artifact@v4
               with:
                 name: build-artifact
-                path: ./build/* 
+                path: ./build.zip
 
     deploy:
         needs: build
@@ -45,7 +45,7 @@ jobs:
               uses: actions/download-artifact@v4
               with:
                   name: build-artifact
-                  path: ./
+                  path: ./build.zip
 
             - name: Verify downloaded artifact
               run: ls ./
@@ -71,15 +71,12 @@ jobs:
               run: |
                 #   PUBLIC_IP=$(doctl compute droplet get $DROPLET_ID --format PublicIPv4 --no-header)
                   ls -a
-                  scp -o "StrictHostKeyChecking=no" ./build-artifact.zip www@$PUBLIC_IP:/home/www/deploying/build-artifact.zip
+                  scp -o "StrictHostKeyChecking=no" ./build.zip www@$PUBLIC_IP:/home/www/deploying/build.zip
                   ssh -o "StrictHostKeyChecking=no" www@$PUBLIC_IP "
-                      # Ensure installation of unzip and npm
-                      command -v unzip >/dev/null 2>&1 || sudo apt-get update && sudo apt-get install -y unzip
-                      command -v npm >/dev/null 2>&1 || sudo apt-get install -y npm
-                      
+                      # Ensure installation of unzip and npm                      
                       # Handle deployment
                       mkdir -p /home/www/deploying
-                      unzip -o -qq /home/www/deploying/build-artifact.zip -d /home/www/deploying
+                      unzip -o -qq /home/www/deploying/build.zip -d /home/www/deploying
 
                       # Backup the .env file
                       [ -f /home/www/build/.env ] && cp /home/www/build/.env /home/www/.env_backup
