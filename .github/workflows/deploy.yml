@@ -34,14 +34,5 @@ jobs:
           run: |
               ssh -o "StrictHostKeyChecking=no" \
               root@$(doctl compute droplet get $DROPLET_ID --format PublicIPv4 --no-header) "
-                  cd /root/OpenGig.org
-                  git checkout main
-                  git pull
-                  git submodule update
-                  npm install
-                  npm run build
-
-                  fuser -k 3000/tcp || echo 'No process found on port 3000'
-
-                  npm start
+                  # TODO: pull artifacts from gitlab main branch, pull the build folder to /home/www/build
               "
