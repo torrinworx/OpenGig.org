@@ -77,11 +77,13 @@ jobs:
               run: |
                   PUBLIC_IP=$(doctl compute droplet get $DROPLET_ID --format PublicIPv4 --no-header)
                   ls -a
-                  scp -o "StrictHostKeyChecking=no" ./build.zip www@$PUBLIC_IP:/home/www/deploying/build.zip
                   ssh -o "StrictHostKeyChecking=no" www@$PUBLIC_IP "
-                      # Ensure installation of unzip and npm                      
-                      # Handle deployment
+                      # Create and set permissions for deployment directory
                       mkdir -p /home/www/deploying
+                      chmod -R 755 /home/www/deploying
+
+                      scp -o 'StrictHostKeyChecking=no' ./build.zip www@$PUBLIC_IP:/home/www/deploying/build.zip
+
                       unzip -o -qq /home/www/deploying/build.zip -d /home/www/deploying
 
                       # Backup the .env file
