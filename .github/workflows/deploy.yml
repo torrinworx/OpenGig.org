@@ -35,8 +35,9 @@ jobs:
               ssh -o "StrictHostKeyChecking=no" \
               root@$(doctl compute droplet get $DROPLET_ID --format PublicIPv4 --no-header) "
                   cd /root/OpenGig.org
-                  git pull origin main
-                  git submodule update --init --recursive
+                  git checkout main
+                  git pull
+                  git submodule update
                   npm install
                   npm run build
 
