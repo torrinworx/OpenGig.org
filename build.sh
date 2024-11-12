@@ -7,7 +7,7 @@ if [ -d "./build" ]; then
 fi
 
 npm i
-npm run build
+npx vite build
 
 npm i --production
 

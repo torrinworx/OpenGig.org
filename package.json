@@ -7,7 +7,7 @@
 	"scripts": {
 		"start": "node ./backend/index.js",
 		"dev": "nodemon --watch ./web-core/server --watch ./backend --exec node ./backend/index.js",
-		"build": "vite build"
+		"build": "bash build.sh"
 	},
 	"repository": {
 		"type": "git",
