@@ -76,6 +76,8 @@ jobs:
                   DROPLET_ID: ${{ secrets.DROPLET_ID }}
               run: |
                   PUBLIC_IP=$(doctl compute droplet get $DROPLET_ID --format PublicIPv4 --no-header)
+                  mkdir -p /home/www/deploying
+                  chmod -R 755 /home/www/deploying
 
                   # Use scp outside of the SSH session
                   scp -o 'StrictHostKeyChecking=no' ./build.zip www@$PUBLIC_IP:/home/www/deploying/build.zip
@@ -83,8 +85,6 @@ jobs:
                   # Perform the remaining operations inside the SSH session
                   ssh -o "StrictHostKeyChecking=no" www@$PUBLIC_IP "
                       # Create and set permissions for deployment directory
-                      mkdir -p /home/www/deploying
-                      chmod -R 755 /home/www/deploying
 
                       unzip -o -qq /home/www/deploying/build.zip -d /home/www/deploying
 
