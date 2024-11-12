@@ -71,7 +71,7 @@ jobs:
                     unzip -o -qq /home/www/build.zip -d /home/www/deploying
                     rm -r /home/www/build.zip
 
-                    sudo systemctl daemon-reload
+                    systemctl daemon-reload
 
                     mv /home/www/deploying/build /home/www/build.new
                     rm -r /home/www/deploying
@@ -79,11 +79,11 @@ jobs:
 
                     npm install
 
-                    sudo systemctl stop opengig || echo 'skipped stop opengig'
+                    systemctl stop opengig || echo 'skipped stop opengig'
                     rm -r /home/www/build.old | true
                     mv /home/www/build /home/www/build.old
                     mv /home/www/build.new /home/www/build
 
                     chmod +x /home/www/build/run.sh
-                    sudo systemctl enable --now opengig
+                    systemctl enable --now opengig
                   "
