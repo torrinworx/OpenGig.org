@@ -15,6 +15,6 @@ console.log('Root Directory:', rootDir);
 
 coreServer(
 	path.resolve('./backend/jobs'),
-	path.resolve('./build/dist'),
+	path.resolve('./dist'),
 	connection
 );
