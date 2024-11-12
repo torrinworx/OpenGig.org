@@ -65,6 +65,13 @@ jobs:
               with:
                   ssh-private-key: ${{ secrets.SSH_KEY }}
 
+            - name: Verify file operations
+              run: |
+                echo "Current directory structure:"
+                ls -l ./
+                file ./build.zip
+                file /home/www/deploying/build.zip
+
             - name: Deploy application
               env:
                   DROPLET_ID: ${{ secrets.DROPLET_ID }}
