@@ -65,10 +65,11 @@ jobs:
               env:
                   PUBLIC_IP: ${{ secrets.PUBLIC_IP }}
               run: |
-                  scp -o 'StrictHostKeyChecking=no' ./build.zip www@$PUBLIC_IP:/home/www/deploying/build.zip
+                  scp -o 'StrictHostKeyChecking=no' ./build.zip www@$PUBLIC_IP:/home/www/build.zip
                   ssh -o "StrictHostKeyChecking=no" www@$PUBLIC_IP "
                     mkdir /home/www/deploying
-                    unzip -o -qq /home/www/deploying/build.zip -d /home/www/deploying
+                    unzip -o -qq /home/www/build.zip -d /home/www/deploying
+                    rm -r /home/www/build.zip
 
                     systemctl --user daemon-reload
 
