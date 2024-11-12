@@ -1,5 +1,5 @@
 import { OObject } from "destam";
-import { ODB, coreServer } from "web-core/server";
+import { coreServer } from "web-core/server";
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -14,7 +14,7 @@ const rootDir = path.resolve(__dirname, '..');
 console.log('Root Directory:', rootDir);
 
 coreServer(
-	path.resolve(rootDir, 'backend/jobs'),
-	path.resolve(rootDir, 'frontend/build'),
+	path.resolve('./backend/jobs'),
+	path.resolve('./build/dist'),
 	connection
 );

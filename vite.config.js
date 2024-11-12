@@ -46,6 +46,6 @@ export default defineConfig({
         extensions: ['.js', '.ts', '.tsx', '.jsx'],
 	},
 	build: {
-		outDir: './build',
+		outDir: '../build/dist',
 	},
 });
