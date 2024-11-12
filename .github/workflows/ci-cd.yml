@@ -66,7 +66,7 @@ jobs:
                   PUBLIC_IP: ${{ secrets.PUBLIC_IP }}
               run: |
                   ls -a
-                  
+
                   # Use scp outside of the SSH session
                   scp -o 'StrictHostKeyChecking=no' ./build.zip www@$PUBLIC_IP:/home/www/deploying/build.zip
 
@@ -84,14 +84,12 @@ jobs:
 
                       # Move the build files
                       mv /home/www/deploying/build /home/www/build.new
-                      rm -r /home/www/deploying
                       cd /home/www/build.new/
 
                       # Install dependencies
                       npm install
-
-                      # Change run script permissions
-                      chmod +x /home/www/build/run.sh
+                      
+                      ls -a /home/www/build
 
                       # Swap builds atomically
                       systemctl --user stop opengig || echo 'Service not running'
