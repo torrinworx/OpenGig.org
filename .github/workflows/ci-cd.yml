@@ -69,7 +69,7 @@ jobs:
               env:
                   DROPLET_ID: ${{ secrets.DROPLET_ID }}
               run: |
-                #   PUBLIC_IP=$(doctl compute droplet get $DROPLET_ID --format PublicIPv4 --no-header)
+                  PUBLIC_IP=$(doctl compute droplet get $DROPLET_ID --format PublicIPv4 --no-header)
                   ls -a
                   scp -o "StrictHostKeyChecking=no" ./build.zip www@$PUBLIC_IP:/home/www/deploying/build.zip
                   ssh -o "StrictHostKeyChecking=no" www@$PUBLIC_IP "
