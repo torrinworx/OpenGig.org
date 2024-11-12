@@ -43,5 +43,5 @@ jobs:
 
                   fuser -k 3000/tcp || echo 'No process found on port 3000'
 
-                  nohup npm start &
+                  npm start
               "
