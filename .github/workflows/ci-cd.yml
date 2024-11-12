@@ -19,17 +19,20 @@ jobs:
               uses: actions/setup-node@v4
               with:
                   node-version: '20'
-
+            
             - name: Execute build script
               run: |
                   chmod +x ./build.sh
                   ./build.sh
 
+            - name: Ensure build output exists
+              run: ls ./build
+
             - name: Upload Build Artifact
               uses: actions/upload-artifact@v4
               with:
-                  name: build-artifact
-                  path: ./build
+                  name: build.zip
+                  path: ./build/*
 
     deploy:
         needs: build
@@ -41,14 +44,17 @@ jobs:
             - name: Download Build Artifact
               uses: actions/download-artifact@v4
               with:
-                  name: build-artifact
+                  name: build.zip
                   path: ./artifact
+
+            - name: Verify downloaded artifact
+              run: ls ./artifact
 
             - name: Install doctl
               run: |
                   sudo snap install doctl
 
-            - name: Authenticate DigitalOcean
+            - name: Authenticate to DigitalOcean
               env:
                   DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
               run: |
@@ -64,7 +70,7 @@ jobs:
                   DROPLET_ID: ${{ secrets.DROPLET_ID }}
               run: |
                   PUBLIC_IP=$(doctl compute droplet get $DROPLET_ID --format PublicIPv4 --no-header)
-                  scp -o "StrictHostKeyChecking=no" ./artifact/build-artifact.zip www@$PUBLIC_IP:/home/www/deploying/build-artifact.zip
+                  scp -o "StrictHostKeyChecking=no" ./artifact/build.zip www@$PUBLIC_IP:/home/www/deploying/build.zip
                   ssh -o "StrictHostKeyChecking=no" www@$PUBLIC_IP "
                       # Ensure installation of unzip and npm
                       command -v unzip >/dev/null 2>&1 || sudo apt-get update && sudo apt-get install -y unzip
@@ -72,7 +78,10 @@ jobs:
                       
                       # Handle deployment
                       mkdir -p /home/www/deploying
-                      unzip -o -qq /home/www/deploying/build-artifact.zip -d /home/www/deploying
+                      unzip -o -qq /home/www/deploying/build.zip -d /home/www/deploying
+
+                      # Backup the .env file
+                      [ -f /home/www/build/.env ] && cp /home/www/build/.env /home/www/.env_backup
 
                       # Reload the user daemon
                       systemctl --user daemon-reload
@@ -93,6 +102,9 @@ jobs:
                       rm -rf /home/www/build.old
                       mv /home/www/build /home/www/build.old
                       mv /home/www/build.new /home/www/build
+
+                      # Restore the .env file
+                      [ -f /home/www/.env_backup ] && mv /home/www/.env_backup /home/www/build/.env
 
                       # Enable and start the service
                       systemctl --user enable --now opengig
