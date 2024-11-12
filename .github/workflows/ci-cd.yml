@@ -45,10 +45,10 @@ jobs:
               uses: actions/download-artifact@v4
               with:
                   name: build-artifact
-                  path: ./artifact
+                  path: ./
 
             - name: Verify downloaded artifact
-              run: ls ./artifact
+              run: ls ./
 
             - name: Install doctl
               run: |
@@ -70,7 +70,7 @@ jobs:
                   DROPLET_ID: ${{ secrets.DROPLET_ID }}
               run: |
                   PUBLIC_IP=$(doctl compute droplet get $DROPLET_ID --format PublicIPv4 --no-header)
-                  scp -o "StrictHostKeyChecking=no" ./artifact/build-artifact.zip www@$PUBLIC_IP:/home/www/deploying/build-artifact.zip
+                  scp -o "StrictHostKeyChecking=no" ./build-artifact.zip www@$PUBLIC_IP:/home/www/deploying/build-artifact.zip
                   ssh -o "StrictHostKeyChecking=no" www@$PUBLIC_IP "
                       # Ensure installation of unzip and npm
                       command -v unzip >/dev/null 2>&1 || sudo apt-get update && sudo apt-get install -y unzip
