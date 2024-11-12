@@ -18,7 +18,7 @@ jobs:
             - name: Set up Node.js
               uses: actions/setup-node@v4
               with:
-                  node-version: '20'
+                  node-version: "20"
 
             - name: Execute build script
               run: |
@@ -67,27 +67,22 @@ jobs:
               run: |
                   scp -o 'StrictHostKeyChecking=no' ./build.zip www@$PUBLIC_IP:/home/www/deploying/build.zip
                   ssh -o "StrictHostKeyChecking=no" www@$PUBLIC_IP "
-                      mkdir /home/www/deploying
-                      unzip -o -qq /home/www/deploying/build.zip -d /home/www/deploying
+                    mkdir /home/www/deploying
+                    unzip -o -qq /home/www/deploying/build.zip -d /home/www/deploying
 
-                      systemctl --user daemon-reload
+                    systemctl --user daemon-reload
 
-                      mv /home/www/deploying/build /home/www/build.new
-                      rm -r /home/www/deploying
-                      cd /home/www/build.new/
+                    mv /home/www/deploying/build /home/www/build.new
+                    rm -r /home/www/deploying
+                    cd /home/www/build.new/
 
-                      # Install dependencies
-                      npm install
+                    npm install
 
-                      ls -a /home/www/build
+                    systemctl --user stop opengig || echo 'skipped stop opengig'
+                    rm -r /home/www/build.old | true
+                    mv /home/www/build /home/www/build.old
+                    mv /home/www/build.new /home/www/build
 
-                      # Swap builds atomically
-                      systemctl --user stop opengig || echo 'Service not running'
-                      rm -rf /home/www/build.old
-                      mv /home/www/build /home/www/build.old
-                      mv /home/www/build.new /home/www/build
-
-                      chmod +x /home/www/build/backend/run.sh
-
-                      systemctl --user enable --now opengig
+                    chmod +x /home/www/build/run.sh
+                    systemctl --user enable --now opengig
                   "
