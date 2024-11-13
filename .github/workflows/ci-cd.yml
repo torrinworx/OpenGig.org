@@ -68,6 +68,7 @@ jobs:
                   scp -o 'StrictHostKeyChecking=no' ./build.zip www@$PUBLIC_IP:/home/www/build.zip
                   ssh -o "StrictHostKeyChecking=no" www@$PUBLIC_IP "
                       export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus
+                      export XDG_RUNTIME_DIR=/run/user/$(id -u)
                       mkdir /home/www/deploying
                       unzip -o -qq /home/www/build.zip -d /home/www/deploying
                       rm -r /home/www/build.zip
