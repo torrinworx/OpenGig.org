@@ -68,13 +68,15 @@ jobs:
                   scp -o 'StrictHostKeyChecking=no' ./build.zip www@$PUBLIC_IP:/home/www/build.zip
                   ssh -o "StrictHostKeyChecking=no" www@$PUBLIC_IP "
                       # Ensure DBus and XDG environment variables are set for the user
-                      export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus
-                      export XDG_RUNTIME_DIR=/run/user/$(id -u)
+                      export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u www)/bus
+                      export XDG_RUNTIME_DIR=/run/user/$(id -u www)
                       
-                      # Make sure DBus is initialized
-                      dbus-launch --sh-syntax --exit-with-session
+                      # Initialize DBus session if dbus-launch is available
+                      if command -v dbus-launch > /dev/null; then
+                          dbus-launch --sh-syntax --exit-with-session
+                      fi
 
-                      # Create necessary directories
+                      # Proceed with deployment steps
                       mkdir /home/www/deploying
                       unzip -o -qq /home/www/build.zip -d /home/www/deploying
                       rm -r /home/www/build.zip
@@ -86,16 +88,18 @@ jobs:
                       mv /home/www/deploying/build /home/www/build.new
                       rm -r /home/www/deploying
                       cd /home/www/build.new/
-
                       npm install
 
-                      # Stop opengig service with absolute paths
+                      # Stop opengig service
                       sudo -u www systemctl stop opengig || echo 'skipped stop opengig'
 
+                      # Clean up old builds
                       rm -r /home/www/build.old | true
                       mv /home/www/build /home/www/build.old
                       mv /home/www/build.new /home/www/build
 
                       chmod +x /home/www/build/run.sh
+
+                      # Enable and start the service under the www user
                       sudo -u www systemctl enable --now opengig
                       "
