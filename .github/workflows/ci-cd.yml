@@ -65,41 +65,41 @@ jobs:
               env:
                   PUBLIC_IP: ${{ secrets.PUBLIC_IP }}
               run: |
-                  scp -o 'StrictHostKeyChecking=no' ./build.zip www@$PUBLIC_IP:/home/www/build.zip
-                  ssh -o "StrictHostKeyChecking=no" www@$PUBLIC_IP "
-                      # Ensure DBus and XDG environment variables are set for the user
-                      export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u www)/bus
-                      export XDG_RUNTIME_DIR=/run/user/$(id -u www)
-                      
+                  scp -o 'StrictHostKeyChecking=no' ./build.zip root@$PUBLIC_IP:/root/build.zip
+                  ssh -o "StrictHostKeyChecking=no" root@$PUBLIC_IP "
+                      # Ensure DBus and XDG environment variables are set for root
+                      export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u root)/bus
+                      export XDG_RUNTIME_DIR=/run/user/$(id -u root)
+
                       # Initialize DBus session if dbus-launch is available
                       if command -v dbus-launch > /dev/null; then
                           dbus-launch --sh-syntax --exit-with-session
                       fi
 
                       # Proceed with deployment steps
-                      mkdir /home/www/deploying
-                      unzip -o -qq /home/www/build.zip -d /home/www/deploying
-                      rm -r /home/www/build.zip
+                      mkdir /root/deploying
+                      unzip -o -qq /root/build.zip -d /root/deploying
+                      rm -r /root/build.zip
 
                       # Reload systemd
-                      sudo systemctl daemon-reload
+                      systemctl daemon-reload
 
                       # Move to new build directory and install dependencies
-                      mv /home/www/deploying/build /home/www/build.new
-                      rm -r /home/www/deploying
-                      cd /home/www/build.new/
+                      mv /root/deploying/build /root/build.new
+                      rm -r /root/deploying
+                      cd /root/build.new/
                       npm install
 
                       # Stop opengig service
-                      sudo -u www systemctl stop opengig || echo 'skipped stop opengig'
+                      systemctl stop opengig || echo 'skipped stop opengig'
 
                       # Clean up old builds
-                      rm -r /home/www/build.old | true
-                      mv /home/www/build /home/www/build.old
-                      mv /home/www/build.new /home/www/build
+                      rm -r /root/build.old | true
+                      mv /root/build /root/build.old
+                      mv /root/build.new /root/build
 
-                      chmod +x /home/www/build/run.sh
+                      chmod +x /root/build/run.sh
 
-                      # Enable and start the service under the www user
-                      sudo -u www systemctl enable --now opengig
-                      "
+                      # Enable and start the service under root
+                      systemctl enable --now opengig
+                  "
