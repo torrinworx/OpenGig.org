@@ -16,7 +16,7 @@ const theme = OObject({
         transition: 'opacity 250ms ease-out, box-shadow 250ms ease-out, color 250ms ease-out, background-color 250ms ease-in-out'
     },
     secondary: {
-        $color: '#2678FC',  // Vomit blue
+        $color: '#1E8EFF',  // Vomit blue
         $color_hover: 'rgba(94, 188, 255, .2)',
         $color_top: 'white',
     },

@@ -47,7 +47,7 @@ const Header = ({ client }) => <span theme="header">
 		<Button
 			label="Signup or Login"
 			type="contained"
-			onMouseDown={() => client.observer.path('openPage').set({ page: Auth })}
+			onMouseDown={() => client.openPage = { page: Auth }}
 		/>
 	</div>
 </span>;
@@ -63,7 +63,7 @@ export default ({ state }) => <div theme="page">
 			label="Join"
 			type="contained"
 			style={{ marginTop: '20px' }}
-			onMouseDown={() => state.client.observer.path('openPage').set({ page: Auth })}
+			onMouseDown={() => state.client.openPage = { page: Auth }}
 		/>
 	</div>
 	<div theme="pageSection_inset">
