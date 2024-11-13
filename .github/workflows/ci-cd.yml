@@ -69,6 +69,10 @@ jobs:
                   ssh -o "StrictHostKeyChecking=no" www@$PUBLIC_IP "
                       export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus
                       export XDG_RUNTIME_DIR=/run/user/$(id -u)
+
+                      # Start user session explicitly
+                      loginctl --user start
+
                       mkdir /home/www/deploying
                       unzip -o -qq /home/www/build.zip -d /home/www/deploying
                       rm -r /home/www/build.zip
@@ -81,14 +85,11 @@ jobs:
 
                       npm install
 
-                      # Use the --user flag to stop the user-level service
                       sudo systemctl --user stop opengig || echo 'skipped stop opengig'
                       rm -r /home/www/build.old | true
                       mv /home/www/build /home/www/build.old
                       mv /home/www/build.new /home/www/build
 
                       chmod +x /home/www/build/run.sh
-                      
-                      # Use the --user flag to enable the user-level service
                       sudo systemctl --user enable --now opengig
                       "
