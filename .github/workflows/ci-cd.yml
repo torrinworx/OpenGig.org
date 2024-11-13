@@ -67,23 +67,26 @@ jobs:
               run: |
                   scp -o 'StrictHostKeyChecking=no' ./build.zip www@$PUBLIC_IP:/home/www/build.zip
                   ssh -o "StrictHostKeyChecking=no" www@$PUBLIC_IP "
-                    mkdir /home/www/deploying
-                    unzip -o -qq /home/www/build.zip -d /home/www/deploying
-                    rm -r /home/www/build.zip
+                  mkdir /home/www/deploying
+                  unzip -o -qq /home/www/build.zip -d /home/www/deploying
+                  rm -r /home/www/build.zip
 
-                    sudo systemctl daemon-reload
+                  sudo systemctl daemon-reload
 
-                    mv /home/www/deploying/build /home/www/build.new
-                    rm -r /home/www/deploying
-                    cd /home/www/build.new/
+                  mv /home/www/deploying/build /home/www/build.new
+                  rm -r /home/www/deploying
+                  cd /home/www/build.new/
 
-                    npm install
+                  npm install
 
-                    sudo systemctl stop opengig || echo 'skipped stop opengig'
-                    rm -r /home/www/build.old | true
-                    mv /home/www/build /home/www/build.old
-                    mv /home/www/build.new /home/www/build
+                  # Use the --user flag to target the user-level service
+                  sudo systemctl --user stop opengig || echo 'skipped stop opengig'
+                  rm -r /home/www/build.old | true
+                  mv /home/www/build /home/www/build.old
+                  mv /home/www/build.new /home/www/build
 
-                    chmod +x /home/www/build/run.sh
-                    sudo systemctl enable --now opengig
+                  chmod +x /home/www/build/run.sh
+
+                  # Use the --user flag to start the service
+                  sudo systemctl --user enable --now opengig
                   "
