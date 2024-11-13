@@ -10,14 +10,14 @@ const theme = OObject({
     },
     primary: {
         $color: '#00FA53', // Vomit green
-        $color_hover: 'rgba(58, 255, 140, 0.2)',
+        $color_hover: '$alpha($color, 0.2)',
         $color_error: 'red',
         $color_top: 'white',
         transition: 'opacity 250ms ease-out, box-shadow 250ms ease-out, color 250ms ease-out, background-color 250ms ease-in-out'
     },
     secondary: {
         $color: '#1E8EFF',  // Vomit blue
-        $color_hover: 'rgba(94, 188, 255, .2)',
+        $color_hover: '$alpha($color, .2)',
         $color_top: 'white',
     },
     error: {
@@ -70,6 +70,7 @@ const theme = OObject({
         width: "auto",
         color: '$color',
         boxShadow: 'none',
+        background: 'transparent'
     },
     button_contained: {
         color: '$color_top',
