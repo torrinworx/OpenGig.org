@@ -55,7 +55,6 @@ const Header = ({ client }) => <span theme="header">
 export default ({ state }) => <div theme="page">
 	<Header client={state.client} />
 	<div theme="pageSection">
-	<Typography type="h1" >Hello World</Typography>
 		<Typography type="h1" >Join OpenGig</Typography>
 		<Typography type="p1">
 			OpenGig.org is an Open Source Service platform built for gig workers and customers. We stand for openness, the rights of customers, and for the empowerment of workers.
