@@ -67,32 +67,35 @@ jobs:
               run: |
                   scp -o 'StrictHostKeyChecking=no' ./build.zip www@$PUBLIC_IP:/home/www/build.zip
                   ssh -o "StrictHostKeyChecking=no" www@$PUBLIC_IP "
-                    echo \$DBUS_SESSION_BUS_ADDRESS
-                    echo \$XDG_RUNTIME_DIR
+                      # Ensure DBus and XDG environment variables are set for the user
+                      export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus
+                      export XDG_RUNTIME_DIR=/run/user/$(id -u)
+                      
+                      # Make sure DBus is initialized
+                      dbus-launch --sh-syntax --exit-with-session
 
-                    export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus
-                    export XDG_RUNTIME_DIR=/run/user/$(id -u)
+                      # Create necessary directories
+                      mkdir /home/www/deploying
+                      unzip -o -qq /home/www/build.zip -d /home/www/deploying
+                      rm -r /home/www/build.zip
 
-                    # Check the DBus connection
-                    dbus-send --session --dest=org.freedesktop.DBus --type=method_call --print-reply /org/freedesktop/DBus org.freedesktop.DBus.ListNames
+                      # Reload systemd
+                      sudo systemctl daemon-reload
 
-                    mkdir /home/www/deploying
-                    unzip -o -qq /home/www/build.zip -d /home/www/deploying
-                    rm -r /home/www/build.zip
+                      # Move to new build directory and install dependencies
+                      mv /home/www/deploying/build /home/www/build.new
+                      rm -r /home/www/deploying
+                      cd /home/www/build.new/
 
-                    sudo systemctl daemon-reload
+                      npm install
 
-                    mv /home/www/deploying/build /home/www/build.new
-                    rm -r /home/www/deploying
-                    cd /home/www/build.new/
+                      # Stop opengig service with absolute paths
+                      sudo -u www systemctl stop opengig || echo 'skipped stop opengig'
 
-                    npm install
+                      rm -r /home/www/build.old | true
+                      mv /home/www/build /home/www/build.old
+                      mv /home/www/build.new /home/www/build
 
-                    sudo -u www systemctl stop opengig || echo 'skipped stop opengig'
-                    rm -r /home/www/build.old | true
-                    mv /home/www/build /home/www/build.old
-                    mv /home/www/build.new /home/www/build
-
-                    chmod +x /home/www/build/run.sh
-                    sudo -u www systemctl enable --now opengig
-                    "
+                      chmod +x /home/www/build/run.sh
+                      sudo -u www systemctl enable --now opengig
+                      "
