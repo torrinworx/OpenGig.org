@@ -2,7 +2,7 @@ import { atomic } from "destam/Network";
 import { OObject } from "destam-dom";
 
 
-// https://coolors.co/f83a3a-fffc47-3aff8c-00c1ff-a683ec
+// https://coolors.co/f83a3a-fffc47-00fa53-1e8eff-a683ec
 const theme = OObject({
     '*': {
         fontFamily: 'IBM Plex Sans',
