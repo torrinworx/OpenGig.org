@@ -70,6 +70,8 @@ export default ({ state }) => <div theme="page">
 		<Typography type="h2">Why work on OpenGig?</Typography>
 		<Typography type="p1">
 			Our platform empowers gig workers by removing the greedy middlemen. OpenGig allows you to dictate your own terms by providing tools built for you.
+		</Typography>
+		<Typography type="p1">
 			<ul>
 				<li><Typography type="p1">Set your own rates and earn a fair share.</Typography></li>
 				<li><Typography type="p1">Use transparent, open-source pricing algorithms that suggest fair prices based on real data.</Typography></li>
@@ -77,6 +79,8 @@ export default ({ state }) => <div theme="page">
 				<li><Typography type="p1">Gain insights into market trends through our Open Statistics accessible to everyone.</Typography></li>
 				<li><Typography type="p1">Join a community-directed platform focused on development and improvement.</Typography></li>
 			</ul>
+		</Typography>
+		<Typography type="p1">
 			Gig workers benefit from our Open Source principle; OpenGig is entirely open source, providing everyone with equal access to its core. Nothing is hidden, and there's no secret algorithm to manipulate your labor.
 		</Typography>
 	</div>
