@@ -15,6 +15,6 @@ console.log('Root Directory:', rootDir);
 
 coreServer(
 	path.resolve('./backend/jobs'),
-	path.resolve('./dist'),
+	process.env.ENV === 'production' ? './dist' : './frontend',
 	connection
 );
