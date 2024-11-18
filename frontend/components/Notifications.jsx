@@ -1,4 +1,4 @@
-import { Observer } from 'destam-dom';
+import { OArray, Observer } from 'destam-dom';
 import { Theme, Button, Icon } from 'destamatic-ui';
 
 Theme.define({
@@ -82,11 +82,24 @@ const Notification = ({ each: msg, notifications }) => {
 };
 
 const Notifications = ({ state }) => {
-    const notifications = state.sync.notifications;
+    let notifications;
 
-    return <div theme='notifications'>
-        <Notification each={notifications} notifications={notifications} />
-    </div>;
+    return state.observer.path('sync').shallow().ignore().map((s) => {
+        if (s) {
+            notifications = state.sync.notifications.def(OArray([]));
+
+            if (state.client.notifications) {
+                delete state.client.notifications;
+            }
+        } else {
+            notifications = state.client.notifications.def(OArray([]));
+        };
+
+        return <div theme='notifications'>
+            <Notification each={notifications} notifications={notifications} />
+        </div>;
+    });
+
 };
 
 export default Notifications;

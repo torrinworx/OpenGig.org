@@ -2,7 +2,7 @@ import { Observer } from 'destam-dom';
 import { jobRequest } from "web-core/client";
 import { TextField, Button, Typography, Shown, LoadingDots } from 'destamatic-ui';
 
-import Home from "../pages/Home";
+import Home from "./Home";
 import { define } from "../theme";
 
 define({
@@ -53,7 +53,7 @@ const SignUp = ({ login }) => {
 
 	return <div theme='authPage'>
 		<div style={{ position: 'absolute', top: '10px', left: '10px' }}>
-			<Button label="Back" type="text" onMouseDown={() => { }} />
+		<Button label="Back" type="text" onMouseDown={() => state.client.openPage = { page: "Landing" }} />
 		</div>
 		<div theme='authForm'>
 			<Typography type="h3">Sign Up</Typography>
@@ -91,15 +91,17 @@ const Login = ({ state, login }) => {
 		const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
 		const sessionToken = response.result.sessionToken;
 		document.cookie = `webCore=${sessionToken}; expires=${expires}; path=/; SameSite=Lax`;
-
+		console.log("HI THERE")
+		
 		await jobRequest('sync');
+
 		loading.set(false)
-		state.client.observer.path('authenticated').set(true);
+		state.client.authenticated = true;
 	};
 
 	return <div theme='authPage'>
 		<div style={{ position: 'absolute', top: '10px', left: '10px' }}>
-			<Button label="Back" type="text" onMouseDown={() => { }} />
+			<Button label="Back" type="text" onMouseDown={() => state.client.openPage = { page: "Landing" }} />
 		</div>
 		<div theme='authForm'>
 			<Typography type="h3">Login</Typography>
