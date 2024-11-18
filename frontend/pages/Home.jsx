@@ -32,9 +32,6 @@ export const Ham = ({ options }) => {
 			menu={null}
 			type='icon'
 			icon={<Icon size="40" libraryName="feather" iconName="menu" />}
-			style={{
-
-			}}
 		>
 			<Paper style={{
 				minWidth: 100,
