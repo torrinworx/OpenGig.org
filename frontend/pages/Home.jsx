@@ -81,7 +81,7 @@ export default ({ state }) => {
 		<Typography type='h4' >5000 checkboxes:</Typography>
 		<div style={{ display: 'flex', flexWrap: 'wrap' }}>
 			{Array(5000).fill(null).map((_, i) =>
-				i ? <input type="checkbox" /> : null
+				i ? <Checkbox value={Observer.mutable(true)} /> : null
 			)}
 		</div>
 	</div>;
