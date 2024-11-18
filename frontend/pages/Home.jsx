@@ -25,13 +25,16 @@ export const Ham = ({ options }) => {
 		</div>;
 	};
 
-	return <span>
+	return <span style={{ zIndex: 100 }}>
 		<Detached
 			focusable={false}
 			enabled={focused}
 			menu={null}
 			type='icon'
 			icon={<Icon size="40" libraryName="feather" iconName="menu" />}
+			style={{
+
+			}}
 		>
 			<Paper style={{
 				minWidth: 100,
@@ -78,9 +81,9 @@ export default ({ state }) => {
 			<img src={Logo} style={{ height: '75px', userSelect: 'none' }} />
 			<Ham options={options} />
 		</div>
-		<Typography type='h4' >5000 checkboxes:</Typography>
+		<Typography type='h4' >1000 checkboxes:</Typography>
 		<div style={{ display: 'flex', flexWrap: 'wrap' }}>
-			{Array(5000).fill(null).map((_, i) =>
+			{Array(1000).fill(null).map((_, i) =>
 				i ? <Checkbox value={Observer.mutable(true)} /> : null
 			)}
 		</div>
