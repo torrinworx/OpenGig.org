@@ -91,7 +91,6 @@ const Login = ({ state, login }) => {
 		const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
 		const sessionToken = response.result.sessionToken;
 		document.cookie = `webCore=${sessionToken}; expires=${expires}; path=/; SameSite=Lax`;
-		console.log("HI THERE")
 		
 		await jobRequest('sync');
 
