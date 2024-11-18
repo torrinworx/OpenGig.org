@@ -12,13 +12,13 @@ const theme = OObject({
         $color: '#00FA53', // Vomit green
         $color_hover: '$alpha($color, 0.2)',
         $color_error: 'red',
-        $color_top: 'white',
+        $color_top: '$contrast_text($color)',
         transition: 'opacity 250ms ease-out, box-shadow 250ms ease-out, color 250ms ease-out, background-color 250ms ease-in-out'
     },
     secondary: {
         $color: '#1E8EFF',  // Vomit blue
         $color_hover: '$alpha($color, .2)',
-        $color_top: 'white',
+        $color_top: '$contrast_text($color)',
     },
     error: {
         $color: '#F83A3A'
@@ -132,6 +132,17 @@ const theme = OObject({
 		width: '100%',
 		borderRadius: '20px 20px 0px 0px',
         color: '$color_top',
+	},
+
+    // Custom:
+    page: {
+		padding: '40px',
+		gap: '20px',
+		display: 'flex',
+		flexDirection: 'column',
+		backgroundColor: '#FFFFFF',
+		height: '100%',
+        minHeight: '100vh'
 	},
 });
 
