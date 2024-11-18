@@ -1,7 +1,7 @@
-import { Button, Icon, Detached, popups, Paper, useRipples, Checkbox, Typography } from "destamatic-ui";
-
-import Logo from '/OpenGig.svg';
 import { Observer } from "destam-dom";
+import { Tabs, Button, Icon, Detached, popups, Paper, useRipples, Typography } from "destamatic-ui";
+
+import Header from "../components/Header";
 
 export const Ham = ({ options }) => {
 	const value = Observer.mutable('');
@@ -37,7 +37,7 @@ export const Ham = ({ options }) => {
 				minWidth: 100,
 				padding: 0,
 				overflow: 'auto',
-				marginRight: 5,
+				marginRight: 20,
 			}}>
 				<Selectable each={options} />
 			</Paper>
@@ -73,16 +73,29 @@ export default ({ state }) => {
 		/>
 	]
 
-	return <div theme='page'>
-		<div theme='header'	>
-			<img src={Logo} style={{ height: '75px', userSelect: 'none' }} />
+	return <div theme={['page', 'primary']} style={{ background: '$color' }}>
+		<Header>
 			<Ham options={options} />
-		</div>
-		<Typography type='h4' >1000 checkboxes:</Typography>
-		<div style={{ display: 'flex', flexWrap: 'wrap' }}>
-			{Array(1000).fill(null).map((_, i) =>
-				i ? <Checkbox value={Observer.mutable(true)} /> : null
-			)}
-		</div>
+		</Header>
+		<Paper theme={['secondary']} style={{
+					display: 'flex',
+					justifyContent: 'space-between',
+					alignItems: 'center',
+					flexDirection: 'column',
+					background: '$color',
+					color: '$color_top',
+		}}>
+			<Tabs style={{ width: '100%' }}>
+				<mark:tab name='Freelance'>
+					<Typography>Freelance UI goes here lol</Typography>
+				</mark:tab>
+				<mark:tab name='Rides'>
+					<Typography>TODO</Typography>
+				</mark:tab>
+				<mark:tab name='Delivery'>
+					<Typography>TODO</Typography>
+				</mark:tab>
+			</Tabs>
+		</Paper>
 	</div>;
 };

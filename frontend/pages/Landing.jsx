@@ -1,6 +1,8 @@
 import { Theme, Button, Typography, Icon } from 'destamatic-ui';
 import Logo from '/OpenGig.svg';
 
+import Header from '../components/Header';
+
 Theme.define({
 	header: {
 		display: 'flex',
@@ -13,7 +15,7 @@ Theme.define({
 		display: 'flex',
 		flexDirection: 'column',
 		backgroundColor: '#FFFFFF',
-		height: '100vw'
+		height: '100%'
 	},
 	pageSection: {
 		extends: ['secondary', 'radius'],
@@ -40,19 +42,16 @@ Theme.define({
 	},
 })
 
-const Header = ({ client }) => <span theme="header">
-	<img src={Logo} style={{ height: '75px', userSelect: 'none' }} />
-	<div style={{ display: 'flex', gap: '15px' }}>
-		<Button
-			label="Signup or Login"
-			type="contained"
-			onMouseDown={() => client.openPage = { page: "Auth" }}
-		/>
-	</div>
-</span>;
-
-export default ({ state }) => <div theme="page">
-	<Header client={state.client} />
+export default ({ state }) => <div theme={['page', 'primary']} style={{ background: '$color' }}>
+	<Header>
+		<div style={{ display: 'flex', gap: '15px' }}>
+			<Button
+				label="Signup or Login"
+				type="contained"
+				onMouseDown={() => state.client.openPage = { page: "Auth" }}
+			/>
+		</div>
+	</Header>
 	<div theme="pageSection">
 		<Typography type="h1" >Join OpenGig</Typography>
 		<Typography type="p1">

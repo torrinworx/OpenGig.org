@@ -127,6 +127,12 @@ const theme = OObject({
 		background: 'white',
         boxShadow: 'rgba(0, 0, 0, 0.16) 0px 1px 4px'
 	},
+
+    button_tab: {
+		width: '100%',
+		borderRadius: '20px 20px 0px 0px',
+        color: '$color_top',
+	},
 });
 
 export const define = obj => atomic(() => {
