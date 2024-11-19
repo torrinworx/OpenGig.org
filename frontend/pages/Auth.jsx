@@ -2,64 +2,41 @@ import { Observer } from 'destam-dom';
 import { jobRequest } from "web-core/client";
 import { TextField, Button, Typography, Shown, LoadingDots } from 'destamatic-ui';
 
-import Home from "./Home";
-import { define } from "../theme";
-
-define({
-	authPage: {
-		display: 'flex',
-		height: '100vh',
-		justifyContent: 'center',
-		alignItems: 'center'
-	},
-	authForm: {
-		display: 'flex',
-		flexDirection: 'column',
-		alignItems: 'center',
-	},
-	authButtonContainer: {
-		display: 'flex',
-		flexDirection: 'column',
-		alignItems: 'center',
-		height: '200px',
-		gap: '10px'
-	},
-	authError: {
-		extends: 'error',
-		color: '$color'
-	}
-})
-
 const AuthForm = ({ title, buttonText, switchText, switchAction, onSubmit }) => {
-	const error = Observer.mutable('');
 	const email = Observer.mutable('');
 	const password = Observer.mutable('');
 	const loading = Observer.mutable(false);
 
 	const handleSubmit = async () => {
 		loading.set(true);
-		error.set('');
 
 		const response = await onSubmit({ email: email.get(), password: password.get() });
 
 		if (response.result.error) {
-			error.set(response.result.error);
-			loading.set(false);
+			state.client.notifications.push({
+				type: 'error',
+				content: response.result.error
+			}),
+				loading.set(false);
 			return;
 		}
 		loading.set(false);
 	};
 
-	return <div>
+	return <div theme='pageSection_inset'>
 		<div style={{ position: 'absolute', top: '10px', left: '10px' }}>
 			<Button label="Back" type="text" onMouseDown={() => state.client.openPage = { page: "Landing" }} />
 		</div>
-		<div theme='authForm'>
+		<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 			<Typography type="h3">{title}</Typography>
 			<TextField style={{ margin: '10px 0px' }} disabled={loading} value={email} placeholder="Email" />
 			<TextField style={{ margin: '10px 0px' }} disabled={loading} type="password" value={password} placeholder="Password" />
-			<div theme='authButtonContainer'>
-				<Typography theme='authError' type='p1'>{error}</Typography>
+			<div style={{
+				display: 'flex',
+				flexDirection: 'column',
+				alignItems: 'center',
+				gap: '10px'
+			}}>
 				<Shown value={loading} invert>
 					<Button label={buttonText} onMouseDown={handleSubmit} type="contained" />
 					<Button label={switchText} onMouseDown={switchAction} type="text" />
@@ -101,8 +78,12 @@ const Login = ({ state, login }) => {
 			const sessionToken = response.result.sessionToken;
 			document.cookie = `webCore=${sessionToken}; expires=${expires}; path=/; SameSite=Lax`;
 
-			await jobRequest('sync');
+			// TODO For some reason it get's stuck here and doesn't load the home page/state.sync:
+			console.log("Login, initializing sync...")
+			const response = await jobRequest('sync');
+			console.log(response)
 			state.client.authenticated = true;
+			loading.set(false)
 		}
 
 		return response;
@@ -123,7 +104,7 @@ const Auth = ({ state }) => {
 	return state.observer.path('sync').shallow().ignore().map((s) => {
 		if (s) {
 			return state.client.openPage = { page: "Home" }
-		} else return <div theme='authPage'>
+		} else return <div theme='page_center'>
 			<Shown value={login} invert>
 				<SignUp login={login} />
 			</Shown>
