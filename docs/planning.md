@@ -70,12 +70,11 @@ Things to work on:
 
 **Weaknesses:**
 
-1. **Tone and Language:** The use of expletives and charged language can detract from the professionalism and perceived credibility. Terms like unicorn startups” might alienate readers who prefer a more measured discourse.
-2. **Lack of Specifics on Implementation:** While the goals of transparency and public good are clear, the text lacks details on how OpenGig.org would implement these principles practically. Specific business models, revenue streams, or case studies of similar projects could strengthen the argument.
-3. **Historical and Economic Arguments:** The text makes several sweeping claims about capitalism and historical events without sufficient context or evidence. More nuanced and supported arguments could bolster credibility.
-4. **Audience Targeting:** The document appears to target a very specific audience and could benefit from broadening its appeal by presenting its ideas in a manner more palatable to a wider range of stakeholders, including potential partners or users.
-5. **Assumptions on Capitalism:** The argument assumes that capitalism cannot accommodate or benefit from open-source principles. While it questions the system effectively, it doesn't explore potential synergies or reforms within a capitalist framework.
-6. **Sustainability Concerns:** Addressing sustainability in terms of continuous funding and quality control for an open-source service platform is essential. The document acknowledges the necessity for fair compensation, but it lacks a detailed explanation of how financial stability and service quality will be balanced. Talk about Wikimedia Foundation and how profitable and sustainable they are. The Internet Archive. Mozilla Foundation. OpenStreetMap Foundation. Khan Academy. Let's Encrypt. etc.
+1. **Lack of Specifics on Implementation:** While the goals of transparency and public good are clear, the text lacks details on how OpenGig.org would implement these principles practically. Specific business models, revenue streams, or case studies of similar projects could strengthen the argument.
+2. **Historical and Economic Arguments:** The text makes several sweeping claims about capitalism and historical events without sufficient context or evidence. More nuanced and supported arguments could bolster credibility.
+3. **Audience Targeting:** The document appears to target a very specific audience and could benefit from broadening its appeal by presenting its ideas in a manner more palatable to a wider range of stakeholders, including potential partners or users.
+4. **Assumptions on Capitalism:** The argument assumes that capitalism cannot accommodate or benefit from open-source principles. While it questions the system effectively, it doesn't explore potential synergies or reforms within a capitalist framework.
+5. **Sustainability Concerns:** Addressing sustainability in terms of continuous funding and quality control for an open-source service platform is essential. The document acknowledges the necessity for fair compensation, but it lacks a detailed explanation of how financial stability and service quality will be balanced. Talk about Wikimedia Foundation and how profitable and sustainable they are. The Internet Archive. Mozilla Foundation. OpenStreetMap Foundation. Khan Academy. Let's Encrypt. etc.
 
 
 **Flaws:**
