@@ -1,6 +1,9 @@
+// import { OArray } from "destam";
 import { coreServer } from "web-core/server";
 
-const connection = async (ws, req) => {
+const connection = async (ws, req, user, sync) => {
+	sync.notifications = OArray([]);
+
 	return;
 };
 

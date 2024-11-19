@@ -82,18 +82,16 @@ const Notification = ({ each: msg, notifications }) => {
 };
 
 const Notifications = ({ state }) => {
-    let notifications;
+    let notifications = state.client.notifications = OArray([]);
 
     return state.observer.path('sync').shallow().ignore().map((s) => {
         if (s) {
-            notifications = state.sync.notifications.def(OArray([]));
+            notifications = state.sync.notifications;
 
             if (state.client.notifications) {
                 delete state.client.notifications;
             }
-        } else {
-            notifications = state.client.notifications.def(OArray([]));
-        };
+        }
 
         return <div theme='notifications'>
             <Notification each={notifications} notifications={notifications} />
