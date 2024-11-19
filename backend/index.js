@@ -1,4 +1,4 @@
-// import { OArray } from "destam";
+import { OArray } from "destam";
 import { coreServer } from "web-core/server";
 
 const connection = async (ws, req, user, sync) => {
