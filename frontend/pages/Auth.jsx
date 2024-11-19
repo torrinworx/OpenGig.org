@@ -78,16 +78,17 @@ const Login = ({ state, login }) => {
 			const sessionToken = response.result.sessionToken;
 			document.cookie = `webCore=${sessionToken}; expires=${expires}; path=/; SameSite=Lax`;
 
-			// TODO For some reason it get's stuck here and doesn't load the home page/state.sync:
+			// TODO For some reason it gets stuck here and doesn't load the home page/state.sync:
 			console.log("Login, initializing sync...")
-			const response = await jobRequest('sync');
-			console.log(response)
+			const response2 = await jobRequest('sync'); // Collision occurs here
+			console.log(response2)
 			state.client.authenticated = true;
 			loading.set(false)
 		}
 
 		return response;
 	};
+
 
 	return <AuthForm
 		title="Login"
