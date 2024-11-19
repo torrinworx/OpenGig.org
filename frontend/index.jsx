@@ -3,7 +3,7 @@ import { coreClient, jobRequest, getCookie } from 'web-core/client';
 import { Button, Theme, Typography } from 'destamatic-ui';
 
 import theme from './theme';
-// import Notifications from './components/Notifications';
+import Notifications from './components/Notifications';
 
 const pages = import.meta.glob('./pages/*.jsx', { eager: true }); // Use 'eager: true' to load all files at once
 
@@ -60,7 +60,7 @@ const App = ({ state }) => {
     };
 
     return <Theme value={theme}>
-        {/* <Notifications state={state} /> */}
+        <Notifications state={state} />
         <Pages state={state} />
     </Theme>;
 };
