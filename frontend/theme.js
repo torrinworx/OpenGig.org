@@ -134,15 +134,33 @@ const theme = OObject({
         color: '$color_top',
 	},
 
-    // Custom:
+    // ==== Custom ====
+
+    // Standard entire page.
     page: {
+        extends: 'primary',
 		padding: '40px',
 		gap: '20px',
 		display: 'flex',
 		flexDirection: 'column',
-		backgroundColor: '#FFFFFF',
+        background: '$color',
 		height: '100%',
         minHeight: '100vh'
+	},
+
+    // Standard page section, secondary colour.
+	pageSection: {
+		extends: ['secondary', 'radius'],
+		backgroundColor: '$color',
+		padding: '20px',
+		color: '$color_top',
+	},
+
+    pageSection_inset: {
+		extends: ['secondary', 'radius'],
+		padding: '20px',
+		color: '$color',
+		backgroundColor: 'white',
 	},
 });
 

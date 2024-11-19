@@ -73,7 +73,7 @@ export default ({ state }) => {
 		/>
 	]
 
-	return <div theme={['page', 'primary']} style={{ background: '$color' }}>
+	return <div theme='page'>
 		<Header>
 			<Ham options={options} />
 		</Header>

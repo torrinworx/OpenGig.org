@@ -1,40 +1,9 @@
 import { Theme, Button, Typography, Icon } from 'destamatic-ui';
-import Logo from '/OpenGig.svg';
 
 import Header from '../components/Header';
 
 Theme.define({
-	header: {
-		display: 'flex',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-	},
-	page: {
-		padding: '40px',
-		gap: '20px',
-		display: 'flex',
-		flexDirection: 'column',
-		backgroundColor: '#FFFFFF',
-		height: '100%'
-	},
-	pageSection: {
-		extends: ['secondary', 'radius'],
-		backgroundColor: '$color',
-		padding: '20px',
-		color: '$color_top',
-	},
-	pageSection_inset: {
-		extends: ['secondary', 'radius'],
-		padding: '20px',
-		color: '$color',
-		backgroundColor: '#FFFFFF',
-	},
-	pageSection_centered: {
-		display: 'flex',
-		justifyContent: 'center',
-		alignItems: 'center',
-		flexDirection: 'column',
-	},
+
 	iconWrapper: {
 		display: 'flex',
 		justifyContent: 'center',
@@ -46,7 +15,7 @@ export default ({ state }) => <div theme={['page', 'primary']} style={{ backgrou
 	<Header>
 		<div style={{ display: 'flex', gap: '15px' }}>
 			<Button
-				label="Signup or Login"
+				label="Enter"
 				type="contained"
 				onMouseDown={() => state.client.openPage = { page: "Auth" }}
 			/>
@@ -93,7 +62,7 @@ export default ({ state }) => <div theme={['page', 'primary']} style={{ backgrou
 		</Typography>
 	</div>
 
-	<div theme="pageSection_inset_centered">
+	<div theme="pageSection_inset_center">
 		<div theme="iconWrapper">
 			<Button
 				Icon={<Icon size="40" libraryName="feather" iconName="github" />}

@@ -30,41 +30,39 @@ define({
 	}
 })
 
-const SignUp = ({ login }) => {
+const AuthForm = ({ title, buttonText, switchText, switchAction, onSubmit }) => {
 	const error = Observer.mutable('');
 	const email = Observer.mutable('');
 	const password = Observer.mutable('');
 	const loading = Observer.mutable(false);
 
-	const handleSignUp = async () => {
-		loading.set(true)
-		const response = await jobRequest('signup', { email: email.get(), password: password.get() });
+	const handleSubmit = async () => {
+		loading.set(true);
+		error.set('');
+
+		const response = await onSubmit({ email: email.get(), password: password.get() });
+
 		if (response.result.error) {
 			error.set(response.result.error);
-			loading.set(false)
+			loading.set(false);
 			return;
-		};
-		if (response.result.status === 'success') {
-			login.set(true);
-		};
+		}
+		loading.set(false);
 	};
 
-	error.watch(d => console.log(d.value));
-
-	return <div theme='authPage'>
+	return <div>
 		<div style={{ position: 'absolute', top: '10px', left: '10px' }}>
-		<Button label="Back" type="text" onMouseDown={() => state.client.openPage = { page: "Landing" }} />
+			<Button label="Back" type="text" onMouseDown={() => state.client.openPage = { page: "Landing" }} />
 		</div>
 		<div theme='authForm'>
-			<Typography type="h3">Sign Up</Typography>
+			<Typography type="h3">{title}</Typography>
 			<TextField style={{ margin: '10px 0px' }} disabled={loading} value={email} placeholder="Email" />
 			<TextField style={{ margin: '10px 0px' }} disabled={loading} type="password" value={password} placeholder="Password" />
-
 			<div theme='authButtonContainer'>
 				<Typography theme='authError' type='p1'>{error}</Typography>
 				<Shown value={loading} invert>
-					<Button label="Sign Up" onMouseDown={handleSignUp} type="contained" />
-					<Button label="Already have an account? Log in" onMouseDown={() => login.set(true)} type="text" />
+					<Button label={buttonText} onMouseDown={handleSubmit} type="contained" />
+					<Button label={switchText} onMouseDown={switchAction} type="text" />
 				</Shown>
 				<Shown value={loading}>
 					<LoadingDots />
@@ -74,51 +72,49 @@ const SignUp = ({ login }) => {
 	</div>;
 };
 
-const Login = ({ state, login }) => {
-	const error = Observer.mutable('');
-	const email = Observer.mutable('');
-	const password = Observer.mutable('');
-	const loading = Observer.mutable(false);
+const SignUp = ({ login }) => {
+	const handleSignUp = async ({ email, password }) => {
+		const response = await jobRequest('signup', { email, password });
 
-	const handleLogin = async () => {
-		loading.set(true)
-		const response = await jobRequest('login', { email: email.get(), password: password.get() });
-		if (response.result.error) {
-			error.set(response.result.error);
-			loading.set(false)
-			return;
-		};
-		const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
-		const sessionToken = response.result.sessionToken;
-		document.cookie = `webCore=${sessionToken}; expires=${expires}; path=/; SameSite=Lax`;
-		
-		await jobRequest('sync');
+		if (response.result.status === 'success') {
+			login.set(true);
+		}
 
-		loading.set(false)
-		state.client.authenticated = true;
+		return response;
 	};
 
-	return <div theme='authPage'>
-		<div style={{ position: 'absolute', top: '10px', left: '10px' }}>
-			<Button label="Back" type="text" onMouseDown={() => state.client.openPage = { page: "Landing" }} />
-		</div>
-		<div theme='authForm'>
-			<Typography type="h3">Login</Typography>
-			<TextField style={{ margin: '10px 0px' }} disabled={loading} value={email} placeholder="Email" />
-			<TextField style={{ margin: '10px 0px' }} disabled={loading} type="password" value={password} placeholder="Password" />
+	return <AuthForm
+		title="Sign Up"
+		buttonText="Sign Up"
+		switchText="Already have an account? Log in"
+		switchAction={() => login.set(true)}
+		onSubmit={handleSignUp}
+	/>;
+};
 
-			<div theme='authButtonContainer'>
-				<Typography theme='authError' type='p1'>{error}</Typography>
-				<Shown value={loading} invert>
-					<Button label="Login" onMouseDown={handleLogin} type="contained" />
-					<Button label="New user? Sign Up" onMouseDown={() => login.set(false)} type="text" />
-				</Shown>
-				<Shown value={loading}>
-					<LoadingDots />
-				</Shown>
-			</div>
-		</div>
-	</div>;
+const Login = ({ state, login }) => {
+	const handleLogin = async ({ email, password }) => {
+		const response = await jobRequest('login', { email, password });
+
+		if (response.result.status === 'success') {
+			const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
+			const sessionToken = response.result.sessionToken;
+			document.cookie = `webCore=${sessionToken}; expires=${expires}; path=/; SameSite=Lax`;
+
+			await jobRequest('sync');
+			state.client.authenticated = true;
+		}
+
+		return response;
+	};
+
+	return <AuthForm
+		title="Login"
+		buttonText="Login"
+		switchText="New user? Sign Up"
+		switchAction={() => login.set(false)}
+		onSubmit={handleLogin}
+	/>;
 };
 
 const Auth = ({ state }) => {
@@ -126,15 +122,15 @@ const Auth = ({ state }) => {
 
 	return state.observer.path('sync').shallow().ignore().map((s) => {
 		if (s) {
-			return <Home state={state} />
-		} else return <>
+			return state.client.openPage = { page: "Home" }
+		} else return <div theme='authPage'>
 			<Shown value={login} invert>
-				<SignUp state={state} login={login} />
+				<SignUp login={login} />
 			</Shown>
-			<Shown value={login} >
+			<Shown value={login}>
 				<Login state={state} login={login} />
 			</Shown>
-		</>;
+		</div>;
 	});
 };
 
