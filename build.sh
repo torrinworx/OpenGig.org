@@ -14,6 +14,9 @@ if ! command_exists git; then
 	sudo apt-get install -y git
 fi
 
+git submodule init
+git submodule update
+
 if ! command_exists nvm; then
 	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
 	export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
@@ -32,7 +35,6 @@ if [ -f "$ZIP_FILE" ]; then
 fi
 
 # Install npm dependencies and build the project
-echo "Installing npm dependencies and building the project..."
 npm install
 npx vite build
 
