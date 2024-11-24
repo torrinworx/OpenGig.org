@@ -39,9 +39,7 @@ npm install
 npx vite build
 
 rm -rf ./web-core/.git
-rm -rf ./web-core/node_modules
 rm -rf ./destamatic-ui/.git
-rm -rf ./destamatic-ui/node_modules
 
 # Prepare build directory
 mkdir -p "$BUILD_DIR"
@@ -50,6 +48,7 @@ mkdir -p "$BUILD_DIR"
 cp -r ./backend "$BUILD_DIR"
 cp -r ./web-core "$BUILD_DIR"
 cp -r ./destamatic-ui "$BUILD_DIR"
+cp -r ./node_modules "$BUILD_DIR"
 cp ./package.json "$BUILD_DIR"
 cp ./package-lock.json "$BUILD_DIR"
 
@@ -61,4 +60,3 @@ node ./backend/index.js
 EOF
 
 chmod +x "$BUILD_DIR/run.sh"
-zip -r "$ZIP_FILE" "$BUILD_DIR"
