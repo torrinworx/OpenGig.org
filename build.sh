@@ -55,7 +55,6 @@ cp ./package-lock.json "$BUILD_DIR"
 # Create the run script in the build directory
 cat << 'EOF' > "$BUILD_DIR/run.sh"
 #!/bin/bash
-cd /home/www/build
 node ./backend/index.js
 EOF
 
