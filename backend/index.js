@@ -7,6 +7,8 @@ const connection = async (ws, req, user, sync) => {
 	return;
 };
 
+console.log("DB URL: ", process.env.DB)
+
 coreServer(
 	'./backend/jobs',
 	process.env.ENV === 'production' ? './dist' : './frontend',
