@@ -22,7 +22,7 @@ export default ({ state }) => <div theme={['page', 'primary']} style={{ backgrou
 		</div>
 	</Header>
 	<div theme="pageSection">
-		<Typography type="h1" >Join OpenGig</Typography>
+		<Typography type="h1" >Join OpenGig test test test</Typography>
 		<Typography type="p1">
 			OpenGig.org is an Open Source Service platform built for gig workers and customers. We stand for openness, the rights of customers, and for the empowerment of workers.
 		</Typography>
