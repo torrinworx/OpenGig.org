@@ -2,7 +2,7 @@ import { Paper } from "destamatic-ui";
 
 import Logo from '/OpenGig.svg';
 
-const Header = ({ children }) => <Paper theme='center' style={{
+const Header = ({ children }) => <Paper theme='center_secondary' style={{
     minHeight: '100px',
     justifyContent: 'space-between',
     padding: '0px 25px'
