@@ -46,18 +46,7 @@ const Pages = ({ state }) => {
 };
 
 const App = ({ state }) => {
-    state.client = OObject({
-        authenticated: false,
-        openPage: { page: "Landing" }
-    })
-
-    const token = getCookie('webCore') || '';
-    if (token) {
-        (async () => await jobRequest('sync'))();
-        state.client.observer.path('openPage').set({ page: "Auth" })
-        state.client.observer.path('authenticated').set(true)
-
-    };
+    state.client.openPage = { page: "Landing" };
 
     return <Theme value={theme}>
         <Notifications state={state} />
