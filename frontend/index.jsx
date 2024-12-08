@@ -56,7 +56,6 @@ const App = ({ state }) => {
         (async () => await jobRequest('sync'))();
         state.client.observer.path('openPage').set({ page: "Auth" })
         state.client.observer.path('authenticated').set(true)
-
     };
 
     return <Theme value={theme}>
