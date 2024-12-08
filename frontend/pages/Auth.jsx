@@ -10,7 +10,6 @@ const AuthForm = ({ title, buttonText, switchText, switchAction, onSubmit, login
 		loading.set(true);
 
 		const response = await onSubmit({ email: email, password: password });
-		console.log(response);
 		if (response.name === 'signup' && response.result.status === 'success') {
 			login.set(true);
 		}
@@ -79,7 +78,7 @@ const Auth = ({ state }) => {
 	const login = Observer.mutable(false);
 
 	return state.observer.path('sync').shallow().ignore().map((s) => {
-		console.log(s)
+		// console.log(s)
 		if (s) {
 			state.client.openPage = { page: "Home" }
 			return null
