@@ -1,5 +1,5 @@
 import { Observer } from 'destam-dom';
-import { TextField, Button, Typography, Shown, LoadingDots } from 'destamatic-ui';
+import { TextField, Button, Typography, Shown, LoadingDots, Paper } from 'destamatic-ui';
 
 const AuthForm = ({ title, buttonText, switchText, switchAction, onSubmit, login }) => {
 	const email = Observer.mutable('');
@@ -13,7 +13,7 @@ const AuthForm = ({ title, buttonText, switchText, switchAction, onSubmit, login
 		if (response.name === 'signup' && response.result.status === 'success') {
 			login.set(true);
 		}
-	
+
 		if (response.result.error) {
 			state.client.notifications.push({
 				type: 'error',
@@ -25,7 +25,7 @@ const AuthForm = ({ title, buttonText, switchText, switchAction, onSubmit, login
 		loading.set(false);
 	};
 
-	return <div theme='pageSection_inset'>
+	return <Paper style={{ width: '285px' }}>
 		<div style={{ position: 'absolute', top: '10px', left: '10px' }}>
 			<Button label="Back" type="text" onMouseDown={() => state.client.openPage = { page: "Landing" }} />
 		</div>
@@ -48,46 +48,36 @@ const AuthForm = ({ title, buttonText, switchText, switchAction, onSubmit, login
 				</Shown>
 			</div>
 		</div>
-	</div>;
-};
-
-// TODO: refactor and make this a bit cleaner.
-const SignUp = ({ login }) => {
-	return <AuthForm
-		title="Sign Up"
-		buttonText="Sign Up"
-		switchText="Already have an account? Log in"
-		switchAction={() => login.set(true)}
-		onSubmit={state.signup}
-		login={login}
-	/>;
-};
-
-const Login = ({ login }) => {
-	return <AuthForm
-		title="Login"
-		buttonText="Login"
-		switchText="New user? Sign Up"
-		switchAction={() => login.set(false)}
-		onSubmit={state.login}
-		login={login}
-	/>;
+	</Paper>;
 };
 
 const Auth = ({ state }) => {
 	const login = Observer.mutable(false);
 
 	return state.observer.path('sync').shallow().ignore().map((s) => {
-		// console.log(s)
 		if (s) {
 			state.client.openPage = { page: "Home" }
 			return null
 		} else return <div theme='page_center'>
 			<Shown value={login} invert>
-				<SignUp login={login} />
+				<AuthForm
+					title="Sign Up"
+					buttonText="Sign Up"
+					switchText="Already have an account? Log in"
+					switchAction={() => login.set(true)}
+					onSubmit={state.signup}
+					login={login}
+				/>
 			</Shown>
 			<Shown value={login}>
-				<Login state={state} login={login} />
+				<AuthForm
+					title="Login"
+					buttonText="Login"
+					switchText="New user? Sign Up"
+					switchAction={() => login.set(false)}
+					onSubmit={state.login}
+					login={login}
+				/>
 			</Shown>
 		</div>;
 	});
