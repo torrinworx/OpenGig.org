@@ -82,56 +82,24 @@ const theme = OObject({
         boxShadow: 'none',
         background: 'transparent'
     },
-    button_contained: {
-        color: '$color_top',
-        background: '$color',
-    },
     button_contained_hovered: {
         extends: 'secondary',
         background: '$color',
     },
-    button_outlined: {
-        extends: 'secondary',
-        color: '$color',
-        borderWidth: 2,
-        borderStyle: 'solid',
-        borderColor: '$color',
-        backgroundColor: '$color_top'
-    },
-    button_outlined_hovered: {
-        extends: 'secondary',
-        color: '$color',
-        backgroundColor: '$color_hover',
-    },
-    hover: {
-        backgroundColor: 'rgba(2, 202, 159, 0.1)',
-        color: '#02CA9F',
-    },
-    typography_h1: { fontSize: 62 },
-    typography_h2: { fontSize: 56 },
-    typography_h3: { fontSize: 36 },
-    typography_h4: { fontSize: 30 },
-    typography_h5: { fontSize: 24 },
-    typography_h6: { fontSize: 20 },
-    typography_p1: { fontSize: 16 },
-    typography_p2: { fontSize: 14 },
-    typography_regular: { fontStyle: 'normal' },
-    typography_bold: { fontWeight: 'bold' },
-    typography_italic: { fontStyle: 'italic' },
-
-    focusable: {
-        border: 0,
-        extends: ['primary', 'radius'],
-		padding: 10,
-		alignItems: 'center',
-		background: 'white',
-        boxShadow: 'rgba(0, 0, 0, 0.16) 0px 1px 4px'
-	},
 
     button_tab: {
 		width: '100%',
 		borderRadius: '20px 20px 0px 0px',
         color: '$color_top',
+	},
+
+	focusable: {
+        extends: 'shadow',
+		borderStyle: 'solid',
+		borderWidth: 0,
+		borderColor: '$color',
+		// transitionDuration: '0.3s',
+		transitionProperty: 'border-color, background-color, box-shadow',
 	},
 
     // ==== Custom ====
@@ -148,20 +116,6 @@ const theme = OObject({
         minHeight: '100vh'
 	},
 
-    // Standard page section, secondary colour.
-	pageSection: {
-		extends: ['secondary', 'radius'],
-		backgroundColor: '$color',
-		padding: '20px',
-		color: '$color_top',
-	},
-
-    pageSection_inset: {
-		extends: ['secondary', 'radius'],
-		padding: '20px',
-		color: '$color',
-		backgroundColor: 'white',
-	},
 });
 
 export const define = obj => atomic(() => {
