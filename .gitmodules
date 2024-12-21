@@ -4,3 +4,6 @@
 [submodule "web-core"]
 	path = web-core
 	url = https://github.com/torrinworx/web-core.git
+[submodule "db-core"]
+	path = db-core
+	url = https://github.com/torrinworx/db-core.git
