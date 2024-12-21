@@ -60,11 +60,6 @@ else
 	install_nvm_and_node
 fi
 
-# Optional: Check if running in GitHub Actions and skip NVM installation
-if [ "$CI" = "true" ]; then
-	echo "Running in CI environment. Skipping NVM installation if Node.js is already available."
-fi
-
 # Clean build directory and zip file if they exist
 if [ -d "$BUILD_DIR" ]; then
 	rm -rf "$BUILD_DIR"
