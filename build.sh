@@ -21,7 +21,11 @@ if ! command_exists nvm; then
 	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
 	export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
 	[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+	[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 fi
+
+# Print nvm version to confirm it's available
+nvm --version || (echo "NVM is not available." && exit 1)
 
 nvm install 21
 nvm use 21
@@ -38,6 +42,7 @@ fi
 npm install
 npx vite build
 
+rm -rf ./db-core/.git
 rm -rf ./web-core/.git
 rm -rf ./destamatic-ui/.git
 
@@ -46,6 +51,7 @@ mkdir -p "$BUILD_DIR"
 
 # Copy files to build directory
 cp -r ./backend "$BUILD_DIR"
+cp -r ./db-core "$BUILD_DIR"
 cp -r ./web-core "$BUILD_DIR"
 cp -r ./destamatic-ui "$BUILD_DIR"
 cp -r ./node_modules "$BUILD_DIR"
