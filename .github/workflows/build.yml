@@ -3,7 +3,7 @@ name: Build Pipeline
 on:
   push:
     branches:
-      - '**'  # Triggers on all branches
+      - '**'
 
 jobs:
   build:
