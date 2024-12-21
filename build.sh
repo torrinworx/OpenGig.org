@@ -9,6 +9,7 @@ command_exists() {
 	command -v "$1" >/dev/null 2>&1
 }
 
+# Install git if not present
 if ! command_exists git; then
 	sudo apt-get update
 	sudo apt-get install -y git
@@ -17,19 +18,54 @@ fi
 git submodule init
 git submodule update
 
-if ! command_exists nvm; then
+# Install nvm and Node.js
+install_nvm_and_node() {
+	echo "Installing NVM..."
 	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
-	export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-	[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-	[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+	export NVM_DIR="$HOME/.nvm"
+	if [ -s "$NVM_DIR/nvm.sh" ]; then
+		source "$NVM_DIR/nvm.sh"
+	else
+		echo "nvm.sh not found. Exiting."
+		exit 1
+	fi
+
+	if [ -s "$NVM_DIR/bash_completion" ]; then
+		source "$NVM_DIR/bash_completion"
+	fi
+
+	echo "Installing Node.js version 21..."
+	nvm install 21
+	nvm use 21
+
+	# Verify installations
+	echo "NVM version:"
+	nvm --version
+
+	echo "Node version:"
+	node --version
+
+	echo "NPM version:"
+	npm --version
+}
+
+# Check if Node.js and NPM are installed
+if command_exists node && command_exists npm; then
+	echo "Node and NPM are already installed."
+	node --version
+	npm --version
+else
+	echo "Node or NPM not found. Attempting to install via NVM."
+	install_nvm_and_node
 fi
 
-# Print nvm version to confirm it's available
-nvm --version || (echo "NVM is not available." && exit 1)
+# Optional: Check if running in GitHub Actions and skip NVM installation
+if [ "$CI" = "true" ]; then
+	echo "Running in CI environment. Skipping NVM installation if Node.js is already available."
+fi
 
-nvm install 21
-nvm use 21
-
+# Clean build directory and zip file if they exist
 if [ -d "$BUILD_DIR" ]; then
 	rm -rf "$BUILD_DIR"
 fi
@@ -42,6 +78,7 @@ fi
 npm install
 npx vite build
 
+# Remove .git directories from submodules
 rm -rf ./db-core/.git
 rm -rf ./web-core/.git
 rm -rf ./destamatic-ui/.git
