@@ -1,5 +1,4 @@
-import { OObject } from 'destam-dom';
-import { coreClient, jobRequest, getCookie } from 'web-core/client';
+import { coreClient } from 'web-core/client';
 import { Button, Theme, Typography } from 'destamatic-ui';
 
 import theme from './theme';
@@ -45,13 +44,9 @@ const Pages = ({ state }) => {
     })
 };
 
-const App = ({ state }) => {
-    state.client.openPage = { page: "Landing" };
-
-    return <Theme value={theme}>
-        <Notifications state={state} />
-        <Pages state={state} />
-    </Theme>;
-};
+const App = ({ state }) => <Theme value={theme}>
+    <Notifications state={state} />
+    <Pages state={state} />
+</Theme>;
 
 coreClient(App, NotFound);
