@@ -16,7 +16,7 @@ if ! command_exists git; then
 fi
 
 git submodule init
-git submodule update
+git submodule update --init --recursive
 
 # Install nvm and Node.js
 install_nvm_and_node() {
