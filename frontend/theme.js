@@ -1,14 +1,11 @@
 import { atomic } from "destam/Network";
 import { OObject } from "destam-dom";
 
-
 const theme = OObject({
     /* ==== destamatic-ui ==== */
     '*': {
-        extends: 'eerieBlack',
         fontFamily: 'IBM Plex Sans',
         fontWeight: 600,
-        // color: '$color'
     },
 
     // https://coolors.co/f83a3a-fffc47-00fa53-1e8eff-a683ec
@@ -70,7 +67,7 @@ const theme = OObject({
     eerieBlack: {
         "$color": "#212529"
     },
-    
+
     radius: {
         borderRadius: 8,
     },
