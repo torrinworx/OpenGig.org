@@ -74,8 +74,8 @@ npm install
 npx vite build
 
 # Remove .git directories from submodules
-rm -rf ./db-core/.git
-rm -rf ./web-core/.git
+rm -rf ./destam-db-core/.git
+rm -rf ./destam-web-core/.git
 rm -rf ./destamatic-ui/.git
 
 # Prepare build directory
@@ -83,8 +83,8 @@ mkdir -p "$BUILD_DIR"
 
 # Copy files to build directory
 cp -r ./backend "$BUILD_DIR"
-cp -r ./db-core "$BUILD_DIR"
-cp -r ./web-core "$BUILD_DIR"
+cp -r ./destam-db-core "$BUILD_DIR"
+cp -r ./destam-web-core "$BUILD_DIR"
 cp -r ./destamatic-ui "$BUILD_DIR"
 cp -r ./node_modules "$BUILD_DIR"
 cp ./package.json "$BUILD_DIR"

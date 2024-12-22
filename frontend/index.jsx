@@ -1,4 +1,4 @@
-import { coreClient } from 'web-core/client';
+import { coreClient } from 'destam-web-core/client';
 import { Button, Theme, Typography } from 'destamatic-ui';
 
 import theme from './theme';
