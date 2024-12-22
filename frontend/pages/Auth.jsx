@@ -54,7 +54,7 @@ const AuthForm = ({ title, buttonText, switchText, switchAction, onSubmit, login
 const Auth = ({ state }) => {
 	const login = Observer.mutable(false);
 
-	return state.observer.path('sync').shallow().ignore().map((s) => {
+	return state.observer.path('sync').shallow().ignore().map(s => {
 		if (s) {
 			state.client.openPage = { page: "Home" }
 			return null
