@@ -32,7 +32,7 @@ const AuthForm = ({ title, buttonText, switchText, switchAction, onSubmit, login
 		<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 			<Typography type="h3">{title}</Typography>
 			<TextField style={{ margin: '10px 0px' }} disabled={loading} value={email} placeholder="Email" />
-			<TextField style={{ margin: '10px 0px' }} disabled={loading} type="password" value={password} placeholder="Password" />
+			<TextField onEnter={onSubmit} style={{ margin: '10px 0px' }} disabled={loading} type="password" value={password} placeholder="Password" />
 			<div style={{
 				display: 'flex',
 				flexDirection: 'column',
