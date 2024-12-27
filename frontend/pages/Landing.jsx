@@ -3,7 +3,6 @@ import { Theme, Button, Typography, Icon, Paper } from 'destamatic-ui';
 import Header from '../components/Header';
 
 Theme.define({
-
 	iconWrapper: {
 		display: 'flex',
 		justifyContent: 'center',
@@ -12,7 +11,7 @@ Theme.define({
 })
 
 export default ({ state }) => <div theme='page' style={{ background: '$color' }}>
-	<Header>
+	<Header state={state}>
 		<div style={{ display: 'flex', gap: '15px' }}>
 			<Button
 				label="Enter"

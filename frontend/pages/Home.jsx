@@ -31,16 +31,16 @@ export default ({ state }) => {
 	]
 
 	return <div theme='page'>
-		<Header>
+		<Header state={state}>
 			<Ham options={options} />
 		</Header>
 		<Paper theme={['secondary']} style={{
-					display: 'flex',
-					justifyContent: 'space-between',
-					alignItems: 'center',
-					flexDirection: 'column',
-					background: '$color',
-					color: '$color_top',
+			display: 'flex',
+			justifyContent: 'space-between',
+			alignItems: 'center',
+			flexDirection: 'column',
+			background: '$color',
+			color: '$color_top',
 		}}>
 			<Tabs style={{ width: '100%' }}>
 				<mark:tab name='Freelance'>
