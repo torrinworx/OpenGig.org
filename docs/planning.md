@@ -26,6 +26,7 @@ https://geo.coop/articles/the-slow-demise-loconomics
 
 https://www.techspot.com/news/106107-valve-makes-more-money-employee-than-amazon-microsoft.html
 
+https://m.youtube.com/watch?v=vW5EVNT--DA&t=13s&pp=2AENkAIB
 
 "unicorn" should be taken as an insult; a ficticous company that is a made up fairy tail designed to playcate the imaginations of investors who fund delusional spending pits. unicorn startups have multiple characteristics that differentiate themselves form legitimate businesses and startups:
 
