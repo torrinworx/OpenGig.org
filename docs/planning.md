@@ -28,6 +28,8 @@ https://www.techspot.com/news/106107-valve-makes-more-money-employee-than-amazon
 
 https://m.youtube.com/watch?v=vW5EVNT--DA&t=13s&pp=2AENkAIB
 
+https://www.youtube.com/shorts/oP4-V5QqN18
+
 "unicorn" should be taken as an insult; a ficticous company that is a made up fairy tail designed to playcate the imaginations of investors who fund delusional spending pits. unicorn startups have multiple characteristics that differentiate themselves form legitimate businesses and startups:
 
 - unicorn startups often receive large investments, providing them with more money than they need to build an effective service or product. This can lead to spending on non-essential ventures, ego, unnecessary staffing, or over-engineering products. Much of this appears to come from ignorance and a desire to grow for the sake of growth and a perverted self interest. Our goal as humans should be to better the world around us for the sake of self preservation and those around us, your apart of this world.
