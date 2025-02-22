@@ -672,3 +672,16 @@ may consider it more useful to permit linking proprietary applications with
 the library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.  But first, please read
 <https://www.gnu.org/licenses/why-not-lgpl.html>.
+
+
+**Additional Licensing Terms for Trademarks, Logos, and Branding**
+
+The source code and accompanying documentation of this project are licensed under the GNU General Public License version 3 (GNU GPL 3.0). However, the following elements are *not* licensed under the terms of GPL and are subject to separate terms:
+
+- **Trademarks:** Any trade names, trademarks, service marks, logos, and/or brand names that are used in this project (collectively referred to as "Branding") are NOT covered by the GNU GPL 3.0.
+
+- **Usage of Branding:** Permission to use the Branding is granted only with explicit written consent from OpenGig, and such use must comply with OpenGig's branding guidelines. Unauthorized use of these elements is strictly prohibited.
+
+- **Purpose of Exclusion:** This exclusion is to protect the integrity and reputation of the OpenGig cooperative and to avoid confusion about the origin of products and services bearing its marks. 
+
+For any inquiries about using these elements or obtaining permission, please contact: Torrin Z. Leonard torrin@worx4you.com
