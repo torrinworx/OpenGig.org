@@ -1,7 +1,13 @@
 
+<div align="center">
+<img src="../frontend/public/OpenGig.svg" alt="OpenGig Logo" style="height: 30%; width: auto;">
+
 OpenGig Business Plan
+</div>
 
 ---
+<br/>
+
 # Executive Summary
 ## Introduction
 OpenGig is a cooperative platform based in Waterloo, Ontario, Canada. Our goal is to create a fair labor marketplace that benefits workers, consumers, and employees equally. Most modern labor platforms are wasteful and predatory, causing workers and customers to suffer financially for shareholder gain. OpenGig aims to fix this by operating as a lean, at-cost cooperative that avoids the reckless spending and bloated overhead commonly found in traditional startups and labor platforms.
@@ -96,27 +102,27 @@ We're not just another startup; we're a movement for change. That’s OpenGig.
 
 ---
 
-## Cooperative Governance Structure
+# Cooperative Governance Structure
 OpenGig is a multi stakeholder cooperative with three types of memebers: workers, customers, and employees. All memebers have voting rights on cooperative votes for major decisions on running the platform and feature improvements.
 
-### Employees
+## Employees
 **Employees** are memebers of the cooperative that design and develop the platform, as well as  manage the **Core Team**. **Employees** are trusted to have the expertise to evaluate the technical and operational needs of the cooperative. This includes managing the development, marketing, legal, managearial, and hiring needs of the cooperative.
 
 The governance system of employees is such that while employees are trusted to run the platform, any of their decisions can be reversed if a vote is called to reverse a decision. These can include anything from payment resturcturings, feature development, employee hirings, or rebranding efforts.
 
 The goal is to allow employees to make quick, informed decisions, while also allowing for accountability if they abuse their power.
 
-### Workers
+## Workers
 **Workers** are the memebers of the cooperative that advertise, and execute labour for monetary compensation from **Customers**.
 
-### Customers
+## Customers
 **Customers** are the memebers of the cooperative that purchase labour or products from **workers**.
 
-### Vote Proposals
+## Vote Proposals
 
 OpenGig has an open submission voting system where all members are able to submit a vote proposal on our dedicated public forum (to be built). Members will be required to submit basic criteria for proposals, such as a clear description of the issue, proposed solutions, and the impact on different stakeholders. Each proposal will have a deadecated public comment section, allowing members of other stakeholder groups to have their voices heard.
 
-### Vote Vetting
+## Vote Vetting
 Members can express initial interest or disapproval by upvoting or downvoting proposals on the forum. Votes get approved and go forward to be member wide votes if they pass the **active member vote threshold**, a (to be determined) percentage of the active members of OpenGig.
 
 # Market Analysis 
@@ -136,17 +142,6 @@ Members can express initial interest or disapproval by upvoting or downvoting pr
 
 # TODO: other points to mention
 our commitment to open source and the rest of the principles outlined in the main readme:
-
-<div align="center">
-<img src="./frontend/public/OpenGig.svg" alt="OpenGig Logo" style="height: 30%; width: auto;">
-
-A platform built for gig workers and customers.
-
-[Docs](./docs/index.md) | [OpenGig.org](https://opengig.org)
-</div>
-
----
-<br/>
 
 OpenGig.org is an Open Source Service platform built for gig workers and customers. We stand for openness, the rights of customers, and for the empowerment of workers.
 
@@ -215,3 +210,9 @@ The cost to run the platform is directly dictated by these factors:
 - [ ] Freelance tasks: Enable customers to post freelance tasks workers can apply to, workers to post free lance services customers can search for and request. https://github.com/torrinworx/OpenGig.org/issues/6
 
 - [ ] Community Participation and Voting System: Create a community communication platform for member interaction and updates on platform development (similar to Discord). Incorporate a democratic voting system for platform decisions, aligning with the Open Structure principle.
+
+
+The current expendature cost for setting up a platform like this would simply be:
+- $1,500 - $2,000 for a solid ui/ux design that would allow me to develop a good frontend interface that users find easy to use.
+- $18.34 for a domain (opengig.org, already purchased).
+- $23.98 a month for hosting the database and server needed to run the mvp of the platform.
