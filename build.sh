@@ -60,7 +60,7 @@ else
 	install_nvm_and_node
 fi
 
-# Clean build directory and zip file if they exist
+# Clean build directory and zip file if they exist from previous run
 if [ -d "$BUILD_DIR" ]; then
 	rm -rf "$BUILD_DIR"
 fi
@@ -98,3 +98,5 @@ node ./backend/index.js
 EOF
 
 chmod +x "$BUILD_DIR/run.sh"
+
+zip -r "$ZIP_FILE" "$BUILD_DIR"
