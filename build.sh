@@ -71,6 +71,7 @@ fi
 
 # Install npm dependencies and build the project
 npm install
+npm run test
 npx vite build
 
 # Remove .git directories from submodules
