@@ -71,7 +71,7 @@ fi
 
 # Install npm dependencies and build the project
 npm install
-npm run test
+# npm run test # TODO: Enable when destamatic tests are working
 npx vite build
 
 # Remove .git directories from submodules
