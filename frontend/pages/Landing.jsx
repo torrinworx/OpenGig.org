@@ -1,9 +1,8 @@
-import { Theme, Button, Typography, Icon } from 'destamatic-ui';
+import { Theme, Button, Typography, Icon, Paper } from 'destamatic-ui';
 
 import Header from '../components/Header';
 
 Theme.define({
-
 	iconWrapper: {
 		display: 'flex',
 		justifyContent: 'center',
@@ -11,8 +10,8 @@ Theme.define({
 	},
 })
 
-export default ({ state }) => <div theme={['page', 'primary']} style={{ background: '$color' }}>
-	<Header>
+export default ({ state }) => <div theme='page' style={{ background: '$color' }}>
+	<Header state={state}>
 		<div style={{ display: 'flex', gap: '15px' }}>
 			<Button
 				label="Enter"
@@ -21,7 +20,7 @@ export default ({ state }) => <div theme={['page', 'primary']} style={{ backgrou
 			/>
 		</div>
 	</Header>
-	<div theme="pageSection">
+	<Paper>
 		<Typography type="h1" >Join OpenGig</Typography>
 		<Typography type="p1">
 			OpenGig.org is an Open Source Service platform built for gig workers and customers. We stand for openness, the rights of customers, and for the empowerment of workers.
@@ -32,8 +31,8 @@ export default ({ state }) => <div theme={['page', 'primary']} style={{ backgrou
 			style={{ marginTop: '20px' }}
 			onMouseDown={() => state.client.openPage = { page: "Auth" }}
 		/>
-	</div>
-	<div theme="pageSection_inset">
+	</Paper>
+	<Paper>
 		<Typography type="h2">Why work on OpenGig?</Typography>
 		<Typography type="p1">
 			Our platform empowers gig workers by removing the greedy middlemen. OpenGig allows you to dictate your own terms by providing tools built for you.
@@ -50,8 +49,8 @@ export default ({ state }) => <div theme={['page', 'primary']} style={{ backgrou
 		<Typography type="p1">
 			Gig workers benefit from our Open Source principle; OpenGig is entirely open source, providing everyone with equal access to its core. Nothing is hidden, and there's no secret algorithm to manipulate your labor.
 		</Typography>
-	</div>
-	<div theme="pageSection">
+	</Paper>
+	<Paper>
 		<Typography type="h2">Why spend on OpenGig?</Typography>
 		<Typography type="p1">
 			OpenGig is adaptable, catering to a wide spectrum of gig services—from ride-sharing and food delivery to freelance tasks. Whatever you need, we've got you covered.
@@ -60,9 +59,9 @@ export default ({ state }) => <div theme={['page', 'primary']} style={{ backgrou
 		<Typography type="p1">
 			Customers benefit from our Open Cost principle. You pay only for what you consume, with every cent transparently used for your service or payout—no hidden charges funding luxury yachts, failed self-driving taxi ventures, or stock bonuses for billionaires.
 		</Typography>
-	</div>
+	</Paper>
 
-	<div theme="pageSection_inset_center">
+	<Paper theme="center">
 		<div theme="iconWrapper">
 			<Button
 				Icon={<Icon size="40" libraryName="feather" iconName="github" />}
@@ -83,5 +82,5 @@ export default ({ state }) => <div theme={['page', 'primary']} style={{ backgrou
 				title={"Twitter"}
 			/>
 		</div>
-	</div>
+	</Paper>
 </div>;

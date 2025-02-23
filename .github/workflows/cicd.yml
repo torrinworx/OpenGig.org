@@ -7,6 +7,7 @@ on:
 
 jobs:
     build:
+        name: Build
         runs-on: ubuntu-latest
         steps:
             - name: Checkout code
@@ -35,11 +36,16 @@ jobs:
                   path: ./build.zip
 
     deploy:
+        name: Deploy
         needs: build
         runs-on: ubuntu-latest
+        if: github.ref == 'refs/heads/main'
         steps:
-            - name: Checkout repository
+            - name: Checkout
               uses: actions/checkout@v4
+              with:
+                  submodules: true
+                  fetch-depth: 0
 
             - name: Download Build Artifact
               uses: actions/download-artifact@v4

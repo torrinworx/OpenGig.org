@@ -1,5 +1,4 @@
-import { OObject } from 'destam-dom';
-import { coreClient, jobRequest, getCookie } from 'web-core/client';
+import { coreClient } from 'destam-web-core/client';
 import { Button, Theme, Typography } from 'destamatic-ui';
 
 import theme from './theme';
@@ -45,23 +44,9 @@ const Pages = ({ state }) => {
     })
 };
 
-const App = ({ state }) => {
-    state.client = OObject({
-        authenticated: false,
-        openPage: { page: "Landing" }
-    })
-
-    const token = getCookie('webCore') || '';
-    if (token) {
-        (async () => await jobRequest('sync'))();
-        state.client.observer.path('openPage').set({ page: "Auth" })
-        state.client.observer.path('authenticated').set(true)
-    };
-
-    return <Theme value={theme}>
-        <Notifications state={state} />
-        <Pages state={state} />
-    </Theme>;
-};
+const App = ({ state }) => <Theme value={theme}>
+    <Notifications state={state} />
+    <Pages state={state} />
+</Theme>;
 
 coreClient(App, NotFound);
