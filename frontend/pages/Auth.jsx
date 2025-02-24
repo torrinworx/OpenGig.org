@@ -9,8 +9,6 @@ const Auth = ({ state }) => {
 	const exists = Observer.mutable(false);
 	const checked = Observer.mutable(false);
 
-	loading.watch(d => console.log(d.value));
-
 	const checkUser = async () => {
 		loading.set(true);
 		const response = await state.check(email);
@@ -26,7 +24,7 @@ const Auth = ({ state }) => {
 			});
 			checked.set(false);
 		}
-		console.log("THIS IS HAPPENING");
+
 		loading.set(false);
 	};
 
@@ -40,7 +38,7 @@ const Auth = ({ state }) => {
 			loading.set(false);
 			return;
 		}
-		await enter(email, password);
+		await state.enter(email, password);
 	};
 
 	return state.observer.path('sync').shallow().ignore().map(s => {
@@ -116,11 +114,13 @@ const Auth = ({ state }) => {
 											value={confirmPassword}
 											placeholder="Confirm Password"
 										/>
-										<Button
-											label='Create Account'
-											onMouseDown={createAccount}
-											type="contained"
-										/>
+										<Shown value={loading} invert>
+											<Button
+												label='Create Account'
+												onMouseDown={createAccount}
+												type="contained"
+											/>
+										</Shown>
 									</mark:then>
 									<mark:else>
 										<Button
