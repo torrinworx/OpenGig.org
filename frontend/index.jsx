@@ -27,7 +27,7 @@ const NotFound = () => <Theme value={theme}>
 const Pages = ({ state }) => {
     const openPage = state.client.observer.path('openPage');
 
-    return openPage.map((p) => {
+    return openPage.map(p => {
         const matchedPath = Object.keys(pages).find(filePath => {
             const parts = filePath.split('/');
             const fileName = parts[parts.length - 1].replace('.jsx', '');
@@ -46,6 +46,8 @@ const Pages = ({ state }) => {
 
 const App = ({ state }) => <Theme value={theme}>
     <Notifications state={state} />
+    <div theme='wide_center' style={{ background: 'red' }}> Warning: This is a beta, any accounts you make will potentially be deleted and are not guaranteed to be permanent.</div>
+
     <Pages state={state} />
 </Theme>;
 
