@@ -6,7 +6,7 @@ import Notifications from './components/Notifications';
 
 const pages = import.meta.glob('./pages/*.jsx', { eager: true }); // Use 'eager: true' to load all files at once
 
-const NotFound = () => <Theme value={theme}>
+const NotFound = () => <Theme value={theme.theme}>
     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <Typography type='h4' style={{ marginBottom: '20px' }}>404 Page Not Found</Typography>
         <Typography type='p1' style={{ marginBottom: '20px' }}>The page you are trying to access is either unavailable or restricted.</Typography>
@@ -44,11 +44,9 @@ const Pages = ({ state }) => {
     })
 };
 
-const App = ({ state }) => <Theme value={theme}>
+const App = ({ state }) => <Theme value={theme.theme}>
     <Notifications state={state} />
-    <div theme='wide_center' style={{ background: 'red' }}> Warning: This is a beta, any accounts you make will potentially be deleted and are not guaranteed to be permanent.</div>
-
-    <Pages state={state} />
+    <Pages theme='page' state={state} />
 </Theme>;
 
 coreClient(App, NotFound);

@@ -1,6 +1,7 @@
 import { Theme, Paper, useRipples } from "destamatic-ui";
 
-import Logo from '/OpenGig.svg';
+import LogoLightMode from '/OpenGig_Logo_Light_Mode.svg';
+import LogoDarkMode from '/OpenGig_Logo_Dark_Mode.svg';
 import { Observer } from "destam-dom";
 
 Theme.define({
@@ -8,26 +9,17 @@ Theme.define({
         cursor: 'pointer',
         overflow: 'clip'
     },
-    headerbutton_hovered: {
-        extends: 'secondary',
-        background: '$color',
-    }
 });
 
 const Header = ({ state, children }) => {
     const hover = Observer.mutable(false);
     const [ripples, createRipple] = useRipples();
 
-    return <Paper theme='center' style={{
-        minHeight: '100px',
-        justifyContent: 'space-between',
-        padding: '0px 25px'
-    }}>
+    return <Paper >
         <div theme='center' style={{ width: '100%', justifyContent: 'space-between' }}>
             <div
                 theme={[
-                    'radius_center_headerbutton',
-                    hover.map(h => h ? 'hovered' : null)
+                    'radius_center_headerbutton'
                 ]}
                 onClick={(e) => {
                     createRipple(e)
@@ -36,8 +28,8 @@ const Header = ({ state, children }) => {
                 isHovered={hover}
             >
                 <img
-                    src={Logo}
-                    style={{ margin: 10, height: '4vh', userSelect: 'none' }}
+                    src={window.themeMode.map(t => t === 'light' ? LogoDarkMode : LogoLightMode )}
+                    style={{ margin: 10, height: '5vh', userSelect: 'none' }}
                 />
                 {ripples}
             </div>

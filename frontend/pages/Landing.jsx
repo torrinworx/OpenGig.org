@@ -10,7 +10,7 @@ Theme.define({
 	},
 })
 
-export default ({ state }) => <div theme='page' style={{ background: '$color' }}>
+export default ({ state }) => <div theme='page'>
 	<Header state={state}>
 		<div style={{ display: 'flex', gap: '15px' }}>
 			<Button

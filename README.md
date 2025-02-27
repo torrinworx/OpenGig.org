@@ -1,5 +1,5 @@
 <div align="center">
-<img src="./frontend/public/OpenGig.svg" alt="OpenGig Logo" style="height: 30%; width: auto;">
+<img src="./frontend/public/OpenGig_Logo_Light_Mode.svg" alt="OpenGig Logo" style="height: 30%; width: auto;">
 
 A platform built for gig workers and customers.
 
