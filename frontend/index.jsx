@@ -45,6 +45,17 @@ const Pages = ({ state }) => {
 };
 
 const App = ({ state }) => <Theme value={theme.theme}>
+    <link
+        rel="icon"
+        href={window.themeMode.map(t =>
+            t === 'light'
+                ? "./OpenGig_Icon_Round_Light_Mode.svg"
+                : "./OpenGig_Icon_Round_Dark_Mode.svg"
+        )}
+        sizes="any"
+        type="image/svg+xml"
+    />
+
     <Notifications state={state} />
     <Pages theme='page' state={state} />
 </Theme>;
