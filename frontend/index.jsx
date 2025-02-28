@@ -1,7 +1,9 @@
+import { Observer } from 'destam';
 import { coreClient } from 'destam-web-core/client';
-import { Button, Theme, Typography } from 'destamatic-ui';
+import { popups, Button, Theme, Typography } from 'destamatic-ui';
 
 import theme from './theme';
+import Modal from './components/Modal';
 import Notifications from './components/Notifications';
 
 const pages = import.meta.glob('./pages/*.jsx', { eager: true }); // Use 'eager: true' to load all files at once
@@ -30,8 +32,7 @@ const Pages = ({ state }) => {
     return openPage.map(p => {
         const matchedPath = Object.keys(pages).find(filePath => {
             const parts = filePath.split('/');
-            const fileName = parts[parts.length - 1].replace('.jsx', '');
-            return fileName === p.page;
+            return parts[parts.length - 1].replace('.jsx', '') === p.page;
         });
 
         if (matchedPath) {
@@ -44,20 +45,26 @@ const Pages = ({ state }) => {
     })
 };
 
-const App = ({ state }) => <Theme value={theme.theme}>
-    <link
-        rel="icon"
-        href={window.themeMode.map(t =>
-            t === 'light'
-                ? "./OpenGig_Icon_Round_Light_Mode.svg"
-                : "./OpenGig_Icon_Round_Dark_Mode.svg"
-        )}
-        sizes="any"
-        type="image/svg+xml"
-    />
+const App = ({ state }) => {
+    state.modal = Observer.mutable(false);
 
-    <Notifications state={state} />
-    <Pages theme='page' state={state} />
-</Theme>;
+    return <Theme value={theme.theme}>
+
+        <link
+            rel="icon"
+            href={window.themeMode.map(t =>
+                t === 'light'
+                    ? "./OpenGig_Icon_Round_Light_Mode.svg"
+                    : "./OpenGig_Icon_Round_Dark_Mode.svg"
+            )}
+            sizes="any"
+            type="image/svg+xml"
+        />
+        <Notifications state={state} />
+        <Pages theme='page' state={state} />
+        <Modal {...state} />
+        {popups}
+    </Theme>;
+};
 
 coreClient(App, NotFound);

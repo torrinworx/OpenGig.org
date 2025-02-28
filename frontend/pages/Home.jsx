@@ -20,10 +20,10 @@ Theme.define({
 	}
 })
 
-const Gig = ({ each: gig }) => {
+const Gig = ({ each: gig, state }) => {
 	const hover = Observer.mutable(false);
 
-	return <Button style={{ padding: 0 }} onClick={() => { }}>
+	return <Button style={{ padding: 0 }} onClick={() => state.modal.set({ name: 'Gig' })}>
 		<div
 			theme={[
 				'radius',
@@ -201,7 +201,7 @@ export default ({ state }) => {
 						'row_radius_focusable',
 						focused.map(f => f ? "focused" : null),
 					]}
-					style={{ background: '$color_main' }}
+					style={{ background: '$color_main', padding: 4 }}
 				>
 					<TextField
 						onChange={e => query.set(e.target.value)}
@@ -236,7 +236,7 @@ export default ({ state }) => {
 				gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
 				gap: '10px'
 			}}>
-				<Gig each={exampleGigs} />
+				<Gig each={exampleGigs} state={state} />
 			</div>
 		</Paper>
 	</div>;
