@@ -28,7 +28,7 @@ const Header = ({ state, children }) => {
                 isHovered={hover}
             >
                 <img
-                    src={window.themeMode.map(t => t === 'light' ? LogoDarkMode : LogoLightMode )}
+                    src={window.themeMode.map(t => t === false ? LogoLightMode : LogoDarkMode )}
                     style={{ margin: 10, height: '5vh', userSelect: 'none' }}
                 />
                 {ripples}

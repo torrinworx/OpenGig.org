@@ -47,9 +47,7 @@ const Pages = ({ state }) => {
 
 const App = ({ state }) => {
     state.modal = Observer.mutable(false);
-
     return <Theme value={theme.theme}>
-
         <link
             rel="icon"
             href={window.themeMode.map(t =>

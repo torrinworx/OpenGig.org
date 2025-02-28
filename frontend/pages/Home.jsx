@@ -40,7 +40,7 @@ const Gig = ({ each: gig, state }) => {
 				alignItems: 'center',
 				flexShrink: 0
 			}}>
-				<Icon libraryName='feather' iconName='image' size={20} />
+				<Icon libraryName='feather' iconName='image' size={20} style={{ color: '$color_main' }} />
 			</div>
 			<div style={{
 				display: 'flex',
@@ -57,7 +57,7 @@ const Gig = ({ each: gig, state }) => {
 					justifyContent: 'center',
 					alignItems: 'center'
 				}}>
-					<Icon libraryName='feather' iconName='user' size={20} />
+					<Icon libraryName='feather' iconName='user' size={20} style={{ color: '$color_main' }} />
 				</div>
 				<Typography type='p1' label={gig.userName} style={{ color: '$color_top' }} />
 			</div>
@@ -154,15 +154,9 @@ export default ({ state }) => {
 	return <div theme='page'>
 		<Header state={state}>
 			<div theme='row'>
-				<Toggle
-					value={Observer.mutable(true)}
-					onChange={isChecked => {
-						window.themeMode.set(isChecked ? 'dark' : 'light');
-					}}
-				/>
+				<Toggle value={window.themeMode} />
 				<Button
 					type='text'
-					style={{ color: '$color_main' }}
 					onMouseDown={() => {
 						document.cookie = 'webCore=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax';
 						window.location.reload();
@@ -171,29 +165,7 @@ export default ({ state }) => {
 				/>
 			</div>
 		</Header>
-		<Paper>
-			<Typography type='h1' label='Header 1' />
-			<Typography type='h2' label='Header 2' />
-			<Typography type='h3' label='Header 3' />
-			<Typography type='h4' label='Header 4' />
-			<Typography type='h5' label='Header 5' />
-			<Typography type='h6' label='Header 6' />
-			<Typography type='p1' label='Paragraph 1' />
-			<Typography type='p2' label='Paragraph 2' />
-			<Typography type='p1_regular' label='Paragraph 1 Regular' />
-			<Typography type='p1_bold' label='Paragraph 1 Bold' />
-			<Typography type='p1_italic' label='Paragraph 1 Italic' />
-			<div theme='row' style={{ gap: 10 }}>
-				<Button type='contained' label='Button' onClick={() => { }} />
-				<Button type='outlined' label='Button' onClick={() => { }} />
-				<Button type='text' label='Button' onClick={() => { }} />
-			</div>
-			<div theme='column' style={{ gap: 10 }} >
-				<TextField placeholder='Email' value={Observer.mutable('')} />
-				<TextField />
-				<TextField />
-			</div>
-
+		<Paper theme='column' style={{ gap: 10 }}>
 			<div theme='row_spread'>
 				<Typography type='h1' label='Gigs' />
 				<div
@@ -239,5 +211,33 @@ export default ({ state }) => {
 				<Gig each={exampleGigs} state={state} />
 			</div>
 		</Paper>
+		<Paper theme='paper_inset'>
+			<Typography type='h5' label='UI Component Test:' />
+
+			<Typography type='h1' label='Header 1' />
+			<Typography type='h2' label='Header 2' />
+			<Typography type='h3' label='Header 3' />
+			<Typography type='h4' label='Header 4' />
+			<Typography type='h5' label='Header 5' />
+			<Typography type='h6' label='Header 6' />
+			<Typography type='p1' label='Paragraph 1' />
+			<Typography type='p2' label='Paragraph 2' />
+			<Typography type='p1_regular' label='Paragraph 1 Regular' />
+			<Typography type='p1_bold' label='Paragraph 1 Bold' />
+			<Typography type='p1_italic' label='Paragraph 1 Italic' />
+			<div theme='row' style={{ gap: 10 }}>
+				<Button type='contained' label='Button' onClick={() => { }} />
+				<Button type='outlined' label='Button' onClick={() => { }} />
+				<Button type='text' label='Button' onClick={() => { }} />
+			</div>
+			<div theme='column' style={{ gap: 10 }} >
+				<TextField placeholder='Email' value={Observer.mutable('')} />
+				<TextField />
+				<TextField />
+			</div>
+			<Toggle value={Observer.mutable(false)} />
+
+		</Paper>
+
 	</div>;
 };

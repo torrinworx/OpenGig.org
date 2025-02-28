@@ -14,18 +14,22 @@ const mainColors = {
 const themeModes = {
 	light: {
 		$color_main: mainColors.$color_white,
-		$color_text: mainColors.$color_white,
+		$color_text: mainColors.$color_purple,
 		$color_top: mainColors.$color_purple,
 		$color_hover: mainColors.$color_slate,
+		$color_hover_top: mainColors.$color_white,
 	},
 
 	dark: {
 		$color_main: mainColors.$color_purple,
-		$color_text: mainColors.$color_purple,
+		$color_text: mainColors.$color_white,
 		$color_top: mainColors.$color_white,
 		$color_hover: mainColors.$color_slate,
+		$color_hover_top: mainColors.$color_white,
 	}
 };
+
+const transition = '250ms ease-in-out';
 
 const theme = OObject({
 	// destamatic-ui
@@ -33,16 +37,21 @@ const theme = OObject({
 		fontFamily: 'IBM Plex Sans',
 		fontWeight: 600,
 		boxSizing: 'border-box',
-		transition: 'opacity 250ms ease-out, box-shadow 250ms ease-out, background-color 250ms ease-in-out, color 250ms ease-in-out',
+		transition: `opacity ${transition}, box-shadow ${transition}, background-color ${transition}, color ${transition}, border-color ${transition}`,
 	}),
 
+	shadow: {
+		boxShadow: '4px 4px 10px $alpha($color_top, 0.2)',
+	},
+
 	paper: {
-		extends: ['*', 'radius', 'shadow'],
-		padding: 15,
-		background: '$color_top',
+		extends: ['*', 'radius'],
+		padding: 30,
+		background: '$',
 		color: '$color_text',
 		maxWidth: 'inherit',
 		maxHeight: 'inherit',
+		border: 'solid $color_top 2px'
 	},
 
 	radius: {
@@ -57,7 +66,7 @@ const theme = OObject({
 		position: 'relative',
 		width: '60px',
 		height: '30px',
-		background: '$color_main',
+		background: '$color_top',
 		borderRadius: '37.5px',
 	},
 
@@ -71,7 +80,7 @@ const theme = OObject({
 		transform: 'translateX(4px) translateY(-50%) scale(1)',
 		width: '23px',
 		height: '23px',
-		background: '$color_top',
+		background: '$color_main',
 		borderRadius: '50%',
 		transition: 'transform 150ms cubic-bezier(0.4, 0.0, 0.2, 1), background-color 150ms ease-in-out',
 	},
@@ -100,7 +109,7 @@ const theme = OObject({
 		textDecoration: 'none',
 		position: 'relative',
 		overflow: 'clip',
-		color: '$color_main',
+		color: '$color_top',
 		boxShadow: 'none',
 		background: 'none',
 		_cssProp_focus: { outline: 'none' },
@@ -113,20 +122,21 @@ const theme = OObject({
 
 	button_contained: {
 		extends: 'typography_p1_bold',
-		background: '$color_main',
-		color: '$color_top',
+		background: '$color_top',
+		color: '$color_main',
 	},
 
 	button_contained_hovered: {
 		background: '$color_hover',
+		color: '$color_hover_top'
 	},
 
 	button_outlined: {
 		extends: 'typography_p1_bold',
 		borderWidth: 2,
 		borderStyle: 'solid',
-		borderColor: '$color_main',
-		color: '$color_main',
+		borderColor: '$color_top',
+		color: '$color_top',
 	},
 
 	button_outlined_hovered: {
@@ -148,13 +158,17 @@ const theme = OObject({
 
 	text: {
 		extends: 'typography_p1_regular',
-		color: '$color_main'
+		color: '$color_top'
+	},
+
+	text_hovered: {
+		color: '$color_hover'
 	},
 
 	focusable: {
 		borderStyle: 'solid',
-		borderWidth: .5,
-		borderColor: '$color_hover',
+		borderWidth: 2,
+		borderColor: '$color_top',
 		transitionDuration: '0.3s',
 		transitionProperty: 'border-color, background-color, box-shadow',
 	},
@@ -193,7 +207,7 @@ const theme = OObject({
 	page: {
 		background: '$color_main',
 		padding: '40px',
-		gap: '20px',
+		gap: '40px',
 		display: 'flex',
 		flexDirection: 'column',
 		height: '100%',
@@ -201,10 +215,11 @@ const theme = OObject({
 	},
 });
 
-window.themeMode = Observer.mutable(window.matchMedia("(prefers-color-scheme:dark)").matches ? 'dark' : 'light');
+window.themeMode = Observer.mutable(window.matchMedia("(prefers-color-scheme:dark)").matches ? true : false);
 window.theme = theme;
 
 window.themeMode.effect(mode => atomic(() => {
+	mode = mode ? 'dark' : 'light'; // if mode is true => dark mode, else false => light mode
 	for (const [key, val] of Object.entries(themeModes[mode])) {
 		theme['*'][key] = val;
 	}

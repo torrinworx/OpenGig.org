@@ -45,7 +45,7 @@ const Modal = ({ modal }, cleanup) => {
                 top: '50%',
                 left: '50%',
             }}>
-                <Modal {...{ state, ...m.props }} />;
+                <Modal {...{ state, ...m.props }} />
             </div>
         </Popup>;
     });
