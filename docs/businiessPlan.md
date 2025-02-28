@@ -14,15 +14,15 @@ OpenGig is a cooperative platform based in Waterloo, Ontario, Canada. Our goal i
 
 A cooperative structure fits our market better than the typical investor-led approach. Even the largest labor platforms struggle to be profitable under that model. By letting users, both workers and customers, directly invest in the coop (similar to a credit union), we remove the pressure of traditional investors demanding high returns.
 
-Instead of manipulative pricing, surge fees, or other tricks, OpenGig will charge a fair usage fee per transaction based on actual expenses—not on how much users can pay.Running modern digital platforms efficiently is cheaper than most people realize. The true cost includes fair wages for employees, hardware, marketing, legal fees, domain costs, and maintenance. The true issue lies with predatory investors, executive sallaries and bonuses, missmanaged ventures, stock buy backs, and other wasteful startup gimics like ping pong table, craft beer on tap, slides, nerf gun battles, bean bag chairs, and excessive physical office space.
+Instead of manipulative pricing, surge fees, or other tricks, OpenGig will charge a fair usage fee per transaction based on actual expenses—not on how much users can pay. Running modern digital platforms efficiently is cheaper than most people realize. The true cost includes fair wages for employees, hardware, marketing, legal fees, domain costs, and maintenance. The true issue lies with predatory investors, executive sallaries and bonuses, missmanaged ventures, stock buy backs, and other wasteful startup gimics like ping pong table, craft beer on tap, slides, nerf gun battles, bean bag chairs, and excessive physical office space.
 
-With our cooperative structure, employees are held accountable for their choices and management of the platform by the workers, customers, and each other.This ensures a responsible business model that is profitable and fair.
+With our cooperative structure, employees are held accountable for their choices and management of the platform by the workers, customers, and each other. This ensures a responsible business model that is profitable and fair.
 
 ## Mission Statement
 OpenGig will emancipate workers and customers from the unfair and illegal practices that other labor platforms perpetuate, by providing a transparent, equitable, and member driven alternative that prioritizes their wellbeing and freedom. We aim to be a platform supporting labour transactions, not a middeavil lord placing a chain accross a river and charging a toll to lower it.
 
-## Problem Description
-Today’s digital labor platforms often lack transparency, accountability, and efficiency. Major players are strattled with debt, appease demanding investors, have astronomical evaluations, overspend on growth, and still struggle to turn a profit. Workers and customers end up bearing the real costs of this mismanagement.
+## The Problem
+Today’s digital labor platforms often lack transparency, accountability, and efficiency. Major players are strattled with debt, obligated to appease demanding investors, have astronomicaly unsustainable evaluations, overspend on growth, and still struggle to turn a profit. Workers and customers end up bearing the real costs of this mismanagement.
 This provides an opportunity for a small, efficient, unburdened competitor to enter the space.
 
 ## Our Solution
@@ -35,12 +35,10 @@ OpenGig is a multi stakeholder cooperative with three member types: workers, cus
 
 • Feature Votes: to request new features or improvements.
 
-This voting system keeps employees accountable while allowing them to move quickly on decisions based on their expertise.
-
-The OpenGig voting system serves as a corrective measure to balance the need for development speed and worker and customer interests. Employees are a trusted group, making informed decisions given their speciality and intrusted to make the correct decisions for the benifit of the cooperative.
+This voting system keeps employees accountable while allowing them to move quickly on decisions based on their expertise. The OpenGig voting system serves as a corrective measure to balance the need for development speed and worker and customer interests. Employees are a trusted group, making informed decisions given their speciality and intrusted to make the correct decisions for the benifit of the cooperative.
 
 ## Value Proposition
-The value proposition that OpenGig brings to the table is quite substantial and obvious, we do not overly charge our workers and customers. We provide clear metrics and open data so workers can make informed, independent business decisions rather than be forced into surge pricing or hidden fees. True market dynamics come from many individuals making decisions—not from a single platform dictating prices.
+The value proposition that OpenGig brings to the table is quite substantial and obvious, we do not overly charge our workers and customers. We provide clear metrics and open data so workers can make informed, independent business decisions rather than be forced into surge pricing or hidden fees. The benefit from the market and it's dynamics come from many individuals making individual and subjective decisions—not from a single platform dictating prices.
 
 We run at cost, paying fair wages to employees and avoiding bloated executive salaries. Customers pay only for the actual cost of fulfilling their requests and running the platform. This lean approach offers employees fair, livable salaries, gives workers direct control over their compensation, and offers customers a better deal than predatory labor platforms.
 
@@ -48,7 +46,7 @@ We run at cost, paying fair wages to employees and avoiding bloated executive sa
 
 The gig economy is experiencing rapid growth, driven by an increasing shift away from traditional employment models towards more flexible, self determined short term contract based work.
 
-There is a substantial opportunity to create a blue ocean in this market with a  cooperative model that does not have high cost structures and complex hidden pricing. OpenGig is well positioned to attract members from gig workers disillusioned by diminishing returns, to consumers seeking more ethical and cost effective platforms.
+There is a substantial opportunity to create a blue ocean in this market with a cooperative model that does not have high cost structures and complex hidden pricing. OpenGig is well positioned to attract members from gig workers disillusioned by diminishing returns, to consumers seeking more ethical and cost effective platforms.
 
 At the regional level, Waterloo, Ontario, offers a tech based community and a supportive regulatory environment, ideal for piloting and growing our platform. Using these local resources and scaling responsibly, OpenGig aims to build a sustainable, cooperative-based digital marketplaces.
 
