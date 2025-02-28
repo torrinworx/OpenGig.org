@@ -53,6 +53,7 @@ const Auth = ({ state }) => {
 						<Button
 							label="Back"
 							type="text"
+							style={{ color: '$color_top' }}
 							onMouseDown={() => (state.client.openPage = { page: "Landing" })}
 						/>
 					</div>

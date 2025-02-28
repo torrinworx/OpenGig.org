@@ -46,7 +46,7 @@ Theme.define({
         color: 'white'
     },
     notificationButton_hovered: {
-        extends: ['primary', 'button_icon_hovered'],
+        extends: [ 'button_icon_hovered'],
         color: '$color',
     },
 });
