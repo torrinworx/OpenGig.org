@@ -33,7 +33,7 @@ const theme = OObject({
 		fontFamily: 'IBM Plex Sans',
 		fontWeight: 600,
 		boxSizing: 'border-box',
-		transition: 'opacity 250ms ease-out, box-shadow 250ms ease-out, background-color 250ms ease-in-out',
+		transition: 'opacity 250ms ease-out, box-shadow 250ms ease-out, background-color 250ms ease-in-out, color 250ms ease-in-out',
 	}),
 
 	paper: {
