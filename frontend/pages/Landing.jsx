@@ -64,19 +64,19 @@ export default ({ state }) => <div theme='page'>
 	<Paper theme="center">
 		<div theme="iconWrapper">
 			<Button
-				Icon={<Icon size="40" libraryName="feather" iconName="github" />}
+				icon={<Icon size="40" libraryName="feather" iconName="github" />}
 				type="icon"
 				onMouseDown={() => window.open('https://github.com/torrinworx/OpenGig.org', '_blank')}
 				title={"GitHub"}
 			/>
 			<Button
-				Icon={<Icon size="40" libraryName="feather" iconName="globe" />}
+				icon={<Icon size="40" libraryName="feather" iconName="globe" />}
 				type="icon"
 				onMouseDown={() => window.open('', '_blank')}
 				title={"Twitter"}
 			/>
 			<Button
-				Icon={<Icon size="40" libraryName="feather" iconName="feather" />}
+				icon={<Icon size="40" libraryName="feather" iconName="feather" />}
 				type="icon"
 				onMouseDown={() => window.open('', '_blank')}
 				title={"Twitter"}
