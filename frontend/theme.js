@@ -18,7 +18,6 @@ const themeModes = {
 		$color_top: mainColors.$color_purple,
 		$color_hover: mainColors.$color_slate,
 		$color_hover_top: mainColors.$color_white,
-		color: '$color_text',
 	},
 
 	dark: {
@@ -27,7 +26,6 @@ const themeModes = {
 		$color_top: mainColors.$color_white,
 		$color_hover: mainColors.$color_slate,
 		$color_hover_top: mainColors.$color_white,
-		color: '$color_text',
 	}
 };
 

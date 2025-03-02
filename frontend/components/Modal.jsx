@@ -47,8 +47,7 @@ const Modal = ({ modal }, cleanup) => {
         const ModalFunc = modals[matchedPath];
         const ModalInner = ModalFunc.default;
 
-        // const header = m.props?.header;
-        const header = null // TODO: Find a way to add a header within each modal file.
+        const header = m?.header;
 
         return <Popup style={{ position: 'fixed', inset: 0 }}>
             <div
