@@ -18,6 +18,7 @@ const themeModes = {
 		$color_top: mainColors.$color_purple,
 		$color_hover: mainColors.$color_slate,
 		$color_hover_top: mainColors.$color_white,
+		color: '$color_text',
 	},
 
 	dark: {
@@ -26,6 +27,7 @@ const themeModes = {
 		$color_top: mainColors.$color_white,
 		$color_hover: mainColors.$color_slate,
 		$color_hover_top: mainColors.$color_white,
+		color: '$color_text',
 	}
 };
 
@@ -188,6 +190,15 @@ const theme = OObject({
 
 	button_icon_hovered: {
 		color: '$color_hover',
+	},
+
+	text: {
+		extends: 'typography_p1_regular',
+		color: '$color_top'
+	},
+
+	text_hovered: {
+		color: '$color_hover'
 	},
 
 	focusable: {

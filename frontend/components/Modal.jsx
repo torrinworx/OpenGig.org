@@ -1,6 +1,5 @@
 import { Popup, Button, Icon, Typography } from 'destamatic-ui';
 
-
 const modals = import.meta.glob('../modals/*.jsx', { eager: true }); // Use 'eager: true' to load all files at once
 
 const Modal = ({ modal }, cleanup) => {
@@ -51,7 +50,7 @@ const Modal = ({ modal }, cleanup) => {
         // const header = m.props?.header;
         const header = null // TODO: Find a way to add a header within each modal file.
 
-        return <Popup style={{ inset: 0 }}>
+        return <Popup style={{ position: 'fixed', inset: 0 }}>
             <div
                 style={{
                     background: 'rgba(0, 0, 0, 0.7)',
@@ -60,12 +59,14 @@ const Modal = ({ modal }, cleanup) => {
                 }}
                 onClick={() => modal.set(false)}
             />
-            <div style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-            }}>
+            <div
+                style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                }}
+            >
                 <div theme='radius' style={{ background: '$color_main', width: 500, height: 500, padding: 20 }}>
                     <div theme='row_end_spread'>
                         <div>
@@ -83,9 +84,7 @@ const Modal = ({ modal }, cleanup) => {
                                 borderRadius: 50,
                                 flexShrink: 0,
                             }}
-                            icon={
-                                <Icon size={30} libraryName='feather' iconName='x' />
-                            }
+                            icon={<Icon size={30} libraryName='feather' iconName='x' />}
                         />
                     </div>
                     <ModalInner {...m.props} />
