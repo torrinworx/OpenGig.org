@@ -85,15 +85,42 @@ const theme = OObject({
 		transition: 'transform 150ms cubic-bezier(0.4, 0.0, 0.2, 1), background-color 150ms ease-in-out',
 	},
 
-	typography: { display: 'block' },
-	typography_h1: { fontSize: 62 },
-	typography_h2: { fontSize: 56 },
-	typography_h3: { fontSize: 36 },
-	typography_h4: { fontSize: 30 },
-	typography_h5: { fontSize: 24 },
-	typography_h6: { fontSize: 20 },
-	typography_p1: { fontSize: 16 },
-	typography_p2: { fontSize: 14 },
+	typography: {
+		color: '$color_text',
+		display: 'block'
+	},
+	typography_h1: {
+		color: '$color_text',
+		fontSize: 62
+	},
+	typography_h2: {
+		color: '$color_text',
+		fontSize: 56
+	},
+	typography_h3: {
+		color: '$color_text',
+		fontSize: 36
+	},
+	typography_h4: {
+		color: '$color_text',
+		fontSize: 30
+	},
+	typography_h5: {
+		color: '$color_text',
+		fontSize: 24
+	},
+	typography_h6: {
+		color: '$color_text',
+		fontSize: 20
+	},
+	typography_p1: {
+		color: '$color_text',
+		fontSize: 16
+	},
+	typography_p2: {
+		color: '$color_text',
+		fontSize: 14
+	},
 	typography_regular: { fontStyle: 'normal' },
 	typography_bold: { fontWeight: 'bold' },
 	typography_italic: { fontStyle: 'italic' },
@@ -116,7 +143,7 @@ const theme = OObject({
 	},
 
 	button_text_hovered: {
-		background: 'rgb(0, 0, 0, 0.1)',
+		background: 'none',
 		color: '$color_hover'
 	},
 
@@ -150,19 +177,17 @@ const theme = OObject({
 	},
 
 	button_contained_disabled: {
-		// temp var
 		$bg: '$saturate($color, -1)',
 		background: '$bg',
 		color: '$contrast_text($bg)',
 	},
 
-	text: {
-		extends: 'typography_p1_regular',
-		color: '$color_top'
+	button_icon: {
+		color: '$color_top',
 	},
 
-	text_hovered: {
-		color: '$color_hover'
+	button_icon_hovered: {
+		color: '$color_hover',
 	},
 
 	focusable: {

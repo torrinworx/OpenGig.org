@@ -11,41 +11,59 @@ const Modal = ({ modal }, cleanup) => {
         }
     };
 
-    cleanup(modal.effect(d => {
-        if (d && !d.noEsc) {
-            window.addEventListener('keydown', escape);
-            return () => window.removeEventListener('keydown', escape);
+    cleanup(modal.effect(current => {
+        // If the modal is open, wire up the escape handler + disable scroll;
+        // undo it when modal closes.
+        if (current) {
+            // Disable body scroll:
+            const oldOverflow = document.body.style.overflow;
+            document.body.style.overflow = 'hidden';
+
+            // Optional: listen for escape-press, unless explicitly prevented
+            if (!current.noEsc) {
+                window.addEventListener('keydown', escape);
+            }
+
+            // Return a cleanup function that reverts everything
+            return () => {
+                document.body.style.overflow = oldOverflow;
+                if (!current.noEsc) {
+                    window.removeEventListener('keydown', escape);
+                }
+            };
         }
     }));
 
     return modal.map(m => {
-        if (!m) return null;
-        if (!modals) return null;
+        // No modal is open
+        if (!m || !modals) return null;
 
+        // Figure out which file to load (from import.meta.glob)
         const matchedPath = Object.keys(modals).find(filePath => {
             const parts = filePath.split('/');
             return parts[parts.length - 1].replace('.jsx', '') === m.name;
         });
+        if (!matchedPath) return null;
 
         const ModalFunc = modals[matchedPath];
-        const Modal = ModalFunc.default;
+        const ModalInner = ModalFunc.default;
 
         return <Popup style={{ inset: 0 }}>
             <div
                 style={{
                     background: 'rgba(0, 0, 0, 0.7)',
                     height: '100vh',
-                    width: '100vw'
+                    width: '100vw',
                 }}
                 onClick={() => modal.set(false)}
             />
             <div style={{
-                transform: 'translate(-50%, -50%)',
                 position: 'absolute',
                 top: '50%',
                 left: '50%',
+                transform: 'translate(-50%, -50%)',
             }}>
-                <Modal {...{ state, ...m.props }} />
+                <ModalInner {...m.props} />
             </div>
         </Popup>;
     });
