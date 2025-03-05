@@ -23,7 +23,7 @@ Theme.define({
 const Gig = ({ each: gig, state }) => {
 	const hover = Observer.mutable(false);
 
-	return <Button style={{ padding: 0 }} onClick={() => state.modal.set({ name: 'Gig' })}>
+	return <Button style={{ padding: 0 }} onClick={() => state.modal.set({ name: 'Gig', header: gig.name })}>
 		<div
 			theme={[
 				'radius',
@@ -40,7 +40,7 @@ const Gig = ({ each: gig, state }) => {
 				alignItems: 'center',
 				flexShrink: 0
 			}}>
-				<Icon libraryName='feather' iconName='image' size={20} style={{ color: '$color_main' }} />
+				<Icon name='image' size={20} style={{ color: '$color_main' }} />
 			</div>
 			<div style={{
 				display: 'flex',
@@ -55,9 +55,9 @@ const Gig = ({ each: gig, state }) => {
 					borderRadius: '50%',
 					display: 'flex',
 					justifyContent: 'center',
-					alignItems: 'center'
+					alignItems: 'center',
 				}}>
-					<Icon libraryName='feather' iconName='user' size={20} style={{ color: '$color_main' }} />
+					<Icon name='user' size={20} style={{ color: '$color_main' }} />
 				</div>
 				<Typography type='p1' label={gig.userName} style={{ color: '$color_top' }} />
 			</div>
@@ -154,6 +154,11 @@ export default ({ state }) => {
 	return <div theme='page'>
 		<Header state={state}>
 			<div theme='row'>
+				<Button
+					type='contained'
+					onMouseDown={async () => state.modal.set({ name: 'StripeTest', header: 'Stripe Test' })}
+					label='Stripe setup'
+				/>
 				<Toggle value={window.themeMode} />
 				<Button
 					type='text'
@@ -162,6 +167,18 @@ export default ({ state }) => {
 						window.location.reload();
 					}}
 					label='Sign Out'
+				/>
+				<Button
+					type='icon'
+					onClick={() => { }}
+					style={{
+						padding: 0,
+						height: 40,
+						width: 40,
+						borderRadius: 50,
+						flexShrink: 0,
+					}}
+					icon={<Icon name='user' size={30} />}
 				/>
 			</div>
 		</Header>
@@ -193,12 +210,14 @@ export default ({ state }) => {
 					/>
 					<Button
 						type='icon'
-						Icon={<Icon
-							libraryName='feather'
-							iconName='search'
-							size={20}
-							style={{ color: '$color_top' }}
-						/>}
+						style={{
+							padding: 0,
+							height: 40,
+							width: 40,
+							borderRadius: 50,
+							flexShrink: 0,
+						}}
+						icon={<Icon name='search' size={30} />}
 						onClick={() => { }}
 					/>
 				</div>
@@ -236,8 +255,6 @@ export default ({ state }) => {
 				<TextField />
 			</div>
 			<Toggle value={Observer.mutable(false)} />
-
 		</Paper>
-
 	</div>;
 };

@@ -83,7 +83,7 @@ const Modal = ({ modal }, cleanup) => {
                                 borderRadius: 50,
                                 flexShrink: 0,
                             }}
-                            icon={<Icon size={30} libraryName='feather' iconName='x' />}
+                            icon={<Icon size={30} name='x' />}
                         />
                     </div>
                     <ModalInner {...m.props} />

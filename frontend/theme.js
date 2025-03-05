@@ -1,6 +1,7 @@
 import { OObject } from "destam-dom";
 import { Observer } from "destam-dom";
 import { atomic } from "destam/Network";
+import FeatherIcons from "destamatic-ui/components/icons/FeatherIcons";
 
 const mainColors = {
 	$color_purple: '#500089',
@@ -39,6 +40,13 @@ const theme = OObject({
 		boxSizing: 'border-box',
 		transition: `opacity ${transition}, box-shadow ${transition}, background-color ${transition}, color ${transition}, border-color ${transition}`,
 	}),
+
+	// Override destamatic-ui primary theme
+	primary: {
+		$color: '$color_main',
+		$color_hover: '$color_hover',
+		$color_top: '$color_top',
+	},
 
 	shadow: {
 		boxShadow: '4px 4px 10px $alpha($color_top, 0.2)',
@@ -225,7 +233,7 @@ const theme = OObject({
 			50% { opacity: 1; }
 		`,
 
-		background: '$color_main',
+		background: '$color_top',
 		display: 'inline-block',
 		width: '8px',
 		height: '8px',
@@ -261,6 +269,15 @@ window.themeMode.effect(mode => atomic(() => {
 
 export default {
 	theme,
+	icons: {
+		search: FeatherIcons('search'),
+		x: FeatherIcons('x'),
+		user: FeatherIcons('user'),
+		image: FeatherIcons('image'),
+		feather: FeatherIcons('feather'),
+		globe: FeatherIcons('globe'),
+		github: FeatherIcons('github'),
+	},
 	define: (...args) => atomic(() => {
 		let prefix = '';
 		let i = 0;

@@ -1,6 +1,6 @@
 import { Observer } from 'destam';
 import { coreClient } from 'destam-web-core/client';
-import { popups, Button, Theme, Typography } from 'destamatic-ui';
+import { Theme, Icons, popups, Button, Typography } from 'destamatic-ui';
 
 import theme from './theme';
 import Modal from './components/Modal';
@@ -8,20 +8,23 @@ import Notifications from './components/Notifications';
 
 const pages = import.meta.glob('./pages/*.jsx', { eager: true }); // Use 'eager: true' to load all files at once
 
-const NotFound = () => <div theme='page_column_center' style={{ height: '100vh' }}>
-    <Typography type='h4' label='404 Page Not Found' />
-    <Typography type='p1' label='The page you are trying to access is either unavailable or restricted.' />
-    <Button
-        type='contained'
-        label='Return to Site'
-        onMouseDown={() => {
-            state.client.observer.path('openPage').set({ page: "Landing" });
-            if (window.location.pathname !== '/') {
-                window.location.href = '/';
-            }
-        }}
-    />
-</div>;
+const NotFound = () => <Theme value={theme.theme}><Icons value={theme.icons}>
+    <div theme='page_column_center' style={{ height: '100vh' }}>
+        <Typography type='h4' label='404 Page Not Found' />
+        <Typography type='p1' label='The page you are trying to access is either unavailable or restricted.' />
+        <Button
+            type='contained'
+            label='Return to Site'
+            onMouseDown={() => {
+                state.client.observer.path('openPage').set({ page: "Landing" });
+                if (window.location.pathname !== '/') {
+                    window.location.href = '/';
+                }
+            }}
+        />
+    </div>
+</Icons></Theme>;
+
 
 // Pages, openPage helps avoid circular import issues when trying to just simply set the page on a button click.
 const Pages = ({ state }) => {
@@ -45,7 +48,7 @@ const Pages = ({ state }) => {
 
 const App = ({ state }) => {
     state.modal = Observer.mutable(false);
-    return <Theme value={theme.theme}>
+    return <Theme value={theme.theme}><Icons value={theme.icons}>
         <link
             rel="icon"
             href={window.themeMode.map(t =>
@@ -60,7 +63,7 @@ const App = ({ state }) => {
         <Pages theme='page' state={state} />
         <Modal {...state} />
         {popups}
-    </Theme>;
+    </Icons></Theme>;
 };
 
 coreClient(App, NotFound);
