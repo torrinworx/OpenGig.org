@@ -147,4 +147,7 @@ const Auth = ({ state }) => {
 	});
 };
 
-export default Auth;
+export default {
+	authenticated: false,
+	page: Auth,
+};

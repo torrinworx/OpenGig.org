@@ -18,7 +18,7 @@ Theme.define({
 	gigtile_hovered: {
 		background: '$color_hover'
 	}
-})
+});
 
 const Gig = ({ each: gig, state }) => {
 	const hover = Observer.mutable(false);
@@ -69,7 +69,7 @@ const Gig = ({ each: gig, state }) => {
 	</Button>;
 };
 
-export default ({ state }) => {
+const Home = ({ state }) => {
 	const exampleGigs = [
 		{
 			userName: 'Bob',
@@ -170,7 +170,7 @@ export default ({ state }) => {
 				/>
 				<Button
 					type='icon'
-					onClick={() => { }}
+					onClick={() => state.modal.set({ name: 'Account', header: 'Account' })}
 					style={{
 						padding: 0,
 						height: 40,
@@ -230,7 +230,7 @@ export default ({ state }) => {
 				<Gig each={exampleGigs} state={state} />
 			</div>
 		</Paper>
-		<Paper theme='paper_inset'>
+		<Paper>
 			<Typography type='h5' label='UI Component Test:' />
 
 			<Typography type='h1' label='Header 1' />
@@ -256,5 +256,22 @@ export default ({ state }) => {
 			</div>
 			<Toggle value={Observer.mutable(false)} />
 		</Paper>
+		<Paper theme='row_center'>
+			<Button
+				type='text'
+				label='Privacy'
+				onMouseDown={() => state.client.openPage = { page: "Privacy" }}
+			/>
+			<Button
+				type='text'
+				label='Terms'
+				onMouseDown={() => state.client.openPage = { page: "Terms" }}
+			/>
+		</Paper>
 	</div>;
+};
+
+export default {
+	authenticated: true,
+	page: Home,
 };
