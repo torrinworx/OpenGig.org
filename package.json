@@ -26,6 +26,7 @@
 		"destam": "^0.5.2",
 		"destam-dom": "^0.10.2",
 		"destam-web-core": "file:destam-web-core",
+		"destam-db-core": "file:destam-web-core/destam-db-core",
 		"destamatic-ui": "file:destamatic-ui",
 		"dotenv": "^16.4.5",
 		"express": "^4.21.0",
