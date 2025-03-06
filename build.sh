@@ -35,9 +35,9 @@ install_nvm_and_node() {
 		source "$NVM_DIR/bash_completion"
 	fi
 
-	echo "Installing Node.js version 21..."
-	nvm install 21
-	nvm use 21
+	echo "Installing Node.js version 23..."
+	nvm install 23
+	nvm use 23
 
 	# Verify installations
 	echo "NVM version:"
