@@ -85,9 +85,10 @@ cp -r ./node_modules "$BUILD_DIR"
 cp ./package.json "$BUILD_DIR"
 cp ./package-lock.json "$BUILD_DIR"
 
-# Create the run script in the build directory
+# Create the run script the service will use
 cat << 'EOF' > "$BUILD_DIR/run.sh"
 #!/bin/bash
+. ~/.nvm/nvm.sh use 23
 node ./backend/index.js
 EOF
 

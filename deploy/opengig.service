@@ -1,0 +1,14 @@
+# Systemd service file used in production
+[Unit]
+Description=OpenGig.org
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/root/build/run.sh
+WorkingDirectory=/root/build
+Restart=always
+EnvironmentFile=/root/.env
+
+[Install]
+WantedBy=multi-user.target
