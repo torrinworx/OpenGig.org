@@ -3,12 +3,11 @@ import { OArray } from "destam";
 import { coreServer } from "destam-web-core/server";
 
 let stripe;
+const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
 try {
-	if (!process.env.STRIPE_SECRET_KEY) {
-		console.warn('No STRIPE_SECRET_KEY provided. Skipping Stripe initialization.');
-	} else {
-		stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-		console.log('Stripe initialized successfully.');
+	console.log("THIS IS THE STRIPE VAR: ", STRIPE_SECRET_KEY)
+	if (STRIPE_SECRET_KEY) {
+		stripe = new Stripe(STRIPE_SECRET_KEY);
 	}
 } catch (error) {
 	console.error('Failed to initialize Stripe. Continuing without it:', error);
