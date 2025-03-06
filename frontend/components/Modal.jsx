@@ -1,8 +1,10 @@
 import { Popup, Button, Icon, Typography } from 'destamatic-ui';
 
+// TODO: Move this into a web-core/client helper as modals are pretty standard.
 const modals = import.meta.glob('../modals/*.jsx', { eager: true }); // Use 'eager: true' to load all files at once
 
-const Modal = ({ modal }, cleanup) => {
+const Modal = ({state, ...props}, cleanup) => {
+    const modal = state.modal
     const escape = (e) => {
         if (e.which === 27) {
             e.preventDefault();
@@ -86,7 +88,7 @@ const Modal = ({ modal }, cleanup) => {
                             icon={<Icon size={30} name='x' />}
                         />
                     </div>
-                    <ModalInner {...m.props} />
+                    <ModalInner state={state} {...{...m.props, ...props}} />
                 </div>
             </div>
         </Popup>;
