@@ -33,10 +33,10 @@ const onEnter = async ({ email, user }) => {
 		console.error('Failed to create Stripe customer:', error);
 	}
 };
-
+console.log(process.env.NODE_ENV);
 coreServer(
 	'./backend/jobs',
-	process.env.ENV === 'production' ? './dist' : './frontend',
+	process.env.NODE_ENV === 'production' ? './dist' : './frontend',
 	connection,
 	{ stripe },
 	onEnter
