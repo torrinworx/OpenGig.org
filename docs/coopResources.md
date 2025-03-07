@@ -13,3 +13,7 @@ https://platform.coop
 https://coopcycle.org
 
 https://fairbnb.coop
+
+https://ised-isde.canada.ca/site/cooperatives-canada/en/success-stories
+
+https://ised-isde.canada.ca/site/cooperatives-canada/en
