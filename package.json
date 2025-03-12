@@ -8,7 +8,7 @@
 		"start": "node ./backend/index.js",
 		"dev": "nodemon --watch ./destam-web-core/server --watch ./backend --exec node ./backend/index.js",
 		"build": "bash build.sh",
-		"test": "node --test"
+		"test": "node --test && npm --prefix destamatic-ui run test"
 	},
 	"repository": {
 		"type": "git",
