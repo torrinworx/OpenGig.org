@@ -8,7 +8,12 @@
 		"start": "node ./backend/index.js",
 		"dev": "nodemon --watch ./destam-web-core/server --watch ./backend --exec node ./backend/index.js",
 		"build": "bash build.sh",
-		"test": "node --test && npm --prefix destamatic-ui run test"
+		"test": "node --test && npm --prefix destamatic-ui run test",
+		"prod": "bash build.sh && bash ./build/run.sh"
+	},
+	"engines": {
+		"npm": ">=10.9.2",
+		"node": ">=23.9.0"
 	},
 	"repository": {
 		"type": "git",
@@ -24,14 +29,12 @@
 		"@stripe/stripe-js": "^5.7.0",
 		"bcryptjs": "^2.4.3",
 		"destam": "^0.5.2",
+		"destam-db-core": "file:destam-web-core/destam-db-core",
 		"destam-dom": "^0.10.2",
 		"destam-web-core": "file:destam-web-core",
-		"destam-db-core": "file:destam-web-core/destam-db-core",
 		"destamatic-ui": "file:destamatic-ui",
 		"dotenv": "^16.4.5",
-		"express": "^4.21.0",
 		"feather-icons": "^4.29.2",
-		"mongodb": "^6.9.0",
 		"stripe": "^17.7.0",
 		"vite": "^5.4.11",
 		"ws": "^8.18.0"

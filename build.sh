@@ -88,8 +88,9 @@ cp ./package-lock.json "$BUILD_DIR"
 # Create the run script the service will use
 cat << 'EOF' > "$BUILD_DIR/run.sh"
 #!/bin/bash
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . ~/.nvm/nvm.sh use 23
-node ./backend/index.js
+node "$SCRIPT_DIR/backend/index.js"
 EOF
 
 chmod +x "$BUILD_DIR/run.sh"
