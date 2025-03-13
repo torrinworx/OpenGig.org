@@ -1,11 +1,16 @@
+import path from 'path';
+import { fileURLToPath } from 'url';
+
 import Stripe from 'stripe';
 import { OArray } from "destam";
 import { coreServer } from "destam-web-core/server";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 let stripe;
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
 try {
-	console.log("THIS IS THE STRIPE VAR: ", STRIPE_SECRET_KEY)
 	if (STRIPE_SECRET_KEY) {
 		stripe = new Stripe(STRIPE_SECRET_KEY);
 	}
@@ -14,7 +19,7 @@ try {
 	stripe = null;
 }
 
-const connection = async (ws, req, user, sync) => {
+const onCon = async (ws, req, user, sync) => {
 	// server side definition of notifications so we can push notifications directly
 	// to the client.
 	sync.notifications = OArray([]);
@@ -33,11 +38,15 @@ const onEnter = async ({ email, user }) => {
 		console.error('Failed to create Stripe customer:', error);
 	}
 };
-console.log(process.env.NODE_ENV);
-coreServer(
-	'./backend/jobs',
-	process.env.NODE_ENV === 'production' ? './dist' : './frontend',
-	connection,
-	{ stripe },
-	onEnter
-);
+
+const root = path.resolve(__dirname, process.env.NODE_ENV === 'production' ? '../dist' : './frontend');
+const modulesDir = path.resolve(__dirname, './modules');
+
+coreServer({
+	modulesDir,
+	root,
+	onCon,
+	onEnter,
+	props: { stripe },
+
+});
