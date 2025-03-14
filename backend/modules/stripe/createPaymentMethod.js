@@ -1,7 +1,7 @@
 export default () => {
 	return {
 		authenticated: true,
-		init: async ({ user, stripe }) => {
+		onMsg: async ({ user, stripe }) => {
 			try {
 				// Check that stripe customer exists
 				if (!user.stripeID) {
