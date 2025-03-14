@@ -2,7 +2,7 @@
 export default () => {
     return {
         authenticated: false,
-        init: (test) => {
+        int: (test) => {
             console.log(test)
             console.log("UNAUTHENTICATED");
 

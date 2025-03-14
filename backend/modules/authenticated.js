@@ -1,7 +1,7 @@
 
 export default () => {
     return {
-        init: (something) => {
+        int: (something) => {
             console.log('something: ', something);
             console.log('AUTHENTICATED');
             return 'Authenticated'
