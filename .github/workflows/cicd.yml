@@ -94,7 +94,7 @@ jobs:
                       mv /root/deploying/build /root/build.new
                       rm -r /root/deploying
                       cd /root/build.new/
-                      npm install
+                      # npm install
 
                       # Stop opengig service
                       systemctl stop opengig || echo 'skipped stop opengig'
