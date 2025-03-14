@@ -21,12 +21,7 @@ const NotFound = ({ state }) => <div theme='page_column_center' style={{ height:
     <Button
         type='contained'
         label='Return to Site'
-        onMouseDown={() => {
-            state.client.observer.path('openPage').set({ page: "Landing" });
-            if (window.location.pathname !== '/') {
-                window.location.href = '/';
-            }
-        }}
+        onMouseDown={() => state.client.openPage = { name: "Landing" }}
     />
 </div>;
 

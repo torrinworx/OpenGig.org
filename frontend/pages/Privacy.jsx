@@ -7,7 +7,7 @@ const Privacy = ({ state }) => <div theme='page'>
             <Button
                 label="Enter"
                 type="contained"
-                onMouseDown={() => state.client.openPage = { page: "Auth" }}
+                onMouseDown={() => state.client.openPage = { name: "Auth" }}
             />
     </Header>
     <Paper>

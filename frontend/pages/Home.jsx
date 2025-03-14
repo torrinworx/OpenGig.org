@@ -164,6 +164,8 @@ const Home = ({ state }) => {
 					type='text'
 					onMouseDown={() => {
 						document.cookie = 'webCore=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax';
+						state.client.openPage = { name: "Landing" }
+
 						window.location.reload();
 					}}
 					label='Sign Out'
@@ -260,12 +262,12 @@ const Home = ({ state }) => {
 			<Button
 				type='text'
 				label='Privacy'
-				onMouseDown={() => state.client.openPage = { page: "Privacy" }}
+				onMouseDown={() => state.client.openPage = { name: "Privacy" }}
 			/>
 			<Button
 				type='text'
 				label='Terms'
-				onMouseDown={() => state.client.openPage = { page: "Terms" }}
+				onMouseDown={() => state.client.openPage = { name: "Terms" }}
 			/>
 		</Paper>
 	</div>;

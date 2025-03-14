@@ -51,7 +51,7 @@ const Auth = ({ state }) => {
 
 	return state.observer.path('sync').shallow().ignore().map(s => {
 		if (s) {
-			state.client.openPage = { page: "Home" };
+			state.client.openPage = { name: "Home" };
 			return null;
 		}
 		return <div theme='page_center'>
@@ -60,7 +60,7 @@ const Auth = ({ state }) => {
 					<Button
 						label="Back"
 						type="text"
-						onMouseDown={() => (state.client.openPage = { page: "Landing" })}
+						onMouseDown={() => (state.client.openPage = { name: "Landing" })}
 					/>
 				</div>
 				<div theme='column_center' style={{ margin: 10, gap: 20 }}>

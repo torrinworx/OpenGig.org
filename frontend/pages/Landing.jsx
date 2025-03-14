@@ -19,7 +19,7 @@ const Landing = ({ state }) => {
 				<Button
 					label={cookiePresent ? 'Enter' : 'Join'}
 					type="contained"
-					onMouseDown={() => state.client.openPage = { page: "Auth" }}
+					onMouseDown={() => state.client.openPage = { name: "Auth" }}
 				/>
 			</div>
 		</Header>
@@ -32,7 +32,7 @@ const Landing = ({ state }) => {
 				label={cookiePresent ? 'Enter' : 'Join'}
 				type="contained"
 				style={{ marginTop: '20px' }}
-				onMouseDown={() => state.client.openPage = { page: "Auth" }}
+				onMouseDown={() => state.client.openPage = { name: "Auth" }}
 			/>
 		</Paper>
 		<Paper>

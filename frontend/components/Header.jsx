@@ -23,7 +23,7 @@ const Header = ({ state, children }) => {
                 ]}
                 onClick={(e) => {
                     createRipple(e)
-                    state.client.openPage = { page: 'Landing' }
+                    state.client.openPage = { name: 'Landing' }
                 }}
                 isHovered={hover}
             >
