@@ -1,6 +1,5 @@
 export default () => {
 	return {
-		authenticated: true,
 		onMsg: async ({ user, amount, currency, paymentMethod, stripe }) => {
 			const customerStripeID = user.stripeID;
 

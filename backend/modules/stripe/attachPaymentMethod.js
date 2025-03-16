@@ -1,6 +1,5 @@
 export default () => {
 	return {
-		authenticated: true,
 		onMsg: async ({ user, paymentMethodId, stripe }) => {
 			// console.log("THIS IS HAPPENING")
 			try {

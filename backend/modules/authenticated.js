@@ -1,10 +1,10 @@
 
 export default () => {
     return {
-        int: (something) => {
-            console.log('something: ', something);
+        onMsg: ({ test }) => {
+            console.log(test);
             console.log('AUTHENTICATED');
-            return 'Authenticated'
+            return test
         }
     }
 };
