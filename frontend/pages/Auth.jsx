@@ -1,7 +1,7 @@
 import { Observer } from 'destam-dom';
 import { TextField, Button, Typography, Shown, LoadingDots, Paper } from 'destamatic-ui';
 
-const Auth = ({ state }) => {
+const Auth = ({ state }, cleanup) => {
 	const email = Observer.mutable('');
 	const password = Observer.mutable('');
 	const confirmPassword = Observer.mutable('');
@@ -49,102 +49,99 @@ const Auth = ({ state }) => {
 		});
 	};
 
-	return state.observer.path('sync').shallow().ignore().map(s => {
-		if (s) {
-			state.client.openPage = { name: "Home" };
-			return null;
-		}
-		return <div theme='page_center'>
-			<Paper style={{ width: '285px' }}>
-				<div style={{ position: 'absolute', top: '10px', left: '10px' }}>
-					<Button
-						label="Back"
-						type="text"
-						onMouseDown={() => (state.client.openPage = { name: "Landing" })}
-					/>
-				</div>
-				<div theme='column_center' style={{ margin: 10, gap: 20 }}>
-					<Typography type="h3" label='Enter' />
+	const auth = state.observer.path('sync').shallow().ignore()
+	cleanup(auth.effect(a => { if (a) state.client.openPage = { name: 'Home' } }));
+	return auth.map(s => s && <div theme='page_center'>
+		<Paper style={{ width: '285px' }}>
+			<div style={{ position: 'absolute', top: '10px', left: '10px' }}>
+				<Button
+					label="Back"
+					type="text"
+					onMouseDown={() => (state.client.openPage = { name: "Landing" })}
+				/>
+			</div>
+			<div theme='column_center' style={{ margin: 10, gap: 20 }}>
+				<Typography type="h3" label='Enter' />
 
-					<TextField
-						onEnter={checkUser}
-						disabled={loading}
-						value={email}
-						placeholder="Email"
-					/>
-					<Shown value={exists}>
-						<mark:then>
-							<Shown value={checked}>
-								<mark:then>
-									<TextField
-										style={{ margin: '10px 0px' }}
-										disabled={loading}
-										type="password"
-										value={password}
-										placeholder="Password"
-									/>
-									<Shown value={loading} invert>
-										<Button
-											label='Enter'
-											onMouseDown={async () => {
-												loading.set(true)
-												await state.enter(email, password)
-											}}
-											type="contained"
-										/>
-									</Shown>
-								</mark:then>
-								<mark:else>
+				<TextField
+					onEnter={checkUser}
+					disabled={loading}
+					value={email}
+					placeholder="Email"
+				/>
+				<Shown value={exists}>
+					<mark:then>
+						<Shown value={checked}>
+							<mark:then>
+								<TextField
+									style={{ margin: '10px 0px' }}
+									disabled={loading}
+									type="password"
+									value={password}
+									placeholder="Password"
+								/>
+								<Shown value={loading} invert>
 									<Button
-										label='Continue with Email'
-										onMouseDown={checkUser}
+										label='Enter'
+										onMouseDown={async () => {
+											loading.set(true)
+											await state.enter(email, password)
+										}}
 										type="contained"
 									/>
-								</mark:else>
-							</Shown>
-						</mark:then>
-						<mark:else>
-							<Shown value={checked}>
-								<mark:then>
-									<TextField
-										disabled={loading}
-										type="password"
-										value={password}
-										placeholder="Password"
-									/>
-									<TextField
-										onEnter={createAccount}
-										disabled={loading}
-										type="password"
-										value={confirmPassword}
-										placeholder="Confirm Password"
-									/>
-									<Shown value={loading} invert>
-										<Button
-											label='Create Account'
-											onMouseDown={createAccount}
-											type="contained"
-										/>
-									</Shown>
-								</mark:then>
-								<mark:else>
+								</Shown>
+							</mark:then>
+							<mark:else>
+								<Button
+									label='Continue with Email'
+									onMouseDown={checkUser}
+									type="contained"
+								/>
+							</mark:else>
+						</Shown>
+					</mark:then>
+					<mark:else>
+						<Shown value={checked}>
+							<mark:then>
+								<TextField
+									disabled={loading}
+									type="password"
+									value={password}
+									placeholder="Password"
+								/>
+								<TextField
+									onEnter={createAccount}
+									disabled={loading}
+									type="password"
+									value={confirmPassword}
+									placeholder="Confirm Password"
+								/>
+								<Shown value={loading} invert>
 									<Button
-										label='Continue with Email'
-										onMouseDown={checkUser}
+										label='Create Account'
+										onMouseDown={createAccount}
 										type="contained"
 									/>
-								</mark:else>
-							</Shown>
-						</mark:else>
-					</Shown>
+								</Shown>
+							</mark:then>
+							<mark:else>
+								<Button
+									label='Continue with Email'
+									onMouseDown={checkUser}
+									type="contained"
+								/>
+							</mark:else>
+						</Shown>
+					</mark:else>
+				</Shown>
 
-					<Shown value={loading}>
-						<LoadingDots />
-					</Shown>
-				</div>
-			</Paper>
-		</div>;
-	});
+				<Shown value={loading}>
+					<LoadingDots />
+				</Shown>
+			</div>
+		</Paper>
+	</div>
+	);
 };
 
 export default {

@@ -11,7 +11,7 @@ Theme.define({
 })
 
 const Landing = ({ state }) => {
-	const cookiePresent = getCookie('webCore') || ''; // Doesn't mean cookie is valid
+	const cookiePresent = getCookie('webcore') || ''; // Doesn't mean cookie is valid, only present
 
 	return <div theme='page'>
 		<Header state={state}>
