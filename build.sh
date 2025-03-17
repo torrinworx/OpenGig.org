@@ -95,4 +95,4 @@ EOF
 
 chmod +x "$BUILD_DIR/run.sh"
 
-zip -r "$ZIP_FILE" "$BUILD_DIR"
+# zip -r "$ZIP_FILE" "$BUILD_DIR"
