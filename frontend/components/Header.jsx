@@ -1,11 +1,8 @@
-import { Theme, Paper, useRipples, Button } from "destamatic-ui";
+import { Theme, Paper, useRipples } from "destamatic-ui";
 
 import LogoLightMode from '/OpenGig_Logo_Light_Mode.svg';
 import LogoDarkMode from '/OpenGig_Logo_Dark_Mode.svg';
 import { Observer } from "destam-dom";
-
-import { jobRequest } from 'destam-web-core/client';
-
 
 Theme.define({
     headerbutton: {
@@ -20,15 +17,6 @@ const Header = ({ state, children }) => {
 
     return <Paper >
         <div theme='center' style={{ width: '100%', justifyContent: 'space-between' }}>
-            <Button
-                type="contained"
-                onMouseDown={async () => {
-                    const result = await jobRequest({ name: 'q' });
-                    console.log(result);
-                }}
-                label="Test Queue"
-            />
-
             <div
                 theme={[
                     'radius_center_headerbutton'
