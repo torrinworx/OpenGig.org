@@ -49,9 +49,24 @@ const Auth = ({ state }, cleanup) => {
 		});
 	};
 
+	/*
+	Issue: for some reason thiis component doesn't unmount when the openPage is changed
+	to another componnet. It seems to be hiddn behind the home page or somehow still able
+	to render when the page is set to landing when the user signs out for some reason.
+
+	which doesn't make sense because that goes against how the pages system is setup.
+
+	*/
+
 	const auth = state.observer.path('sync').shallow().ignore()
-	cleanup(auth.effect(a => { if (a) state.client.openPage = { name: 'Home' } }));
-	return auth.map(s => s && <div theme='page_center'>
+
+	cleanup(auth.effect(a => {
+		if (a) {
+			state.client.openPage = { name: 'Home' }
+		}
+	}));
+
+	return <div theme='page_center'>
 		<Paper style={{ width: '285px' }}>
 			<div style={{ position: 'absolute', top: '10px', left: '10px' }}>
 				<Button
@@ -140,8 +155,7 @@ const Auth = ({ state }, cleanup) => {
 				</Shown>
 			</div>
 		</Paper>
-	</div>
-	);
+	</div>;
 };
 
 export default {
