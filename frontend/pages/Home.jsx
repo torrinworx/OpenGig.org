@@ -1,5 +1,6 @@
 import { Observer } from "destam-dom";
-import { Theme, Button, Paper, Toggle, Typography, TextField, Icon } from "destamatic-ui";
+import { jobRequest } from 'destam-web-core/client';
+import { Theme, Button, Paper, Toggle, Typography, TextField, Icon, Detached } from "destamatic-ui";
 
 import Header from "../components/Header";
 
@@ -67,6 +68,73 @@ const Gig = ({ each: gig, state }) => {
 			</div>
 		</div>
 	</Button>;
+};
+
+const SearchBar = () => {
+	const query = Observer.mutable('');
+	const focused = Observer.mutable(false);
+
+	return <div
+		theme={[
+			'row_radius_focusable',
+			focused.map(f => f ? "focused" : null),
+		]}
+		style={{ background: '$color_main', padding: 4 }}
+	>
+		<TextField
+			onChange={e => query.set(e.target.value)}
+			value={query}
+			style={{ border: 'none', outline: 'none' }}
+			isFocused={focused}
+			placeholder='Search Gigs'
+			onKeyDown={e => {
+				if (e.key === 'Enter') {
+					e.preventDefault();
+				} else if (e.key === 'Escape') {
+					query.set('');
+					focused.set(false);
+					e.preventDefault();
+				}
+			}}
+		/>
+		<Button
+			type='icon'
+			style={{
+				padding: 0,
+				height: 40,
+				width: 40,
+				borderRadius: 50,
+				flexShrink: 0,
+			}}
+			icon={<Icon name='search' size={30} />}
+			onClick={() => { }}
+		/>
+	</div>
+};
+
+const Kebab = ({ children, ...props }) => {
+	const focused = Observer.mutable(false);
+
+	return <Detached enabled={focused}>
+		<Button
+			type='icon'
+			onClick={() => focused.set(!focused.get())}
+			style={{
+				padding: 0,
+				height: 40,
+				width: 40,
+				borderRadius: 50,
+				flexShrink: 0,
+			}}
+			title='Menu'
+			icon={<Icon name='menu' size={30} />}
+		/>
+		<mark:popup>
+			<Paper {...props}>
+				{children}
+			</Paper>
+		</mark:popup>
+	</Detached>
 };
 
 const Home = ({ state }) => {
@@ -148,28 +216,9 @@ const Home = ({ state }) => {
 		},
 	];
 
-	const focused = Observer.mutable(false);
-	const query = Observer.mutable('');
-
 	return <div theme='page'>
 		<Header state={state}>
-			<div theme='row'>
-				<Button
-					type='contained'
-					onMouseDown={async () => state.modal.set({ name: 'StripeTest', header: 'Stripe Test' })}
-					label='Stripe setup'
-				/>
-				<Toggle value={window.themeMode} />
-				<Button
-					type='text'
-					onMouseDown={() => {
-						document.cookie = 'webCore=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax';
-						state.client.openPage = { name: "Landing" }
-
-						window.location.reload();
-					}}
-					label='Sign Out'
-				/>
+			<Kebab style={{ padding: 0}} theme='column_tight_center'>
 				<Button
 					type='icon'
 					onClick={() => state.modal.set({ name: 'Account', header: 'Account' })}
@@ -182,47 +231,39 @@ const Home = ({ state }) => {
 					}}
 					icon={<Icon name='user' size={30} />}
 				/>
-			</div>
+				<Button
+					type='contained'
+					onMouseDown={async () => state.modal.set({ name: 'StripeTest', header: 'Stripe Test' })}
+					label='Stripe setup'
+				/>
+				<Button
+					type="contained"
+					onMouseDown={async () => {
+						const result = await jobRequest({ name: 'q' });
+						console.log(result);
+					}}
+					label="Test Queue"
+				/>
+
+				<Toggle value={window.themeMode} />
+				<Button
+					type='text'
+					onMouseDown={() => {
+						state.leave();
+
+						// Try to setup method that doesn't reuiqre this:
+						// window.location.reload();
+
+						state.client.openPage = { name: 'Landing' };
+					}}
+					label='Sign Out'
+				/>
+			</Kebab>
 		</Header>
 		<Paper theme='column' style={{ gap: 10 }}>
 			<div theme='row_spread'>
 				<Typography type='h1' label='Gigs' />
-				<div
-					theme={[
-						'row_radius_focusable',
-						focused.map(f => f ? "focused" : null),
-					]}
-					style={{ background: '$color_main', padding: 4 }}
-				>
-					<TextField
-						onChange={e => query.set(e.target.value)}
-						value={query}
-						style={{ border: 'none', outline: 'none' }}
-						isFocused={focused}
-						placeholder='Search Gigs'
-						onKeyDown={e => {
-							if (e.key === 'Enter') {
-								e.preventDefault();
-							} else if (e.key === 'Escape') {
-								query.set('');
-								focused.set(false);
-								e.preventDefault();
-							}
-						}}
-					/>
-					<Button
-						type='icon'
-						style={{
-							padding: 0,
-							height: 40,
-							width: 40,
-							borderRadius: 50,
-							flexShrink: 0,
-						}}
-						icon={<Icon name='search' size={30} />}
-						onClick={() => { }}
-					/>
-				</div>
+				<SearchBar />
 			</div>
 			<div style={{
 				display: 'grid',
