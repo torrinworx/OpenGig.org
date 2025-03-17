@@ -1,14 +1,8 @@
-import { Theme, Button, Typography, Icon, Paper } from 'destamatic-ui';
 import { getCookie } from 'destam-web-core/client';
-import Header from '../components/Header';
+import { Button, Typography, Paper } from 'destamatic-ui';
 
-Theme.define({
-	iconWrapper: {
-		display: 'flex',
-		justifyContent: 'center',
-		gap: '15px',
-	},
-})
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 const Landing = ({ state }) => {
 	const cookiePresent = getCookie('webcore') || ''; // Doesn't mean cookie is valid, only present
@@ -63,29 +57,7 @@ const Landing = ({ state }) => {
 				Customers benefit from our Open Cost principle. You pay only for what you consume, with every cent transparently used for your service or payout—no hidden charges funding luxury yachts, failed self-driving taxi ventures, or stock bonuses for billionaires.
 			</Typography>
 		</Paper>
-
-		<Paper theme="center">
-			<div theme="iconWrapper">
-				<Button
-					icon={<Icon name="github" size={40} />}
-					type="icon"
-					onMouseDown={() => window.open('https://github.com/torrinworx/OpenGig.org', '_blank')}
-					title={"GitHub"}
-				/>
-				<Button
-					icon={<Icon name="globe" size={40} />}
-					type="icon"
-					onMouseDown={() => window.open('', '_blank')}
-					title={"Twitter"}
-				/>
-				<Button
-					icon={<Icon name="feather" size={40} />}
-					type="icon"
-					onMouseDown={() => window.open('', '_blank')}
-					title={"Twitter"}
-				/>
-			</div>
-		</Paper>
+		<Footer />
 	</div>;
 }
 export default {

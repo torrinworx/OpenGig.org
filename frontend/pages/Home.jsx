@@ -3,6 +3,7 @@ import { jobRequest } from 'destam-web-core/client';
 import { Theme, Button, Paper, Toggle, Typography, TextField, Icon, Detached } from "destamatic-ui";
 
 import Header from "../components/Header";
+import Footer from '../components/Footer';
 
 Theme.define({
 	gigtile: {
@@ -218,7 +219,7 @@ const Home = ({ state }) => {
 
 	return <div theme='page'>
 		<Header state={state}>
-			<Kebab style={{ padding: 0}} theme='column_tight_center'>
+			<Kebab style={{ padding: 0 }} theme='column_tight_center'>
 				<Button
 					type='icon'
 					onClick={() => state.modal.set({ name: 'Account', header: 'Account' })}
@@ -299,18 +300,7 @@ const Home = ({ state }) => {
 			</div>
 			<Toggle value={Observer.mutable(false)} />
 		</Paper>
-		<Paper theme='row_center'>
-			<Button
-				type='text'
-				label='Privacy'
-				onMouseDown={() => state.client.openPage = { name: "Privacy" }}
-			/>
-			<Button
-				type='text'
-				label='Terms'
-				onMouseDown={() => state.client.openPage = { name: "Terms" }}
-			/>
-		</Paper>
+		<Footer />
 	</div>;
 };
 
