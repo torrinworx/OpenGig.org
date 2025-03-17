@@ -60,11 +60,7 @@ const Auth = ({ state }, cleanup) => {
 
 	const auth = state.observer.path('sync').shallow().ignore()
 
-	cleanup(auth.effect(a => {
-		if (a) {
-			state.client.openPage = { name: 'Home' }
-		}
-	}));
+	cleanup(auth.effect(a => { if (a) state.client.openPage = { name: 'Home' } }));
 
 	return <div theme='page_center'>
 		<Paper style={{ width: '285px' }}>
