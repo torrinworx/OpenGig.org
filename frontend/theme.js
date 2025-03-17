@@ -55,7 +55,7 @@ const theme = OObject({
 	paper: {
 		extends: ['*', 'radius'],
 		padding: 30,
-		background: '$',
+		background: '$color_main',
 		color: '$color_text',
 		maxWidth: 'inherit',
 		maxHeight: 'inherit',
@@ -269,7 +269,7 @@ window.themeMode.effect(mode => atomic(() => {
 
 export default {
 	theme,
-	icons: {
+	icons: [{
 		search: FeatherIcons('search'),
 		x: FeatherIcons('x'),
 		user: FeatherIcons('user'),
@@ -278,6 +278,8 @@ export default {
 		globe: FeatherIcons('globe'),
 		github: FeatherIcons('github'),
 	},
+		FeatherIcons
+	],
 	define: (...args) => atomic(() => {
 		let prefix = '';
 		let i = 0;
