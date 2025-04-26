@@ -214,3 +214,17 @@ The current expendature cost for setting up a platform like this would simply be
 - $1,500 - $2,000 for a solid ui/ux design that would allow me to develop a good frontend interface that users find easy to use.
 - $18.34 for a domain (opengig.org, already purchased).
 - $23.98 a month for hosting the database and server needed to run the mvp of the platform.
+
+
+# The sad truth
+The sad truth is that we are headed into a recession, most likely, or some kind of tech bubble burst that will end the upswing in ai investment and hype. This will cause an emense amount of job losses.
+
+Studies have shown that during economic downturns, such as the COVID-19 pandemic, many individuals turn to gig work platforms to supplement lost income or replace traditional employment. For instance, research from the National Bureau of Economic Research indicates that between 2020 and 2021, approximately 5.2 million new workers entered the gig economy, particularly in transportation and food delivery sectors. This surge was largely driven by the immediate need for income due to pandemic-related job losses. [link](https://www.nber.org/digest/20238/evolving-role-gig-work-during-covid-19-pandemic)
+
+However, while gig work offers a flexible income stream, it doesn't always provide financial stability. Research published in Work and Occupations highlighted that although nearly one-third of Amazon Mechanical Turk workers increased their hours during the pandemic, many didn't see a corresponding rise in earnings. This finding underscores the precarious nature of relying solely on gig work for financial support. [link](https://journals.sagepub.com/doi/full/10.1177/07308884221128511)
+
+during the COVID-19 pandemic, there was a notable surge in entrepreneurial activity, with many individuals starting their own businesses. This trend is evidenced by a significant increase in new business applications and domain registrations.
+
+The pandemic also prompted a substantial increase in domain name registrations. Data from the Council of European National Top-Level Domain Registries showed a 20% rise in new domain registrations in April 2020 compared to the same month in the previous year. This trend was largely driven by existing businesses transitioning online and new ventures emerging to meet changing consumer demands. [link](https://centr.org/news/blog/is-the-lockdown-driving-domain-registrations.html)
+
+Research by Mint Formations indicated a 158% increase in inquiries for new business registrations during the pandemic compared to previous years. This surge was attributed to individuals seeking financial stability amid challenging employment conditions, leading many to pursue entrepreneurial ventures.
