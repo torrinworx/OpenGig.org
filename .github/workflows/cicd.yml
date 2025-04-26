@@ -19,7 +19,7 @@ jobs:
             - name: Set up Node.js
               uses: actions/setup-node@v4
               with:
-                  node-version: "20"
+                  node-version: "23"
 
             - name: Execute build script
               run: |
@@ -94,7 +94,7 @@ jobs:
                       mv /root/deploying/build /root/build.new
                       rm -r /root/deploying
                       cd /root/build.new/
-                      npm install
+                      # npm install
 
                       # Stop opengig service
                       systemctl stop opengig || echo 'skipped stop opengig'

@@ -1,6 +1,7 @@
 import { OObject } from "destam-dom";
 import { Observer } from "destam-dom";
 import { atomic } from "destam/Network";
+import FeatherIcons from "destamatic-ui/components/icons/FeatherIcons";
 
 const mainColors = {
 	$color_purple: '#500089',
@@ -40,6 +41,13 @@ const theme = OObject({
 		transition: `opacity ${transition}, box-shadow ${transition}, background-color ${transition}, color ${transition}, border-color ${transition}`,
 	}),
 
+	// Override destamatic-ui primary theme
+	primary: {
+		$color: '$color_main',
+		$color_hover: '$color_hover',
+		$color_top: '$color_top',
+	},
+
 	shadow: {
 		boxShadow: '4px 4px 10px $alpha($color_top, 0.2)',
 	},
@@ -47,7 +55,7 @@ const theme = OObject({
 	paper: {
 		extends: ['*', 'radius'],
 		padding: 30,
-		background: '$',
+		background: '$color_main',
 		color: '$color_text',
 		maxWidth: 'inherit',
 		maxHeight: 'inherit',
@@ -85,15 +93,42 @@ const theme = OObject({
 		transition: 'transform 150ms cubic-bezier(0.4, 0.0, 0.2, 1), background-color 150ms ease-in-out',
 	},
 
-	typography: { display: 'block' },
-	typography_h1: { fontSize: 62 },
-	typography_h2: { fontSize: 56 },
-	typography_h3: { fontSize: 36 },
-	typography_h4: { fontSize: 30 },
-	typography_h5: { fontSize: 24 },
-	typography_h6: { fontSize: 20 },
-	typography_p1: { fontSize: 16 },
-	typography_p2: { fontSize: 14 },
+	typography: {
+		color: '$color_text',
+		display: 'block'
+	},
+	typography_h1: {
+		color: '$color_text',
+		fontSize: 62
+	},
+	typography_h2: {
+		color: '$color_text',
+		fontSize: 56
+	},
+	typography_h3: {
+		color: '$color_text',
+		fontSize: 36
+	},
+	typography_h4: {
+		color: '$color_text',
+		fontSize: 30
+	},
+	typography_h5: {
+		color: '$color_text',
+		fontSize: 24
+	},
+	typography_h6: {
+		color: '$color_text',
+		fontSize: 20
+	},
+	typography_p1: {
+		color: '$color_text',
+		fontSize: 16
+	},
+	typography_p2: {
+		color: '$color_text',
+		fontSize: 14
+	},
 	typography_regular: { fontStyle: 'normal' },
 	typography_bold: { fontWeight: 'bold' },
 	typography_italic: { fontStyle: 'italic' },
@@ -116,7 +151,7 @@ const theme = OObject({
 	},
 
 	button_text_hovered: {
-		background: 'rgb(0, 0, 0, 0.1)',
+		background: 'none',
 		color: '$color_hover'
 	},
 
@@ -150,10 +185,17 @@ const theme = OObject({
 	},
 
 	button_contained_disabled: {
-		// temp var
 		$bg: '$saturate($color, -1)',
 		background: '$bg',
 		color: '$contrast_text($bg)',
+	},
+
+	button_icon: {
+		color: '$color_top',
+	},
+
+	button_icon_hovered: {
+		color: '$color_hover',
 	},
 
 	text: {
@@ -191,7 +233,7 @@ const theme = OObject({
 			50% { opacity: 1; }
 		`,
 
-		background: '$color_main',
+		background: '$color_top',
 		display: 'inline-block',
 		width: '8px',
 		height: '8px',
@@ -227,6 +269,17 @@ window.themeMode.effect(mode => atomic(() => {
 
 export default {
 	theme,
+	icons: [{
+		search: FeatherIcons('search'),
+		x: FeatherIcons('x'),
+		user: FeatherIcons('user'),
+		image: FeatherIcons('image'),
+		feather: FeatherIcons('feather'),
+		globe: FeatherIcons('globe'),
+		github: FeatherIcons('github'),
+	},
+		FeatherIcons
+	],
 	define: (...args) => atomic(() => {
 		let prefix = '';
 		let i = 0;

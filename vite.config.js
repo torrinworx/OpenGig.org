@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import assertRemove from 'destam-dom/transform/assertRemove';
 import compileHTMLLiteral from 'destam-dom/transform/htmlLiteral';
 
@@ -37,17 +37,20 @@ if (process.env.ENV === 'production') {
 	plugins.push(createTransform('assert-remove', assertRemove));
 }
 
-export default defineConfig({
-	root: './frontend',
-	plugins,
-	esbuild: {
-		jsx: 'preserve',
-	},
-	base: '',
-	resolve: {
-        extensions: ['.js', '.ts', '.tsx', '.jsx'],
-	},
-	build: {
-		outDir: '../build/dist',
-	},
-});
+export default ({ mode }) => {
+    process.env = {...process.env, ...loadEnv(mode, process.cwd())};
+	return defineConfig({
+		root: './frontend',
+		plugins,
+		esbuild: {
+			jsx: 'preserve',
+		},
+		base: '',
+		resolve: {
+			extensions: ['.js', '.ts', '.tsx', '.jsx'],
+		},
+		build: {
+			outDir: '../build/dist',
+		},
+	})
+};

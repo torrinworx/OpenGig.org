@@ -68,7 +68,7 @@ const Notification = ({ each: msg, notifications }) => {
         <span style={{ flex: 1 }}>{msg.content}</span>
         <Button
             theme='notificationButton'
-            Icon={<Icon size='20' libraryName='feather' iconName='x' />}
+            icon={<Icon name='x' size={20} />}
             style={{ flexShrink: 0, marginLeft: 'auto' }}
             type='icon'
             onMouseDown={() => {

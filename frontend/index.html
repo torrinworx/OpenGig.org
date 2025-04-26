@@ -67,15 +67,21 @@
 
   <!-- Prevent favicon error -->
   <link rel="shortcut icon" href="#">
+
+  <script>
+    (function () {
+      var isDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      document.documentElement.style.backgroundColor = isDarkMode ? '#500089' : '#FFFFFF';
+    })();
+  </script>
 </head>
 
-<body style="margin: 0px;">
+<body style="margin: 0;">
   <!-- Hidden main content TODO: Need some kind of ssg setup to help create this for Landing page only. -->
   <noscript>
     <div style="text-align: center; padding: 50px;">
       <h1>Welcome to OpenGig</h1>
       <p>Your fair and transparent gig economy platform.</p>
-      <a href="/signup">Join Us Today!</a>
     </div>
   </noscript>
 

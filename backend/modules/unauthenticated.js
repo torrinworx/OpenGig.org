@@ -2,7 +2,7 @@
 export default () => {
     return {
         authenticated: false,
-        init: (test) => {
+        onMsg: ({ test }) => {
             console.log(test)
             console.log("UNAUTHENTICATED");
 

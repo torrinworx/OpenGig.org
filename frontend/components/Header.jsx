@@ -23,12 +23,12 @@ const Header = ({ state, children }) => {
                 ]}
                 onClick={(e) => {
                     createRipple(e)
-                    state.client.openPage = { page: 'Landing' }
+                    state.client.openPage = { name: 'Landing' }
                 }}
                 isHovered={hover}
             >
                 <img
-                    src={window.themeMode.map(t => t === false ? LogoLightMode : LogoDarkMode )}
+                    src={window.themeMode.map(t => t === false ? LogoLightMode : LogoDarkMode)}
                     style={{ margin: 10, height: '5vh', userSelect: 'none' }}
                 />
                 {ripples}

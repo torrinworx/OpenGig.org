@@ -1,7 +1,9 @@
 import { Observer } from "destam-dom";
-import { Theme, Button, Paper, Toggle, Typography, TextField, Icon } from "destamatic-ui";
+import { jobRequest } from 'destam-web-core/client';
+import { Theme, Button, Paper, Toggle, Typography, TextField, Icon, Detached } from "destamatic-ui";
 
 import Header from "../components/Header";
+import Footer from '../components/Footer';
 
 Theme.define({
 	gigtile: {
@@ -18,12 +20,12 @@ Theme.define({
 	gigtile_hovered: {
 		background: '$color_hover'
 	}
-})
+});
 
 const Gig = ({ each: gig, state }) => {
 	const hover = Observer.mutable(false);
 
-	return <Button style={{ padding: 0 }} onClick={() => state.modal.set({ name: 'Gig' })}>
+	return <Button style={{ padding: 0 }} onClick={() => state.modal.set({ name: 'Gig', header: gig.name })}>
 		<div
 			theme={[
 				'radius',
@@ -40,7 +42,7 @@ const Gig = ({ each: gig, state }) => {
 				alignItems: 'center',
 				flexShrink: 0
 			}}>
-				<Icon libraryName='feather' iconName='image' size={20} style={{ color: '$color_main' }} />
+				<Icon name='image' size={20} style={{ color: '$color_main' }} />
 			</div>
 			<div style={{
 				display: 'flex',
@@ -55,9 +57,9 @@ const Gig = ({ each: gig, state }) => {
 					borderRadius: '50%',
 					display: 'flex',
 					justifyContent: 'center',
-					alignItems: 'center'
+					alignItems: 'center',
 				}}>
-					<Icon libraryName='feather' iconName='user' size={20} style={{ color: '$color_main' }} />
+					<Icon name='user' size={20} style={{ color: '$color_main' }} />
 				</div>
 				<Typography type='p1' label={gig.userName} style={{ color: '$color_top' }} />
 			</div>
@@ -69,7 +71,74 @@ const Gig = ({ each: gig, state }) => {
 	</Button>;
 };
 
-export default ({ state }) => {
+const SearchBar = () => {
+	const query = Observer.mutable('');
+	const focused = Observer.mutable(false);
+
+	return <div
+		theme={[
+			'row_radius_focusable',
+			focused.map(f => f ? "focused" : null),
+		]}
+		style={{ background: '$color_main', padding: 4 }}
+	>
+		<TextField
+			onChange={e => query.set(e.target.value)}
+			value={query}
+			style={{ border: 'none', outline: 'none' }}
+			isFocused={focused}
+			placeholder='Search Gigs'
+			onKeyDown={e => {
+				if (e.key === 'Enter') {
+					e.preventDefault();
+				} else if (e.key === 'Escape') {
+					query.set('');
+					focused.set(false);
+					e.preventDefault();
+				}
+			}}
+		/>
+		<Button
+			type='icon'
+			style={{
+				padding: 0,
+				height: 40,
+				width: 40,
+				borderRadius: 50,
+				flexShrink: 0,
+			}}
+			icon={<Icon name='search' size={30} />}
+			onClick={() => { }}
+		/>
+	</div>
+};
+
+const Kebab = ({ children, ...props }) => {
+	const focused = Observer.mutable(false);
+
+	return <Detached enabled={focused}>
+		<Button
+			type='icon'
+			onClick={() => focused.set(!focused.get())}
+			style={{
+				padding: 0,
+				height: 40,
+				width: 40,
+				borderRadius: 50,
+				flexShrink: 0,
+			}}
+			title='Menu'
+			icon={<Icon name='menu' size={30} />}
+		/>
+		<mark:popup>
+			<Paper {...props}>
+				{children}
+			</Paper>
+		</mark:popup>
+	</Detached>
+};
+
+const Home = ({ state }) => {
 	const exampleGigs = [
 		{
 			userName: 'Bob',
@@ -148,60 +217,54 @@ export default ({ state }) => {
 		},
 	];
 
-	const focused = Observer.mutable(false);
-	const query = Observer.mutable('');
-
 	return <div theme='page'>
 		<Header state={state}>
-			<div theme='row'>
+			<Kebab style={{ padding: 0 }} theme='column_tight_center'>
+				<Button
+					type='icon'
+					onClick={() => state.modal.set({ name: 'Account', header: 'Account' })}
+					style={{
+						padding: 0,
+						height: 40,
+						width: 40,
+						borderRadius: 50,
+						flexShrink: 0,
+					}}
+					icon={<Icon name='user' size={30} />}
+				/>
+				<Button
+					type='contained'
+					onMouseDown={async () => state.modal.set({ name: 'StripeTest', header: 'Stripe Test' })}
+					label='Stripe setup'
+				/>
+				<Button
+					type="contained"
+					onMouseDown={async () => {
+						const result = await jobRequest({ name: 'q' });
+						console.log(result);
+					}}
+					label="Test Queue"
+				/>
+
 				<Toggle value={window.themeMode} />
 				<Button
 					type='text'
 					onMouseDown={() => {
-						document.cookie = 'webCore=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax';
-						window.location.reload();
+						state.leave();
+
+						// Try to setup method that doesn't reuiqre this:
+						// window.location.reload();
+
+						state.client.openPage = { name: 'Landing' };
 					}}
 					label='Sign Out'
 				/>
-			</div>
+			</Kebab>
 		</Header>
 		<Paper theme='column' style={{ gap: 10 }}>
 			<div theme='row_spread'>
 				<Typography type='h1' label='Gigs' />
-				<div
-					theme={[
-						'row_radius_focusable',
-						focused.map(f => f ? "focused" : null),
-					]}
-					style={{ background: '$color_main', padding: 4 }}
-				>
-					<TextField
-						onChange={e => query.set(e.target.value)}
-						value={query}
-						style={{ border: 'none', outline: 'none' }}
-						isFocused={focused}
-						placeholder='Search Gigs'
-						onKeyDown={e => {
-							if (e.key === 'Enter') {
-								e.preventDefault();
-							} else if (e.key === 'Escape') {
-								query.set('');
-								focused.set(false);
-								e.preventDefault();
-							}
-						}}
-					/>
-					<Button
-						type='icon'
-						Icon={<Icon
-							libraryName='feather'
-							iconName='search'
-							size={20}
-							style={{ color: '$color_top' }}
-						/>}
-						onClick={() => { }}
-					/>
-				</div>
+				<SearchBar />
 			</div>
 			<div style={{
 				display: 'grid',
@@ -211,7 +274,7 @@ export default ({ state }) => {
 				<Gig each={exampleGigs} state={state} />
 			</div>
 		</Paper>
-		<Paper theme='paper_inset'>
+		<Paper>
 			<Typography type='h5' label='UI Component Test:' />
 
 			<Typography type='h1' label='Header 1' />
@@ -236,8 +299,12 @@ export default ({ state }) => {
 				<TextField />
 			</div>
 			<Toggle value={Observer.mutable(false)} />
-
 		</Paper>
-
+		<Footer />
 	</div>;
+};
+
+export default {
+	authenticated: true,
+	page: Home,
 };
