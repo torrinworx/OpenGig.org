@@ -28,9 +28,9 @@
 	"dependencies": {
 		"@stripe/stripe-js": "^5.7.0",
 		"bcryptjs": "^2.4.3",
-		"destam": "^0.5.2",
 		"destam-db-core": "file:destam-web-core/destam-db-core",
-		"destam-dom": "^0.11.0",
+		"destam": "^0.5.3",
+		"destam-dom": "^0.11.3",
 		"destam-web-core": "file:destam-web-core",
 		"destamatic-ui": "file:destamatic-ui",
 		"dotenv": "^16.4.5",
