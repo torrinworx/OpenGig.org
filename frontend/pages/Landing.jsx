@@ -18,7 +18,7 @@ const Landing = ({ state }) => {
 			</div>
 		</Header>
 		<Paper>
-			<Typography type="h1" >Join OpenGig</Typography>
+			<Typography label='Join OpenGig' type="h1" />
 			<Typography type="p1">
 				OpenGig.org is an Open Source Service platform built for gig workers and customers. We stand for openness, the rights of customers, and for the empowerment of workers.
 			</Typography>
@@ -30,7 +30,7 @@ const Landing = ({ state }) => {
 			/>
 		</Paper>
 		<Paper>
-			<Typography type="h2">Why work on OpenGig?</Typography>
+			<Typography type="h2" label='Why work on OpenGig?' />
 			<Typography type="p1">
 				Our platform empowers gig workers by removing the greedy middlemen. OpenGig allows you to dictate your own terms by providing tools built for you.
 			</Typography>
@@ -48,7 +48,7 @@ const Landing = ({ state }) => {
 			</Typography>
 		</Paper>
 		<Paper>
-			<Typography type="h2">Why spend on OpenGig?</Typography>
+			<Typography type="h2" label='Why spend on OpenGig?' />
 			<Typography type="p1">
 				OpenGig is adaptable, catering to a wide spectrum of gig services—from ride-sharing and food delivery to freelance tasks. Whatever you need, we've got you covered.
 			</Typography>
