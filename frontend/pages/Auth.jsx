@@ -17,10 +17,10 @@ const Auth = ({ state }, cleanup) => {
 		// If response === true => user exists
 		// If response === false => user does not exist
 		if (typeof response === 'string') {
-			state.client.notifications.push({
-				type: 'error',
-				content: response
-			});
+			// state.client.notifications.push({
+			// 	type: 'error',
+			// 	content: response
+			// });
 			checked.set(false);
 		} else {
 			exists.set(response);
@@ -33,20 +33,20 @@ const Auth = ({ state }, cleanup) => {
 	const createAccount = async () => {
 		loading.set(true);
 		if (password.get() !== confirmPassword.get()) {
-			state.client.notifications.push({
-				type: 'error',
-				content: 'Confirmation password did not match your password.'
-			});
+			// state.client.notifications.push({
+			// 	type: 'error',
+			// 	content: 'Confirmation password did not match your password.'
+			// });
 			loading.set(false);
 			return;
 		}
 		// should only get a response if there is an error, else account
 		// creation was successful and state.enter will reload the page
 		const response = await state.enter(email, password);
-		if (response.error) state.client.notifications.push({
-			type: 'error',
-			content: response
-		});
+		// if (response.error) state.client.notifications.push({
+		// 	type: 'error',
+		// 	content: response
+		// });
 	};
 
 	/*

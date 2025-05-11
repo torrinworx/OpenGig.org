@@ -4,7 +4,7 @@ import { Theme, Icons, popups, Button, Typography } from 'destamatic-ui';
 
 import theme from './theme';
 import Modal from './components/Modal';
-import Notifications from './components/Notifications';
+// import Notifications from './components/Notifications';
 
 let pages = import.meta.glob('./pages/*.jsx', { eager: true }); // Use 'eager: true' to load all files at once
 pages = Object.fromEntries(
@@ -39,7 +39,7 @@ const App = ({ state, children }) => {
                 sizes="any"
                 type="image/svg+xml"
             />
-            <Notifications state={state} />
+            {/* <Notifications state={state} /> */}
             {children}
             <Modal state={state} />
             {popups}
