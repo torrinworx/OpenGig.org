@@ -1,6 +1,6 @@
 import { Button } from 'destamatic-ui';
 import { loadStripe } from '@stripe/stripe-js';
-import { jobRequest } from 'destam-web-core/client';
+import { modReq } from 'destam-web-core/client';
 
 export default (props, cleanup, mounted) => {
 	let stripe, cardElement;
@@ -16,7 +16,7 @@ export default (props, cleanup, mounted) => {
 	const handleSetup = async () => {
 		try {
 			// Request a SetupIntent from the server
-			const clientSecret = await jobRequest({ name: 'stripe/createPaymentMethod' });
+			const clientSecret = await modReq({ name: 'stripe/createPaymentMethod' });
 
 			if (!clientSecret) {
 				console.log('No client_secret returned from server');
@@ -38,7 +38,7 @@ export default (props, cleanup, mounted) => {
 			console.log('Setup complete! PaymentMethod:', setupIntent.payment_method);
 
 			// Attach the payment method to the customer on the server
-			const attachResponse = await jobRequest({
+			const attachResponse = await modReq({
 				name: 'stripe/attachPaymentMethod',
 				props: { paymentMethodId: setupIntent.payment_method }
 			});

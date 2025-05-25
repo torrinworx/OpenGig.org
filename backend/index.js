@@ -2,8 +2,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import Stripe from 'stripe';
-import { OArray } from "destam";
-import { coreServer } from "destam-web-core/server";
+import { core } from "destam-web-core/server";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,6 +19,7 @@ try {
 }
 
 const onCon = async (ws, req, user, sync) => {
+	console.log('user in onCon: ', user);
 	// server side definition of notifications so we can push notifications directly
 	// to the client.
 	// console.log('sync server side: ', sync);
@@ -43,11 +43,10 @@ const onEnter = async ({ email, user }) => {
 const root = path.resolve(__dirname, process.env.NODE_ENV === 'production' ? '../dist' : './frontend');
 const modulesDir = path.resolve(__dirname, './modules');
 
-coreServer({
+core({
 	modulesDir,
 	root,
 	onCon,
 	onEnter,
 	props: { stripe },
-
 });

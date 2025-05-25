@@ -1,5 +1,4 @@
 import { Observer } from "destam-dom";
-import { jobRequest } from 'destam-web-core/client';
 import { Theme, Button, Paper, Toggle, Typography, TextField, Icon, Detached } from "destamatic-ui";
 
 import Header from "../components/Header";
@@ -237,14 +236,7 @@ const Home = ({ state }) => {
 					onMouseDown={async () => state.modal.set({ name: 'StripeTest', header: 'Stripe Test' })}
 					label='Stripe setup'
 				/>
-				<Button
-					type="contained"
-					onMouseDown={async () => {
-						const result = await jobRequest({ name: 'q' });
-						console.log(result);
-					}}
-					label="Test Queue"
-				/>
+
 
 				<Toggle value={window.themeMode} />
 				<Button

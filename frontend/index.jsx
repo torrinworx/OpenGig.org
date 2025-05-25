@@ -1,5 +1,5 @@
 import { Observer } from 'destam';
-import { coreClient } from 'destam-web-core/client';
+import { core } from 'destam-web-core/client';
 import { Theme, Icons, popups, Button, Typography } from 'destamatic-ui';
 
 import theme from './theme';
@@ -47,4 +47,4 @@ const App = ({ state, children }) => {
     </Theme>;
 };
 
-coreClient({ App, Fallback: NotFound, pages, defaultPage: 'Landing' });
+core({ App, Fallback: NotFound, pages, defaultPage: 'Landing' });
