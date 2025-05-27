@@ -1,11 +1,27 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { promises as fs } from 'fs';
 
 import Stripe from 'stripe';
 import { core } from "destam-web-core/server";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const loadEnv = async (filePath = './.env') => {
+	try {
+		// Use fs.readFile from fs.promises for async/await
+		const data = await fs.readFile(filePath, { encoding: 'utf8' });
+		data.split('\n').forEach(line => {
+			const [key, value] = line.split('=');
+			if (key && value) process.env[key.trim()] = value.trim();
+		});
+	} catch (e) {
+		console.error(`Failed to load .env file: ${e.message}`);
+	}
+};
+
+await loadEnv();
 
 let stripe;
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
@@ -40,7 +56,7 @@ const onEnter = async ({ email, user }) => {
 	}
 };
 
-const root = path.resolve(__dirname, process.env.NODE_ENV === 'production' ? '../dist' : './frontend');
+const root = path.resolve(__dirname, process.env.ENV === 'production' ? '../dist' : './frontend');
 const modulesDir = path.resolve(__dirname, './modules');
 
 core({
@@ -49,4 +65,8 @@ core({
 	onCon,
 	onEnter,
 	props: { stripe },
+	db: process.env.db,
+	table: process.env.table,
+	env: process.env.ENV,
+	port: process.env.PORT
 });
