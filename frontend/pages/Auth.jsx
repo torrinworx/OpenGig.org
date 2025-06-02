@@ -58,7 +58,7 @@ const Auth = ({ state }, cleanup) => {
 
 	*/
 
-	const auth = state.observer.path('sync').shallow().ignore()
+	const auth = state.observer.path('sync');
 
 	cleanup(auth.effect(a => { if (a) state.client.openPage = { name: 'Home' } }));
 

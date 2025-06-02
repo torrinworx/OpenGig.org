@@ -25,7 +25,6 @@ Theme.define({
 
 const Gig = ModalContext.use(m => {
 	return ({ each: gig }) => {
-		console.log("THIS IS GIG: ", gig);
 		const hover = Observer.mutable(false);
 
 		return <Button style={{ padding: 0 }} onClick={() => m.open({ name: 'Gig', label: gig.name, gig })}>
@@ -148,7 +147,6 @@ const Home = ({ state }) => {
 	// todo have this somehow be a mapped network? or maybe just run this all through state. not sure why we would use mapped network here.
 	const getPosts = async () => {
 		const response = await modReq('posts/Get');
-		console.log(response);
 		posts.push(...response.posts);
 	};
 
