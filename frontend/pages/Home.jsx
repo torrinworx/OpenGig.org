@@ -1,5 +1,7 @@
-import { Observer } from "destam-dom";
-import { Theme, Button, Paper, Toggle, Typography, TextField, Icon, Detached } from "destamatic-ui";
+import { Observer, OArray } from "destam-dom";
+import { modReq } from 'destam-web-core/client';
+import { Theme, Button, Paper, Toggle, Typography, TextField, Icon, Detached, ModalContext } from "destamatic-ui";
+
 
 import Header from "../components/Header";
 import Footer from '../components/Footer';
@@ -21,54 +23,57 @@ Theme.define({
 	}
 });
 
-const Gig = ({ each: gig, state }) => {
-	const hover = Observer.mutable(false);
+const Gig = ModalContext.use(m => {
+	return ({ each: gig }) => {
+		console.log("THIS IS GIG: ", gig);
+		const hover = Observer.mutable(false);
 
-	return <Button style={{ padding: 0 }} onClick={() => state.modal.set({ name: 'Gig', header: gig.name })}>
-		<div
-			theme={[
-				'radius',
-				'gigtile',
-				hover.map(h => h ? 'hovered' : null),
-			]}
-			isHovered={hover}
-		>
-			<div theme='center_radius' style={{
-				height: '150px',
-				backgroundColor: '$color_top',
-				display: 'flex',
-				justifyContent: 'center',
-				alignItems: 'center',
-				flexShrink: 0
-			}}>
-				<Icon name='image' size={20} style={{ color: '$color_main' }} />
-			</div>
-			<div style={{
-				display: 'flex',
-				alignItems: 'center',
-				gap: '10px',
-				flexShrink: 0
-			}}>
-				<div style={{
-					width: '25px',
-					height: '25px',
+		return <Button style={{ padding: 0 }} onClick={() => m.open({ name: 'Gig', label: gig.name, gig })}>
+			<div
+				theme={[
+					'radius',
+					'gigtile',
+					hover.map(h => h ? 'hovered' : null),
+				]}
+				isHovered={hover}
+			>
+				<div theme='center_radius' style={{
+					height: '150px',
 					backgroundColor: '$color_top',
-					borderRadius: '50%',
 					display: 'flex',
 					justifyContent: 'center',
 					alignItems: 'center',
+					flexShrink: 0
 				}}>
-					<Icon name='user' size={20} style={{ color: '$color_main' }} />
+					<Icon name='image' size={20} style={{ color: '$color_main' }} />
 				</div>
-				<Typography type='p1' label={gig.userName} style={{ color: '$color_top' }} />
+				<div style={{
+					display: 'flex',
+					alignItems: 'center',
+					gap: '10px',
+					flexShrink: 0
+				}}>
+					<div style={{
+						width: '25px',
+						height: '25px',
+						backgroundColor: '$color_top',
+						borderRadius: '50%',
+						display: 'flex',
+						justifyContent: 'center',
+						alignItems: 'center',
+					}}>
+						<Icon name='user' size={20} style={{ color: '$color_main' }} />
+					</div>
+					<Typography type='p1' label={gig.userName} style={{ color: '$color_top' }} />
+				</div>
+				<div theme='column' style={{ flexGrow: 1 }}>
+					<Typography type='h6_bold' label={gig.name} style={{ color: '$color_top', textAlign: 'left' }} />
+					<Typography type='p2' label={gig.tagline} style={{ color: '$color_top', textAlign: 'left' }} />
+				</div>
 			</div>
-			<div theme='column' style={{ flexGrow: 1 }}>
-				<Typography type='h6_bold' label={gig.name} style={{ color: '$color_top', textAlign: 'left' }} />
-				<Typography type='p2' label={gig.tagline} style={{ color: '$color_top', textAlign: 'left' }} />
-			</div>
-		</div>
-	</Button>;
-};
+		</Button>;
+	}
+});
 
 const SearchBar = () => {
 	const query = Observer.mutable('');
@@ -138,83 +143,19 @@ const Kebab = ({ children, ...props }) => {
 };
 
 const Home = ({ state }) => {
-	const exampleGigs = [
-		{
-			userName: 'Bob',
-			name: 'Plumbing',
-			type: 'Home Improvement',
-			description: 'Fixing leaks and installing new fixtures.',
-			comments: [
-				{
-					userName: 'John',
-					description: 'Great service, fixed my sink quickly!',
-					created: '2023-10-01',
-				},
-			],
-			tags: ['Plumbing', 'Handyman'],
-			tagline: "Leaky sink? No problem - reliable fixes made easy."
-		},
-		{
-			userName: 'Alice',
-			name: 'Graphic Design',
-			type: 'Creative & Design',
-			description: 'Designing logos and branding assets.',
-			comments: [
-				{
-					userName: 'Eve',
-					description: 'Loved the logo you designed for my brand!',
-					created: '2023-09-25',
-				},
-			],
-			tags: ['Design', 'Graphic Design'],
-			tagline: "Crafting your brand's identity with creativity and style."
-		},
-		{
-			userName: 'Charlie',
-			name: 'Web Development',
-			type: 'Tech & Software',
-			description: 'Developing responsive websites and web apps.',
-			comments: [
-				{
-					userName: 'Dave',
-					description: 'The new website works flawlessly and looks great!',
-					created: '2023-09-20',
-				},
-			],
-			tags: ['Web Development', 'Technology'],
-			tagline: "Building sleek, responsive websites that captivate."
-		},
-		{
-			userName: 'Diana',
-			name: 'Gardening Service',
-			type: 'Outdoor & Garden',
-			description: 'Lawn care, planting, and garden design.',
-			comments: [
-				{
-					userName: 'Bob',
-					description: 'Thank you for making my garden look beautiful!',
-					created: '2023-09-15',
-				},
-			],
-			tags: ['Gardening', 'Landscaping'],
-			tagline: "Transforming your outdoors with a touch of nature's charm."
-		},
-		{
-			userName: 'Ethan',
-			name: 'Tutoring - Math',
-			type: 'Education & Coaching',
-			description: 'Providing math tutoring for high school students.',
-			comments: [
-				{
-					userName: 'Fiona',
-					description: 'Really helped my daughter improve her grades!',
-					created: '2023-10-03',
-				},
-			],
-			tags: ['Tutoring', 'Education', 'Math'],
-			tagline: "Making math easy and fun, one lesson at a time."
-		},
-	];
+	const posts = OArray([]);
+
+	// todo have this somehow be a mapped network? or maybe just run this all through state. not sure why we would use mapped network here.
+	const getPosts = async () => {
+		const response = await modReq('posts/Get');
+		console.log(response);
+		posts.push(...response.posts);
+	};
+
+	getPosts();
+
+	const postName = Observer.mutable('');
+	const postDescription = Observer.mutable('');
 
 	return <div theme='page'>
 		<Header state={state}>
@@ -258,12 +199,20 @@ const Home = ({ state }) => {
 				<Typography type='h1' label='Gigs' />
 				<SearchBar />
 			</div>
+			<div theme='center_column'>
+				<TextField placeholder='Name' value={postName} />
+				<TextField placeholder='Description' value={postDescription} />
+				<Button type='contain' label='post' onClick={async () => {
+					await modReq('posts/Create', { name: postName.get(), description: postDescription.get() });
+					await getPosts();
+				}} />
+			</div>
 			<div style={{
 				display: 'grid',
 				gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
 				gap: '10px'
 			}}>
-				<Gig each={exampleGigs} state={state} />
+				<Gig each={posts} state={state} />
 			</div>
 		</Paper>
 		<Paper>

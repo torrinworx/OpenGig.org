@@ -8,18 +8,6 @@ const Footer = () => <Paper theme='column_center' style={{ gap: '16px', border: 
             onMouseDown={() => window.open('https://github.com/torrinworx/OpenGig.org', '_blank')}
             title={"GitHub"}
         />
-        <Button
-            icon={<Icon name="globe" size={40} />}
-            type="icon"
-            onMouseDown={() => window.open('', '_blank')}
-            title={"Twitter"}
-        />
-        <Button
-            icon={<Icon name="feather" size={40} />}
-            type="icon"
-            onMouseDown={() => window.open('', '_blank')}
-            title={"Twitter"}
-        />
     </div>
     <div theme='row'>
         <Button

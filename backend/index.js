@@ -35,7 +35,6 @@ try {
 }
 
 const onCon = async (ws, req, user, sync) => {
-	console.log('user in onCon: ', user);
 	// server side definition of notifications so we can push notifications directly
 	// to the client.
 	// console.log('sync server side: ', sync);
