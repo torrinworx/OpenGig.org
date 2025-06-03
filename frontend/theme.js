@@ -245,6 +245,24 @@ const theme = OObject({
 		margin: '20px 4px',
 	},
 
+	radio_ring_1: {
+		overflow: 'clip',
+		border: '3px solid $color_text',
+		width: '$size$px',
+		height: '$size$px',
+	},
+
+	radio_ring_3: {
+		// Use a scale transform instead of explicit width/height expansions.
+		// This helps avoid jitter and feels more fluid.
+		transition: 'transform 150ms cubic-bezier(0.4, 0.0, 0.2, 1), background-color 150ms ease-in-out',
+		background: '$color_text',
+		borderRadius: '50%',
+		width: '100%',
+		height: '100%',
+		transform: 'scale(0)',
+	},
+
 	// custom
 	page: {
 		background: '$color_main',
@@ -255,6 +273,13 @@ const theme = OObject({
 		height: '100%',
 		minHeight: '100vh'
 	},
+
+	divider: {
+		width: '100%',
+		height: '1px',
+		background: '$color_text',
+		margin: '20px 0'
+	}
 });
 
 window.themeMode = Observer.mutable(window.matchMedia("(prefers-color-scheme:dark)").matches ? true : false);

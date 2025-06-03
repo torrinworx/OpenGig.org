@@ -113,7 +113,7 @@ const SearchBar = () => {
 			icon={<Icon name='search' size={30} />}
 			onClick={() => { }}
 		/>
-	</div>
+	</div>;
 };
 
 const Kebab = ({ children, ...props }) => {
@@ -142,18 +142,15 @@ const Kebab = ({ children, ...props }) => {
 };
 
 const Home = ({ state }) => {
-	const posts = OArray([]);
+	const gigs = OArray([]);
 
 	// todo have this somehow be a mapped network? or maybe just run this all through state. not sure why we would use mapped network here.
-	const getPosts = async () => {
-		const response = await modReq('posts/Get');
-		posts.push(...response.posts);
+	const getGigs = async () => {
+		const response = await modReq('gigs/Get');
+		gigs.push(...response.gigs);
 	};
 
-	getPosts();
-
-	const postName = Observer.mutable('');
-	const postDescription = Observer.mutable('');
+	getGigs();
 
 	return <div theme='page'>
 		<Header state={state}>
@@ -175,17 +172,11 @@ const Home = ({ state }) => {
 					onMouseDown={async () => state.modal.set({ name: 'StripeTest', header: 'Stripe Test' })}
 					label='Stripe setup'
 				/>
-
-
 				<Toggle value={window.themeMode} />
 				<Button
 					type='text'
 					onMouseDown={() => {
 						state.leave();
-
-						// Try to setup method that doesn't reuiqre this:
-						// window.location.reload();
-
 						state.client.openPage = { name: 'Landing' };
 					}}
 					label='Sign Out'
@@ -195,49 +186,25 @@ const Home = ({ state }) => {
 		<Paper theme='column' style={{ gap: 10 }}>
 			<div theme='row_spread'>
 				<Typography type='h1' label='Gigs' />
-				<SearchBar />
-			</div>
-			<div theme='center_column'>
-				<TextField placeholder='Name' value={postName} />
-				<TextField placeholder='Description' value={postDescription} />
-				<Button type='contain' label='post' onClick={async () => {
-					await modReq('posts/Create', { name: postName.get(), description: postDescription.get() });
-					await getPosts();
-				}} />
+				<div theme='row' style={{ gap: 10 }}>
+					<Button
+						title='Create a Gig'
+						type='icon'
+						onMouseDown={() => {
+							state.client.openPage = { name: 'CreateGig' };
+						}}
+						icon={<Icon name='plus' size={30} />}
+					/>
+					<SearchBar />
+				</div>
 			</div>
 			<div style={{
 				display: 'grid',
 				gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
 				gap: '10px'
 			}}>
-				<Gig each={posts} state={state} />
+				<Gig each={gigs} state={state} />
 			</div>
-		</Paper>
-		<Paper>
-			<Typography type='h5' label='UI Component Test:' />
-
-			<Typography type='h1' label='Header 1' />
-			<Typography type='h2' label='Header 2' />
-			<Typography type='h3' label='Header 3' />
-			<Typography type='h4' label='Header 4' />
-			<Typography type='h5' label='Header 5' />
-			<Typography type='h6' label='Header 6' />
-			<Typography type='p1' label='Paragraph 1' />
-			<Typography type='p2' label='Paragraph 2' />
-			<Typography type='p1_regular' label='Paragraph 1 Regular' />
-			<Typography type='p1_bold' label='Paragraph 1 Bold' />
-			<Typography type='p1_italic' label='Paragraph 1 Italic' />
-			<div theme='row' style={{ gap: 10 }}>
-				<Button type='contained' label='Button' onClick={() => { }} />
-				<Button type='outlined' label='Button' onClick={() => { }} />
-				<Button type='text' label='Button' onClick={() => { }} />
-			</div>
-			<div theme='column' style={{ gap: 10 }} >
-				<TextField placeholder='Email' value={Observer.mutable('')} />
-				<TextField />
-				<TextField />
-			</div>
-			<Toggle value={Observer.mutable(false)} />
 		</Paper>
 		<Footer />
 	</div>;
