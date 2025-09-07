@@ -1,6 +1,6 @@
-import { ModalContext, Typography } from "destamatic-ui";
+import { StageContext, Typography } from "destamatic-ui";
 
-export default ModalContext.use(m => {
+export default StageContext.use(m => {
 
     return () => {
         return <div>

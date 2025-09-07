@@ -29,8 +29,8 @@
 		"@stripe/stripe-js": "^5.7.0",
 		"bcryptjs": "^2.4.3",
 		"destam-db": "file:destam-web-core/db",
-		"destam": "^0.6.0",
-		"destam-dom": "^0.12.0",
+		"destam": "^0.8.0",
+		"destam-dom": "^0.14.0",
 		"destam-web-core": "file:destam-web-core",
 		"stripe": "^17.7.0",
 		"ws": "^8.18.0"

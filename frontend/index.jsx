@@ -5,13 +5,13 @@ import {
     Theme,
     Icons,
     Icon,
-    popups,
     Button,
     Typography,
-    ModalContext,
-    Modal,
+    StageContext,
+    Stage,
     Popup,
-    Paper
+    Paper,
+    PopupContext
 } from 'destamatic-ui';
 
 import theme from './theme';
@@ -106,22 +106,25 @@ const App = ({ state, children }) => {
     state.modal = Observer.mutable(false);
     return <Theme value={theme.theme}>
         <Icons value={theme.icons}>
-            <ModalContext value={{ modals, state, template: Template }}>
-                <link
-                    rel="icon"
-                    href={window.themeMode.map(t =>
-                        t === 'light'
-                            ? "./OpenGig_Icon_Round_Light_Mode.svg"
-                            : "./OpenGig_Icon_Round_Dark_Mode.svg"
-                    )}
-                    sizes="any"
-                    type="image/svg+xml"
-                />
-                {/* <Notifications state={state} /> */}
-                {children}
-                <Modal />
-                {popups}
-            </ModalContext>
+            <PopupContext>
+                <StageContext value={{ modals, state, template: Template }}>
+                    <link
+                        rel="icon"
+                        href={window.themeMode.map(t =>
+                            t === 'light'
+                                ? "./OpenGig_Icon_Round_Light_Mode.svg"
+                                : "./OpenGig_Icon_Round_Dark_Mode.svg"
+                        )}
+                        sizes="any"
+                        type="image/svg+xml"
+                    />
+                    {/* <Notifications state={state} /> */}
+                    {children}
+                    <Stage />
+                    <Popup />
+                </StageContext>
+            </PopupContext>
+
         </Icons>
     </Theme>;
 };

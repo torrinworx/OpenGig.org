@@ -1,6 +1,6 @@
 import { Observer, OArray } from "destam-dom";
 import { modReq } from 'destam-web-core/client';
-import { Theme, Button, Paper, Toggle, Typography, TextField, Icon, Detached, ModalContext } from "destamatic-ui";
+import { Theme, Button, Paper, Toggle, Typography, TextField, Icon, Detached, StageContext } from "destamatic-ui";
 
 
 import Header from "../components/Header";
@@ -23,7 +23,7 @@ Theme.define({
 	}
 });
 
-const Gig = ModalContext.use(m => {
+const Gig = StageContext.use(m => {
 	return ({ each: gig }) => {
 		const hover = Observer.mutable(false);
 
