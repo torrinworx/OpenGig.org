@@ -13,7 +13,7 @@ import {
 	Meta,
 	is_node,
 	Script,
-	InputContext
+	InputContext,
 } from 'destamatic-ui';
 import IconifyIcons from "destamatic-ui/components/icons/IconifyIcons/IconifyIcons";
 
@@ -127,7 +127,7 @@ const stage = {
 	},
 	template: ({ children }) => children,
 	ssg: true,
-	initial: 'demo',
+	initial: 'landing',
 	urlRouting: true,
 	fallback: 'fallback',
 	truncateInitial: true,
@@ -142,6 +142,98 @@ const inputs = {
 	onClick: onClick,
 };
 
+const socialLinks = [
+	{
+		title: 'LinkedIn',
+		icon: 'simpleIcons:linkedin',
+		href: 'https://www.linkedin.com/in/torrin-leonard-8343a1154/'
+	},
+	{
+		title: 'Instagram',
+		icon: 'simpleIcons:instagram',
+		href: 'https://www.instagram.com/torrinleonard/',
+	},
+	{
+		title: 'GitHub',
+		icon: 'simpleIcons:github',
+		href: 'https://github.com/torrinworx',
+	},
+	{
+		title: 'GitLab',
+		icon: 'simpleIcons:gitlab',
+		href: 'https://gitlab.com/torrin1',
+	},
+	{
+		title: 'YouTube',
+		icon: 'simpleIcons:youtube',
+		href: 'https://www.youtube.com/@TorrinZLeonard',
+	},
+	{
+		title: 'Medium',
+		icon: 'simpleIcons:medium',
+		href: 'https://medium.com/@torrin_1169',
+	},
+	{
+		title: 'dev.to',
+		icon: 'simpleIcons:devdotto',
+		href: 'https://dev.to/torrin',
+	},
+	{
+		title: 'Hacker News',
+		icon: 'simpleIcons:ycombinator',
+		href: 'https://news.ycombinator.com/user?id=torrinleonard',
+	},
+];
+
+const SocialButton = ({ each }) => <Button
+	style={{ height: 50, width: 50 }}
+	title={each.title}
+	type='text'
+	icon={<Icon name={each.icon} size={30} />}
+	onClick={() => window.open(each.href, '_blank')}
+	href={each.href}
+/>;
+
+const Footer = StageContext.use(s => () => <div theme='column_fill_center_contentContainer' style={{ gap: 10 }} >
+	<div theme='column_center_fill' style={{ gap: 10 }}>
+		<div theme='row_wrap_fill_center' style={{ gap: 10 }}>
+			<SocialButton each={socialLinks} />
+		</div>
+	</div>
+	<div theme='row_center_fill_wrap_tight'>
+		<Typography style={{ textAlign: 'center' }} type='p1' label={`© OpenGig 2024-${new Date().getFullYear()} | Built by `} />
+		<Button
+			type='link'
+			iconPosition='right'
+			icon={<Icon name='feather:external-link' />}
+			label='Torrin'
+			onClick={() => window.open('https://torrin.me', '_blank')}
+			href='https://torrin.me'
+		/>
+		<Typography style={{ textAlign: 'center' }} type='p1' label=' with ' />
+		<Button
+			type='link'
+			iconPosition='right'
+			icon={<Icon name='feather:external-link' />}
+			label='destamatic-ui'
+			onClick={() => window.open('https://github.com/torrinworx/destamatic-ui', '_blank')}
+			href='https://github.com/torrinworx/destamatic-ui'
+		/>
+	</div>
+	<div theme='row_fill_center'>
+		<Button
+			type='text'
+			label='Privacy'
+		// onMouseDown={() => state.client.openPage = { name: "Privacy" }}
+		/>
+		<Button
+			type='text'
+			label='Terms'
+		// onMouseDown={() => state.client.openPage = { name: "Terms" }}
+		/>
+	</div>
+</div>);
+
 const App = () => <Theme value={theme}>
 	<InputContext value={inputs} >
 		<Icons value={[IconifyIcons]} >
@@ -153,7 +245,10 @@ const App = () => <Theme value={theme}>
 						height: '100%',
 						minHeight: '100vh'
 					}}>
-						<Stage />
+						<div theme='column_fill_center' style={{ gap: 20, padding: '20px 0' }}>
+							<Stage />
+							<Footer />
+						</div>
 					</div>
 				</StageContext>
 			</Head>
