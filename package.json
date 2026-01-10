@@ -36,7 +36,7 @@
 		"ws": "^8.18.0"
 	},
 	"devDependencies": {
-		"vite": "^5.4.11",
+		"vite": "^7.3.1",
 		"destamatic-ui": "file:destamatic-ui",
 		"@babel/core": "^7.25.2",
 		"@babel/generator": "^7.25.6",
