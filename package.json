@@ -19,7 +19,7 @@
 		"type": "git",
 		"url": "git+https://github.com/torrinworx/OpenGig.org.git"
 	},
-	"author": "Torrin Z. Leonard <torrin@worx4you.com> (https://torrinleonard.com/)",
+	"author": "Torrin Z. Leonard <torrin@worx4you.com> (https://torrin.me/)",
 	"license": "GPL-3.0",
 	"bugs": {
 		"url": "https://github.com/torrinworx/OpenGig.org/issues"
@@ -37,13 +37,18 @@
 	},
 	"devDependencies": {
 		"vite": "^5.4.11",
-		"feather-icons": "^4.29.2",
 		"destamatic-ui": "file:destamatic-ui",
 		"@babel/core": "^7.25.2",
 		"@babel/generator": "^7.25.6",
 		"@babel/parser": "^7.25.6",
 		"@babel/plugin-syntax-jsx": "^7.24.7",
 		"esbuild": "^0.24.0",
-		"nodemon": "^3.1.7"
+		"nodemon": "^3.1.7",
+		"@plausible-analytics/tracker": "^0.4.4",
+		"@iconify-json/feather": "^1.2.1",
+		"@iconify-json/lineicons": "^1.2.6",
+		"@iconify-json/simple-icons": "^1.2.1",
+		"@iconify-json/svg-spinners": "^1.2.4",
+		"@iconify-json/tabler": "^1.2.22"
 	}
 }

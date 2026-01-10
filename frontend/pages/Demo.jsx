@@ -1,0 +1,30 @@
+import { DropDown, Typography, Icon, Icons, OObject, Paper } from 'destamatic-ui';
+
+const ExampleWrapper = ({ example }) => {
+	const { header, example: ExampleComp } = example;
+
+	return <DropDown
+		open={example.open}
+		label={<Typography type="p1" label={header} />}
+		iconOpen={<Icon name="feather:chevron-up" />}
+		iconClose={<Icon name="feather:chevron-down" />}
+	>
+		<ExampleComp globalTheme={OObject({})} />
+	</DropDown>;
+};
+
+const Demo = () => {
+	const example_array = Object.values(
+		import.meta.glob(
+			'../../destamatic-ui/components/**/**/*.example.jsx',
+			{ eager: true }
+		)
+	).map(e => e.default);
+
+	return <>
+			<Paper style={{ width: 500, height: 500 }}><Typography type='h1' label='test' /></Paper>
+			<ExampleWrapper each:example={example_array} />
+	</>;
+};
+
+export default Demo;

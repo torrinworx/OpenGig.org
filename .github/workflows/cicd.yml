@@ -19,22 +19,19 @@ jobs:
             - name: Set up Node.js
               uses: actions/setup-node@v4
               with:
-                  node-version: "23"
+                  node-version: "25"
+
+            - name: Install dependencies
+              run: npm i
 
             - name: Execute build script
-              run: |
-                  chmod +x ./build.sh
-                  ./build.sh
-
-            - name: Ensure build output exists
-              run: ls ./
+              run: npm run build 
 
             - name: Upload Build Artifact
               uses: actions/upload-artifact@v4
               with:
                   name: build-artifact
                   path: ./build.zip
-
     deploy:
         name: Deploy
         needs: build
@@ -52,60 +49,47 @@ jobs:
               with:
                   name: build-artifact
 
-            - name: Verify downloaded artifact
-              run: ls ./
-
             - name: Set up SSH
               uses: webfactory/ssh-agent@v0.9.0
               with:
                   ssh-private-key: ${{ secrets.SSH_KEY }}
 
-            - name: Verify file operations
-              run: |
-                  echo "Current directory structure:"
-                  ls -l ./
-                  file ./build.zip
-                  file /home/www/deploying/build.zip
-
             - name: Deploy application
               env:
-                  PUBLIC_IP: ${{ secrets.PUBLIC_IP }}
+                PUBLIC_IP: ${{ secrets.PUBLIC_IP }}
               run: |
-                  scp -o 'StrictHostKeyChecking=no' ./build.zip root@$PUBLIC_IP:/root/build.zip
-                  ssh -o "StrictHostKeyChecking=no" root@$PUBLIC_IP "
-                      # Ensure DBus and XDG environment variables are set for root
-                      export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u root)/bus
-                      export XDG_RUNTIME_DIR=/run/user/$(id -u root)
+                ssh -o "StrictHostKeyChecking=no" root@$PUBLIC_IP "mkdir -p /var/www/downloads"
+                scp -o 'StrictHostKeyChecking=no' ./build.zip root@$PUBLIC_IP:/var/www/downloads/build-${{ github.sha }}.zip
+                ssh -o "StrictHostKeyChecking=no" root@$PUBLIC_IP "
+                  set -euo pipefail
+                  # Ensure DBus and XDG environment variables are set for root
+                  export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/\$(id -u root)/bus
+                  export XDG_RUNTIME_DIR=/run/user/\$(id -u root)
 
-                      # Initialize DBus session if dbus-launch is available
-                      if command -v dbus-launch > /dev/null; then
-                          dbus-launch --sh-syntax --exit-with-session
-                      fi
+                  # Initialize DBus session if dbus-launch is available
+                  if command -v dbus-launch > /dev/null; then
+                      dbus-launch --sh-syntax --exit-with-session
+                  fi
 
-                      # Proceed with deployment steps
-                      mkdir /root/deploying
-                      unzip -o -qq /root/build.zip -d /root/deploying
-                      rm -r /root/build.zip
+                  BUILD_ID='${{ github.sha }}'
+                  ZIP_PATH=\"/var/www/downloads/build-\$BUILD_ID.zip\"
+                  BUILD_DIR=\"/var/www/downloads/build-\$BUILD_ID\"
+                  TEMP_SETUP=\"/tmp/setup-\$BUILD_ID.sh\"
 
-                      # Reload systemd
-                      systemctl daemon-reload
+                  mkdir -p \"\$BUILD_DIR\"
+                  unzip -o -qq \"\$ZIP_PATH\" -d \"\$BUILD_DIR\"
+                  rm \"\$ZIP_PATH\"
 
-                      # Move to new build directory and install dependencies
-                      mv /root/deploying/build /root/build.new
-                      rm -r /root/deploying
-                      cd /root/build.new/
-                      # npm install
+                  SETUP_SRC=\"\$BUILD_DIR/setup.sh\"
 
-                      # Stop opengig service
-                      systemctl stop opengig || echo 'skipped stop opengig'
+                  if [ ! -f \"\$SETUP_SRC\" ]; then
+                    echo \"setup.sh not found at \$SETUP_SRC\"
+                    ls -R \"\$BUILD_DIR\"
+                    exit 1
+                  fi
 
-                      # Clean up old builds
-                      rm -r /root/build.old | true
-                      mv /root/build /root/build.old
-                      mv /root/build.new /root/build
-
-                      chmod +x /root/build/run.sh
-
-                      # Enable and start the service under root
-                      systemctl enable --now opengig
-                  "
+                  mv \"\$SETUP_SRC\" \"\$TEMP_SETUP\"
+                  chmod +x \"\$TEMP_SETUP\"
+                  \"\$TEMP_SETUP\" \"\$BUILD_DIR\"
+                  rm -f \"\$TEMP_SETUP\"
+                "

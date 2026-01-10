@@ -1,4 +1,4 @@
-import { defineConfig, loadEnv } from 'vite';
+import { defineConfig } from 'vite';
 import assertRemove from 'destam-dom/transform/assertRemove';
 import compileHTMLLiteral from 'destam-dom/transform/htmlLiteral';
 
@@ -24,8 +24,7 @@ const plugins = [];
 plugins.push(createTransform('transform-literal-html', compileHTMLLiteral, true, {
 	jsx_auto_import: {
 		h: 'destamatic-ui',
-		'mark': 'destamatic-ui',
-
+		mark: 'destamatic-ui',
 		raw: {
 			name: 'h',
 			location: 'destam-dom'
@@ -37,20 +36,42 @@ if (process.env.ENV === 'production') {
 	plugins.push(createTransform('assert-remove', assertRemove));
 }
 
-export default ({ mode }) => {
-    process.env = {...process.env, ...loadEnv(mode, process.cwd())};
-	return defineConfig({
-		root: './frontend',
-		plugins,
-		esbuild: {
-			jsx: 'preserve',
+export default defineConfig({
+	root: './frontend',
+	plugins,
+	esbuild: {
+		jsx: 'preserve',
+	},
+	base: '',
+	resolve: {
+		extensions: ['.js', '.ts', '.tsx', '.jsx'],
+		alias: {
+			util: 'util/',
 		},
-		base: '',
-		resolve: {
-			extensions: ['.js', '.ts', '.tsx', '.jsx'],
+	},
+	define: {
+		'process.env.NODE_ENV': '"development"',
+		'process.env.BABEL_TYPES_8_BREAKING': 'false',
+		'process.env.BABEL_8_BREAKING': 'false',
+		global: 'globalThis',
+	},
+	server: {
+		host: true,
+		port: process.env.PORT || 3000,
+	},
+	optimizeDeps: {
+		include: ['@babel/parser', '@babel/generator', '@babel/types', 'util'],
+		exclude: ['destamatic-ui', 'destam-dom', 'destam'],
+	},
+	build: {
+		target: 'esnext',
+		outDir: '../build/dist',
+		rollupOptions: {
+			output: {
+				entryFileNames: '[name].js',
+				chunkFileNames: 'assets/[name].[hash].js',
+				assetFileNames: 'assets/[name].[hash][extname]',
+			},
 		},
-		build: {
-			outDir: '../build/dist',
-		},
-	})
-};
+	},
+});

@@ -1,7 +1,6 @@
 import { OObject } from "destam-dom";
 import { Observer } from "destam-dom";
 import { atomic } from "destam/Network";
-import FeatherIcons from "destamatic-ui/components/icons/FeatherIcons";
 
 const mainColors = {
 	$color_purple: '#500089',
@@ -284,7 +283,6 @@ const theme = OObject({
 
 window.themeMode = Observer.mutable(window.matchMedia("(prefers-color-scheme:dark)").matches ? true : false);
 window.theme = theme;
-
 window.themeMode.effect(mode => atomic(() => {
 	mode = mode ? 'dark' : 'light'; // if mode is true => dark mode, else false => light mode
 	for (const [key, val] of Object.entries(themeModes[mode])) {
@@ -292,42 +290,4 @@ window.themeMode.effect(mode => atomic(() => {
 	}
 }));
 
-export default {
-	theme,
-	icons: [{
-		search: FeatherIcons('search'),
-		x: FeatherIcons('x'),
-		user: FeatherIcons('user'),
-		image: FeatherIcons('image'),
-		feather: FeatherIcons('feather'),
-		globe: FeatherIcons('globe'),
-		github: FeatherIcons('github'),
-	},
-		FeatherIcons
-	],
-	define: (...args) => atomic(() => {
-		let prefix = '';
-		let i = 0;
-
-		for (; i < args.length; i++) {
-			if (typeof args[i] === 'string') {
-				prefix += args[i] + '_';
-			} else {
-				break;
-			}
-		}
-
-		const obj = args[i];
-		for (const o in obj) {
-			let name;
-			if (o === '*') {
-				name = prefix.substring(0, prefix.length - 1);
-			} else {
-				name = prefix + o;
-			}
-
-			if (name in theme) throw new Error("Theme.define: theme definition already exists: " + o);
-			theme[name] = obj[o];
-		}
-	}),
-};
+export default theme;
