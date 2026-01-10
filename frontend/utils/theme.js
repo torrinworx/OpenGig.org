@@ -36,7 +36,7 @@ const theme = OObject({
 	paper: {
 		extends: ['radius'],
 		boxShadow: 'none',
-		padding: 30,
+		padding: 20,
 		background: '$color_background',
 		color: '$color_text',
 		maxWidth: 'inherit',
@@ -79,6 +79,22 @@ const theme = OObject({
 
 	loadingDots_dot_contained: {
 		background: '$color_background',
+	},
+
+	contentContainer: {
+		padding: 20,
+		maxWidth: 800,
+	},
+
+	divider: {
+		marginTop: 10,
+		marginBottom: 10,
+		background: '$color_top',
+	},
+
+	divider_secondary: {
+		extends: 'secondary',
+		background: '$color_top',
 	},
 });
 
