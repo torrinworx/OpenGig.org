@@ -45,11 +45,10 @@ if (!is_node()) {
 };
 
 const HeadTags = () => {
-	const siteUrl = 'https://torrin.me';
-	const pageTitle = 'Torrin Leonard | Full-Stack Engineer';
-	const description =
-		'Full-stack software engineer building AI-powered web apps, custom UI frameworks, and the infrastructure they run on.';
-	const imageUrl = `${siteUrl}/site-card.png`;
+	const siteUrl = 'https://opengig.org';
+	const pageTitle = 'OpenGig';
+	const description = 'A transparent gig platform. Anyone can hire or work. Pricing and fees are transparent.';
+	const imageUrl = `${siteUrl}/branding/OpenGig_Logo_Light_Mode.svg`;
 
 	return <>
 		<Title text={pageTitle} />
@@ -66,7 +65,7 @@ const HeadTags = () => {
 		<Meta property="og:type" content="website" />
 		<Meta property="og:url" content={siteUrl} />
 		<Meta property="og:image" content={imageUrl} />
-		<Meta property="og:site_name" content="Torrin Leonard" />
+		<Meta property="og:site_name" content="OpenGig" />
 		<Meta property="og:locale" content="en_CA" />
 
 		<Meta name="twitter:card" content="summary_large_image" />

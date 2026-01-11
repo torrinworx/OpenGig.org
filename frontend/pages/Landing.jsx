@@ -24,7 +24,7 @@ const Landing = StageContext.use(s => () => {
 
 		<div theme='column_fill_contentContainer'>
 			<div theme='row_spread_wrap'>
-				<Typography label='Join OpengGig' type="h1" />
+				<Typography label='Join' type="h1" />
 				<Button
 					label={cookiePresent ? 'Enter' : 'Join'}
 					type="contained"
@@ -34,7 +34,7 @@ const Landing = StageContext.use(s => () => {
 			</div>
 			<div theme='divider' />
 			<Typography type="p1">
-				A transparent gig platform built for workers, services, and customers.
+				OpenGig is a transparent gig platform. Anyone can hire or work. Pricing and fees are transparent.
 			</Typography>
 
 			<ul theme='primary' style={{ color: '$color' }}>
