@@ -238,7 +238,7 @@ const Footer = StageContext.use(s => () => <div theme='column_fill_center_conten
 		</div>
 	</div>
 	<div theme='row_center_fill_wrap_tight'>
-		<Typography style={{ textAlign: 'center' }} type='p1' label={`© OpenGig 2024-${new Date().getFullYear()} | Built by `} />
+		<Typography style={{ textAlign: 'center' }} type='p1' label={`© OpenGig 2024-${new Date().getFullYear()} 🇨🇦 | Built by `} />
 		<Button
 			type='link'
 			iconPosition='right'
