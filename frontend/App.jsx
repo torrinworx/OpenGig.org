@@ -29,6 +29,7 @@ import Demo from './pages/Demo.jsx';
 import Auth from './pages/Auth.jsx';
 import Home from './pages/Home.jsx';
 import AppContext from './utils/appContext.js';
+import NewGig from './pages/NewGig.jsx';
 
 import { syncState } from 'destam-web-core/client';
 
@@ -125,7 +126,7 @@ const HeadTags = () => {
 };
 
 const appContext = Observer.mutable(false)
-window.state = appContext; 
+window.state = appContext;
 
 const authenticate = (Comp) =>
 	StageContext.use(stage =>
@@ -135,13 +136,11 @@ const authenticate = (Comp) =>
 				const syncExists = !!app.get()?.observer?.path('sync')?.get()
 				if (!syncExists) {
 					const state = await syncState();
-					console.log(state.observer.path('sync').get());
 					app.set(state);
 				}
 
 				const authed = !!app.get()?.observer?.path('sync')?.get();
 
-				console.log('Authed: ', authed);
 				if (!authed) {
 					queueMicrotask(() => stage.open({ name: 'auth' }));
 					return null;
@@ -157,10 +156,11 @@ const stage = {
 		landing: Landing,
 		auth: Auth,
 		home: authenticate(Home),
+		'new-gig': authenticate(NewGig),
 		demo: Demo,
 		fallback: NotFound,
 	},
-	onOpen: ({ }) => {
+	onOpen: () => {
 		window.scrollTo(0, 0);
 	},
 	template: ({ children }) => children,
@@ -271,15 +271,6 @@ const Footer = StageContext.use(s => () => <div theme='column_fill_center_conten
 		/>
 	</div>
 </div>);
-
-/*
-Logic I need:
-
-any url loaded -> check if cookie, if cookie, attempt initws and syncNetwork
-if no cookie, load page/let onOpen direct pages.
-
-*/
-
 
 const App = () => <AppContext value={appContext}>
 	<Theme value={theme}>
