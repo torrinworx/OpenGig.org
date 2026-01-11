@@ -120,7 +120,7 @@ const HeadTags = () => {
 						plausible.o = opts || {};
 						};
 						plausible.init();
-						`}
+			`}
 		</Script>
 	</>;
 };

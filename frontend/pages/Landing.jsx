@@ -8,7 +8,7 @@ const Landing = StageContext.use(s => () => {
 	const cookiePresent = getCookie('webcore') || '';
 
 	return <>
-		<div theme='row_fill_wrap_spread_contentContainer'>
+		<div theme='row_center_fill_contentContainer'>
 			<img
 				src={window.themeMode.map(t => t === false ? LogoLightMode : LogoDarkMode)}
 				style={{
@@ -20,20 +20,11 @@ const Landing = StageContext.use(s => () => {
 					display: 'block',
 				}}
 			/>
-			<Button
-				label={cookiePresent ? 'Enter' : 'Join'}
-				type="contained"
-				onClick={() => s.open({ name: 'auth' })}
-			/>
 		</div>
 
 		<div theme='column_fill_contentContainer'>
-			<Typography label='Join OpenGig' type="h1" />
-			<Typography type="p1">
-				OpenGig.org is an Open Source Service platform built for gig workers and customers. We stand for openness, the rights of customers, and for the empowerment of workers.
-			</Typography>
-			<div theme='divider' />
-			<div theme='row_start'>
+			<div theme='row_spread_wrap'>
+				<Typography label='Join OpengGig' type="h1" />
 				<Button
 					label={cookiePresent ? 'Enter' : 'Join'}
 					type="contained"
@@ -41,6 +32,44 @@ const Landing = StageContext.use(s => () => {
 					onClick={() => s.open({ name: 'auth' })}
 				/>
 			</div>
+			<div theme='divider' />
+			<Typography type="p1">
+				A transparent gig platform built for workers, services, and customers.
+			</Typography>
+
+			<ul theme='primary' style={{ color: '$color' }}>
+				<li key={0}>
+					<Typography label={<>Workers <b>set their own rates</b>.</>} type='p1' />
+				</li>
+				<li key={1}>
+					<Typography label={<>Customers get <b>clear pricing</b>.</>} type='p1' />
+				</li>
+				<li key={2}>
+					<Typography label={<><b>Open source</b> and <b>community run.</b></>} type='p1' />
+				</li>
+			</ul>
+
+			<Typography label='Goodbye:' type='p1_bold' />
+
+			<ul theme='primary' style={{ color: '$color' }}>
+				<li><Typography label={<><s>Surprise fees</s></>} type='p1' /></li>
+				<li><Typography label={<><s>Surge / markup pricing</s></>} type='p1' /></li>
+				<li><Typography label={<><s>Unclear payouts</s></>} type='p1' /></li>
+				<li><Typography label={<><s>Dark patterns</s></>} type='p1' /></li>
+			</ul>
+
+		</div>
+
+		<div theme='column_fill_contentContainer'>
+			<Typography type="h2" label='Why spend on OpenGig?' />
+			<div theme='divider' />
+			<Typography type="p1">
+				OpenGig is adaptable, catering to a wide spectrum of gig services—from ride-sharing and food delivery to freelance tasks. Whatever you need, we've got you covered.
+			</Typography>
+			<br />
+			<Typography type="p1">
+				Customers benefit from our Open Cost principle. You pay only for what you consume, with every cent transparently used for your service or payout—no hidden charges funding luxury yachts, failed self-driving taxi ventures, or stock bonuses for billionaires.
+			</Typography>
 		</div>
 
 		<div theme='column_fill_contentContainer'>
@@ -63,17 +92,9 @@ const Landing = StageContext.use(s => () => {
 			</Typography>
 		</div>
 
-		<div theme='column_fill_contentContainer'>
-			<Typography type="h2" label='Why spend on OpenGig?' />
-			<div theme='divider' />
-			<Typography type="p1">
-				OpenGig is adaptable, catering to a wide spectrum of gig services—from ride-sharing and food delivery to freelance tasks. Whatever you need, we've got you covered.
-			</Typography>
-			<br />
-			<Typography type="p1">
-				Customers benefit from our Open Cost principle. You pay only for what you consume, with every cent transparently used for your service or payout—no hidden charges funding luxury yachts, failed self-driving taxi ventures, or stock bonuses for billionaires.
-			</Typography>
-		</div>
+
+		{/* TODO: Bottom hero footer section. Ready to join the change? Join OpenGig today! */}
+
 	</>;
 });
 
