@@ -182,44 +182,14 @@ const inputs = {
 
 const socialLinks = [
 	{
-		title: 'LinkedIn',
-		icon: 'simpleIcons:linkedin',
-		href: 'https://www.linkedin.com/in/torrin-leonard-8343a1154/'
-	},
-	{
-		title: 'Instagram',
-		icon: 'simpleIcons:instagram',
-		href: 'https://www.instagram.com/torrinleonard/',
-	},
-	{
 		title: 'GitHub',
 		icon: 'simpleIcons:github',
-		href: 'https://github.com/torrinworx',
+		href: 'https://github.com/torrinworx/OpenGig.org',
 	},
 	{
-		title: 'GitLab',
-		icon: 'simpleIcons:gitlab',
-		href: 'https://gitlab.com/torrin1',
-	},
-	{
-		title: 'YouTube',
-		icon: 'simpleIcons:youtube',
-		href: 'https://www.youtube.com/@TorrinZLeonard',
-	},
-	{
-		title: 'Medium',
-		icon: 'simpleIcons:medium',
-		href: 'https://medium.com/@torrin_1169',
-	},
-	{
-		title: 'dev.to',
-		icon: 'simpleIcons:devdotto',
-		href: 'https://dev.to/torrin',
-	},
-	{
-		title: 'Hacker News',
-		icon: 'simpleIcons:ycombinator',
-		href: 'https://news.ycombinator.com/user?id=torrinleonard',
+		title: 'Discord',
+		icon: 'simpleIcons:discord',
+		href: 'https://discord.gg/VsZ3gUQCUe',
 	},
 ];
 
