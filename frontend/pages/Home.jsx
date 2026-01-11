@@ -156,6 +156,8 @@ const Home = StageContext.use(s => ({ state }) => {
 		gigs.push(...response.gigs);
 	};
 
+
+	// TODO: Move gigs thing to a suspended component.
 	getGigs();
 
 	return <>

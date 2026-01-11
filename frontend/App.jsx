@@ -17,6 +17,7 @@ import {
 	Observer,
 	suspend,
 	LoadingDots,
+	Toggle,
 } from 'destamatic-ui';
 import IconifyIcons from "destamatic-ui/components/icons/IconifyIcons/IconifyIcons";
 
@@ -257,6 +258,7 @@ const Footer = StageContext.use(s => () => <div theme='column_fill_center_conten
 			href='https://github.com/torrinworx/destamatic-ui'
 		/>
 	</div>
+	<Toggle value={window.themeMode} />
 	<div theme='row_fill_center' style={{ gap: 10 }}>
 		<Button
 			type='text'
