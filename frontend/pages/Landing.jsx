@@ -1,4 +1,4 @@
-import { Button, Typography, Paper, StageContext } from 'destamatic-ui';
+import { Button, Typography, StageContext } from 'destamatic-ui';
 import { getCookie } from 'destam-web-core/client';
 
 import LogoLightMode from '/branding/OpenGig_Logo_Light_Mode.svg';
@@ -23,7 +23,7 @@ const Landing = StageContext.use(s => () => {
 			<Button
 				label={cookiePresent ? 'Enter' : 'Join'}
 				type="contained"
-			// onMouseDown={() => state.client.openPage = { name: "Auth" }}
+				onClick={() => s.open({ name: 'auth' })}
 			/>
 		</div>
 
@@ -38,7 +38,7 @@ const Landing = StageContext.use(s => () => {
 					label={cookiePresent ? 'Enter' : 'Join'}
 					type="contained"
 					style={{ marginTop: '20px' }}
-				// onMouseDown={() => state.client.openPage = { name: "Auth" }}
+					onClick={() => s.open({ name: 'auth' })}
 				/>
 			</div>
 		</div>

@@ -14,6 +14,9 @@ import {
 	is_node,
 	Script,
 	InputContext,
+	Observer,
+	suspend,
+	LoadingDots,
 } from 'destamatic-ui';
 import IconifyIcons from "destamatic-ui/components/icons/IconifyIcons/IconifyIcons";
 
@@ -23,6 +26,11 @@ import JsonLd from './utils/JsonLd.jsx';
 import Landing from './pages/Landing.jsx';
 import NotFound from './pages/NotFound.jsx';
 import Demo from './pages/Demo.jsx';
+import Auth from './pages/Auth.jsx';
+import Home from './pages/Home.jsx';
+import AppContext from './utils/appContext.js';
+
+import { syncState } from 'destam-web-core/client';
 
 let track;
 
@@ -33,7 +41,7 @@ if (!is_node()) {
 		endpoint: 'https://stats.torrin.me/api/event',
 	});
 	track = plausible.track;
-}
+};
 
 const HeadTags = () => {
 	const siteUrl = 'https://torrin.me';
@@ -69,7 +77,7 @@ const HeadTags = () => {
 		<Link rel="canonical" href={siteUrl} />
 		<Link
 			rel="icon"
-			href="/favicon.png"
+			href="/branding/OpenGig_Icon.png"
 			sizes="any"
 			type="image/png"
 		/>
@@ -105,24 +113,54 @@ const HeadTags = () => {
 		>
 			{`
                 window.plausible = window.plausible || function() {
-                  (plausible.q = plausible.q || []).push(arguments)
-                };
-                plausible.init = plausible.init || function (opts) {
-                  plausible.o = opts || {};
-                };
-                plausible.init();
-            `}
+					(plausible.q = plausible.q || []).push(arguments)
+					};
+					plausible.init = plausible.init || function (opts) {
+						plausible.o = opts || {};
+						};
+						plausible.init();
+						`}
 		</Script>
 	</>;
 };
 
+const appContext = Observer.mutable(false)
+window.state = appContext; 
+
+const authenticate = (Comp) =>
+	StageContext.use(stage =>
+		AppContext.use(app =>
+			suspend(LoadingDots, async (props) => {
+
+				const syncExists = !!app.get()?.observer?.path('sync')?.get()
+				if (!syncExists) {
+					const state = await syncState();
+					console.log(state.observer.path('sync').get());
+					app.set(state);
+				}
+
+				const authed = !!app.get()?.observer?.path('sync')?.get();
+
+				console.log('Authed: ', authed);
+				if (!authed) {
+					queueMicrotask(() => stage.open({ name: 'auth' }));
+					return null;
+				}
+
+				return <Comp {...props} />;
+			})
+		)
+	);
+
 const stage = {
 	acts: {
 		landing: Landing,
+		auth: Auth,
+		home: authenticate(Home),
 		demo: Demo,
 		fallback: NotFound,
 	},
-	onOpen: () => {
+	onOpen: ({ }) => {
 		window.scrollTo(0, 0);
 	},
 	template: ({ children }) => children,
@@ -220,7 +258,7 @@ const Footer = StageContext.use(s => () => <div theme='column_fill_center_conten
 			href='https://github.com/torrinworx/destamatic-ui'
 		/>
 	</div>
-	<div theme='row_fill_center'>
+	<div theme='row_fill_center' style={{ gap: 10 }}>
 		<Button
 			type='text'
 			label='Privacy'
@@ -234,26 +272,37 @@ const Footer = StageContext.use(s => () => <div theme='column_fill_center_conten
 	</div>
 </div>);
 
-const App = () => <Theme value={theme}>
-	<InputContext value={inputs} >
-		<Icons value={[IconifyIcons]} >
-			<Head>
-				<HeadTags />
-				<StageContext value={stage}>
-					<div theme='primary' style={{
-						background: '$color_background',
-						height: '100%',
-						minHeight: '100vh'
-					}}>
-						<div theme='column_fill_center' style={{ gap: 20, padding: '20px 0' }}>
-							<Stage />
-							<Footer />
+/*
+Logic I need:
+
+any url loaded -> check if cookie, if cookie, attempt initws and syncNetwork
+if no cookie, load page/let onOpen direct pages.
+
+*/
+
+
+const App = () => <AppContext value={appContext}>
+	<Theme value={theme}>
+		<InputContext value={inputs} >
+			<Icons value={[IconifyIcons]} >
+				<Head>
+					<HeadTags />
+					<StageContext value={stage}>
+						<div theme='primary' style={{
+							background: '$color_background',
+							height: '100%',
+							minHeight: '100vh'
+						}}>
+							<div theme='column_fill_center' style={{ gap: 20, padding: '20px 0' }}>
+								<Stage />
+								<Footer />
+							</div>
 						</div>
-					</div>
-				</StageContext>
-			</Head>
-		</Icons>
-	</InputContext>
-</Theme>;
+					</StageContext>
+				</Head>
+			</Icons>
+		</InputContext>
+	</Theme>
+</AppContext>;
 
 export default App;

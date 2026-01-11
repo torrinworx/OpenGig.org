@@ -21,10 +21,10 @@ const Demo = () => {
 		)
 	).map(e => e.default);
 
-	return <>
-			<Paper style={{ width: 500, height: 500 }}><Typography type='h1' label='test' /></Paper>
-			<ExampleWrapper each:example={example_array} />
-	</>;
+	return <div theme='column_fill'>
+		<Paper style={{ width: 500, height: 500 }}><Typography type='h1' label='test' /></Paper>
+		<ExampleWrapper each:example={example_array} />
+	</div>;
 };
 
 export default Demo;
