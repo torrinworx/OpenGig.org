@@ -208,7 +208,7 @@ const Home = StageContext.use(s => ({ state }) => {
 					iconPosition='right'
 					type='outlined'
 					onClick={() => {
-						s.open({ name: 'NewGig' });
+						s.open({ name: 'new-gig' });
 					}}
 					icon={<Icon name='feather:plus' />}
 				/>
