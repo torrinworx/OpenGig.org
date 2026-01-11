@@ -7,6 +7,7 @@ import { core } from "destam-web-core/server";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const isProd = process.env.NODE_ENV === 'production';
 
 const loadEnv = async (filePath = './.env') => {
 	try {
@@ -21,7 +22,9 @@ const loadEnv = async (filePath = './.env') => {
 	}
 };
 
-await loadEnv();
+if (!isProd) {
+    await loadEnv();
+}
 
 let stripe;
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;

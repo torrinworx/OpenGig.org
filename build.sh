@@ -17,7 +17,7 @@ node ./destamatic-ui/ssg/build.js "$BUILD_DIR" ./frontend https://opengig.org
 
 # Server
 cp -R ./backend "$BUILD_DIR/backend"
-cp ./destam-web-core "$BUILD_DIR/destam-web-core"
+cp -R ./destam-web-core "$BUILD_DIR/destam-web-core"
 cp ./package.json "$BUILD_DIR/package.json"
 cp ./package-lock.json "$BUILD_DIR/package-lock.json"
 
