@@ -33,6 +33,10 @@ const theme = OObject({
 		$color_disabled: 'gray'
 	}),
 
+	icon: {
+		color: '$color',
+	},
+
 	paper: {
 		extends: ['radius'],
 		boxShadow: 'none',
