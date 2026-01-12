@@ -161,36 +161,6 @@ const Home = StageContext.use(s => ({ state }) => {
 	getGigs();
 
 	return <>
-		{/* <Header state={state}>
-			<Kebab style={{ padding: 0 }} theme='column_tight_center'>
-				<Button
-					type='icon'
-					onClick={() => state.modal.set({ name: 'Account', header: 'Account' })}
-					style={{
-						padding: 0,
-						height: 40,
-						width: 40,
-						borderRadius: 50,
-						flexShrink: 0,
-					}}
-					icon={<Icon name='user' size={30} />}
-				/>
-				<Button
-					type='contained'
-					onMouseDown={async () => state.modal.set({ name: 'StripeTest', header: 'Stripe Test' })}
-					label='Stripe setup'
-				/>
-				<Toggle value={window.themeMode} />
-				<Button
-					type='text'
-					onMouseDown={() => {
-						state.leave();
-						state.client.openPage = { name: 'Landing' };
-					}}
-					label='Sign Out'
-				/>
-			</Kebab>
-		</Header> */}
 		<div theme='row_fill_wrap_spread_contentContainer'>
 			<img
 				src={window.themeMode.map(t => t === false ? LogoLightMode : LogoDarkMode)}
