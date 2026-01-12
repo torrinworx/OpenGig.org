@@ -250,14 +250,30 @@ const App = () => <AppContext value={appContext}>
 				<Head>
 					<HeadTags />
 					<StageContext value={stage}>
-						<div theme='primary' style={{
-							background: '$color_background',
-							height: '100%',
-							minHeight: '100vh'
-						}}>
-							<div theme='column_fill_center' style={{ gap: 20, padding: '20px 0' }}>
+						<div
+							theme="primary"
+							style={{
+								background: '$color_background',
+								minHeight: '100dvh',
+								display: 'flex',
+								flexDirection: 'column',
+							}}
+						>
+							<div
+								theme="column_fill_center"
+								style={{
+									gap: 20,
+									padding: '20px 10px',
+									display: 'flex',
+									flexDirection: 'column',
+									flex: 1,
+								}}
+							>
 								<Stage />
-								<Footer />
+
+								<div style={{ marginTop: 'auto' }}>
+									<Footer />
+								</div>
 							</div>
 						</div>
 					</StageContext>
