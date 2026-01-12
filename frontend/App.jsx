@@ -206,6 +206,7 @@ const Footer = StageContext.use(s => () => <div theme='column_fill_center_conten
 	<div theme='column_center_fill' style={{ gap: 10 }}>
 		<div theme='row_wrap_fill_center' style={{ gap: 10 }}>
 			<SocialButton each={socialLinks} />
+			<Toggle value={window.themeMode} style={{ padding: 10 }} />
 		</div>
 	</div>
 	<div theme='row_center_fill_wrap_tight'>
@@ -228,7 +229,6 @@ const Footer = StageContext.use(s => () => <div theme='column_fill_center_conten
 			href='https://github.com/torrinworx/destamatic-ui'
 		/>
 	</div>
-	<Toggle value={window.themeMode} />
 	<div theme='row_fill_center' style={{ gap: 10 }}>
 		<Button
 			type='text'
