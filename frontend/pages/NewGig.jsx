@@ -87,7 +87,7 @@ const NewGig = StageContext.use(stage => () => {
 				</div>
 				<div theme='divider' />
 				<Typography type='p1' label={type.map(t => {
-					const base = 'Are you requesting a gig or offering services?';
+					const base = 'Are you requesting a gig or offering one?';
 					if (t === 'Offer') {
 						return <>{base} <b>Offering a service means that users can seek your service and contact you for work.</b></>;
 					} else {
@@ -267,7 +267,6 @@ const NewGig = StageContext.use(stage => () => {
 
 			<div theme='column_fill_center'>
 				<Typography type="validate" label={error} />
-
 				<Button
 					type='contained'
 					label='Publish'
