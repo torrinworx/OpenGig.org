@@ -1,5 +1,3 @@
-import { OArray } from "destam";
-
 export default () => {
     return {
         onMsg: async (_, __, { DB, database }) => {
@@ -9,17 +7,16 @@ export default () => {
                 .limit(10)
                 .toArray();
 
-            let gigs = OArray([]);
+            const gigs = {};
 
             for (const post of recentGigs) {
-                const reactivePost = await DB.reuse('gigs', {
+                const gig = await DB.reuse('gigs', {
                     uuid: post.persistent.uuid,
                 });
-                gigs.push(reactivePost);
+                gigs[gig.query.uuid] = gig;
             }
-            // TODO Figure out how to make these truly reactive? Maybe append to sync? Or do the fancy thing and open a new synced variable with the client?
-            // Unsure.
-            return { gigs };
+
+            return gigs;
         }
     };
 };
