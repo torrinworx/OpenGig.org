@@ -2,7 +2,7 @@ import { moderateStr } from '../../moderation.js';
 
 export default () => {
     return {
-        onMsg: async ({ type, name, description, tags }, __, { sync, user, DB }) => {
+        onMsg: async ({ type, name, description, tags }, __, { user, DB }) => {
             if (type !== "gig_service" && type !== "gig_request") {
                 return { error: "Invalid type. Must be 'gig_service' or 'gig_request'." };
             }
@@ -21,7 +21,6 @@ export default () => {
 
             const nameMod = await moderateStr(name);
             if (!nameMod.ok) {
-                // increment user moderation violation counter?
                 return { error: "Name violates moderation rules.", details: nameMod.reason };
             }
 
@@ -31,7 +30,6 @@ export default () => {
             }
 
             const tagChecks = await Promise.all(tags.map(t => moderateStr(t)));
-
             const badIndex = tagChecks.findIndex(r => !r.ok);
             if (badIndex !== -1) {
                 return {
@@ -41,12 +39,17 @@ export default () => {
                 };
             }
 
-            let gig = await DB('gigs');
+            const gig = await DB('gigs');
+
+            gig.query.uuid = gig.query.uuid ?? gig.persistent?.uuid ?? gig.uuid;
             gig.query.user = user.query.uuid;
+
             gig.type = type;
             gig.name = name;
             gig.description = description;
             gig.tags = tags;
+
+            await DB.flush(gig);
 
             return { gig: gig.query.uuid };
         }
