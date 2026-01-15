@@ -18,6 +18,8 @@ import {
 	suspend,
 	LoadingDots,
 	Toggle,
+	PopupContext,
+	Popup,
 } from 'destamatic-ui';
 import IconifyIcons from "destamatic-ui/components/icons/IconifyIcons/IconifyIcons";
 
@@ -250,32 +252,35 @@ const App = () => <AppContext value={appContext}>
 				<Head>
 					<HeadTags />
 					<StageContext value={stage}>
-						<div
-							theme="primary"
-							style={{
-								background: '$color_background',
-								minHeight: '100dvh',
-								display: 'flex',
-								flexDirection: 'column',
-							}}
-						>
+						<PopupContext>
+							<Popup />
 							<div
-								theme="column_fill_center"
+								theme="primary"
 								style={{
-									gap: 20,
-									padding: '20px 10px',
+									background: '$color_background',
+									minHeight: '100dvh',
 									display: 'flex',
 									flexDirection: 'column',
-									flex: 1,
 								}}
 							>
-								<Stage />
+								<div
+									theme="column_fill_center"
+									style={{
+										gap: 20,
+										padding: '20px 10px',
+										display: 'flex',
+										flexDirection: 'column',
+										flex: 1,
+									}}
+								>
+									<Stage />
 
-								<div style={{ marginTop: 'auto' }}>
-									<Footer />
+									<div style={{ marginTop: 'auto' }}>
+										<Footer />
+									</div>
 								</div>
 							</div>
-						</div>
+						</PopupContext>
 					</StageContext>
 				</Head>
 			</Icons>
