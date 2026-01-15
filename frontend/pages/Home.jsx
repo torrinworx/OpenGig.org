@@ -76,7 +76,7 @@ const SearchBar = () => {
 const Kebab = ({ children }) => {
 	const focused = Observer.mutable(false);
 
-	return <Detached>
+	return <Detached enabled={focused}>
 		<Button
 			type='text'
 			onClick={() => focused.set(!focused.get())}
@@ -84,7 +84,13 @@ const Kebab = ({ children }) => {
 			icon={<Icon name='feather:menu' size={30} />}
 		/>
 		<mark:popup>
-			<Paper theme='column' style={{ padding: 8, gap: 8 }}>
+			<Paper
+				theme='column'
+				style={{ padding: 8, gap: 8 }}
+				onPointerDown={e => e.stopPropagation()}
+				onTouchStart={e => e.stopPropagation()}
+				onMouseDown={e => e.stopPropagation()}
+			>
 				{children}
 			</Paper>
 		</mark:popup>
