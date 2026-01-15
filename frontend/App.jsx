@@ -56,6 +56,7 @@ const HeadTags = () => {
 	return <>
 		<Title text={pageTitle} />
 
+		<Meta charset="UTF-8" />
 		<Meta name="description" content={description} />
 		<Meta name="author" content="Torrin Leonard" />
 		<Meta name="robots" content="index, follow" />
@@ -80,9 +81,9 @@ const HeadTags = () => {
 		<Link rel="canonical" href={siteUrl} />
 		<Link
 			rel="icon"
-			href="/branding/OpenGig_Icon.png"
+			href="/branding/OpenGig_Icon.svg"
 			sizes="any"
-			type="image/png"
+			type="image/svg+xml"
 		/>
 
 		<Style>
