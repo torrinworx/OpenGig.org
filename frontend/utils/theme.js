@@ -38,14 +38,14 @@ const theme = OObject({
 	},
 
 	paper: {
-		extends: ['radius'],
+		extends: 'primary_radius',
 		boxShadow: 'none',
 		padding: 20,
 		background: '$color_background',
 		color: '$color_text',
 		maxWidth: 'inherit',
 		maxHeight: 'inherit',
-		border: 'solid $color_top 2px'
+		border: 'solid $color 2px'
 	},
 
 	typography: {
