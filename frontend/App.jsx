@@ -79,12 +79,7 @@ const HeadTags = () => {
 		<Meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
 		<Link rel="canonical" href={siteUrl} />
-		<Link
-			rel="icon"
-			href="/branding/OpenGig_Icon.svg"
-			sizes="any"
-			type="image/svg+xml"
-		/>
+		<Link rel="icon" href="/branding/favicon.ico" type="image/x-icon" />
 
 		<Style>
 			{`

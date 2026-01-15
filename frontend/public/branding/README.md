@@ -1,6 +1,6 @@
 # OpenGig Branding Assets
 
-The files in this folder are **NOT** licensed under GPLv3.
+The files in this folder and the file /public/favicon.ico are **NOT** licensed under GPLv3.
 
 They are provided for use only in official OpenGig properties, unless you have
 explicit written permission from OpenGig.
