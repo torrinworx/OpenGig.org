@@ -79,7 +79,7 @@ const HeadTags = () => {
 		<Meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
 		<Link rel="canonical" href={siteUrl} />
-		<Link rel="icon" href="/branding/favicon.ico" type="image/x-icon" />
+		<Link rel="icon" href="/favicon.ico" type="image/x-icon" />
 
 		<Style>
 			{`
