@@ -1,18 +1,28 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-BUILD_DIR="$1"
+BUILD_DIR="${1:-}"
+if [[ -z "$BUILD_DIR" || ! -d "$BUILD_DIR" ]]; then
+  echo "Usage: $0 /path/to/build-dir"
+  exit 1
+fi
 
 SERVICE_NAME="opengig.org"
 SERVICE_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
+
 DEPLOY_DIR="/var/www/opengig.org/deploy"
 ENV_FILE="/var/www/opengig.org/.env"
+
 NGINX_SITE_AVAILABLE="/etc/nginx/sites-available/opengig.org"
 NGINX_SITE_ENABLED="/etc/nginx/sites-enabled/opengig.org"
+
+NGINX_DEFAULT_DENY_AVAIL="/etc/nginx/sites-available/00-default-deny"
+NGINX_DEFAULT_DENY_ENAB="/etc/nginx/sites-enabled/00-default-deny"
 
 DOMAIN="opengig.org"
 WEBROOT="/var/www/opengig.org/html"
 EMAIL="torrin@torrin.me"
+
 CERT_LIVE_DIR="/etc/letsencrypt/live/${DOMAIN}"
 
 # Stop existing service if it exists
@@ -36,9 +46,9 @@ else
   exit 1
 fi
 
-# Get PORT from .env (simple grep; assumes lines like PORT=3000)
+# Get PORT from .env
 if [[ -f "$ENV_FILE" ]]; then
-  PORT=$(grep -E '^PORT=' "$ENV_FILE" | tail -n1 | cut -d'=' -f2-)
+  PORT="$(grep -E '^PORT=' "$ENV_FILE" | tail -n1 | cut -d'=' -f2-)"
 else
   echo "ERROR: $ENV_FILE not found; can't configure Nginx PORT"
   exit 1
@@ -50,7 +60,7 @@ if [[ -z "${PORT:-}" ]]; then
 fi
 
 # systemd service
-cat << 'EOF' | tee "/etc/systemd/system/opengig.org.service" > /dev/null
+cat << 'EOF' | tee "$SERVICE_FILE" > /dev/null
 [Unit]
 Description=opengig.org
 After=network.target
@@ -71,6 +81,51 @@ systemctl enable "$SERVICE_NAME"
 systemctl restart "$SERVICE_NAME"
 
 ############################
+# Nginx default deny block #
+############################
+
+# Ensure we have a cert for the default_server 443 deny block
+# Prefer snakeoil if present; otherwise generate a self-signed cert.
+SNAKEOIL_CERT="/etc/ssl/certs/ssl-cert-snakeoil.pem"
+SNAKEOIL_KEY="/etc/ssl/private/ssl-cert-snakeoil.key"
+
+if [[ ! -f "$SNAKEOIL_CERT" || ! -f "$SNAKEOIL_KEY" ]]; then
+  echo "snakeoil cert not found; generating a self-signed default cert..."
+  mkdir -p /etc/ssl/localcerts
+  SNAKEOIL_CERT="/etc/ssl/localcerts/default-selfsigned.crt"
+  SNAKEOIL_KEY="/etc/ssl/localcerts/default-selfsigned.key"
+  if [[ ! -f "$SNAKEOIL_CERT" || ! -f "$SNAKEOIL_KEY" ]]; then
+    openssl req -x509 -nodes -newkey rsa:2048 -days 3650 \
+      -keyout "$SNAKEOIL_KEY" \
+      -out "$SNAKEOIL_CERT" \
+      -subj "/CN=invalid.local"
+  fi
+fi
+
+tee "$NGINX_DEFAULT_DENY_AVAIL" > /dev/null <<EOF
+# Catch-all for random domains pointing at this server IP
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name _;
+    return 444;
+}
+
+server {
+    listen 443 ssl default_server;
+    listen [::]:443 ssl default_server;
+    server_name _;
+
+    ssl_certificate     ${SNAKEOIL_CERT};
+    ssl_certificate_key ${SNAKEOIL_KEY};
+
+    return 444;
+}
+EOF
+
+ln -sf "$NGINX_DEFAULT_DENY_AVAIL" "$NGINX_DEFAULT_DENY_ENAB"
+
+############################
 # Certbot / nginx handling #
 ############################
 
@@ -84,9 +139,8 @@ else
   echo "No existing cert for ${DOMAIN}, will attempt to obtain one"
 fi
 
-# If no cert, get one via webroot
+# If no cert, get one via webroot (HTTP)
 if [[ "$CERT_EXISTS" = false ]]; then
-  # temporary HTTP-only server to serve the ACME challenge
   tee "$NGINX_SITE_AVAILABLE" > /dev/null <<EOF
 server {
     listen 80;
@@ -108,7 +162,7 @@ EOF
   nginx -t
   systemctl reload nginx
 
-  # request certificate
+  # request certificate (include www)
   certbot certonly \
     --webroot \
     -w "${WEBROOT}" \
@@ -164,9 +218,9 @@ server {
         root ${WEBROOT};
     }
 
-    # Redirect everything else to HTTPS
+    # Redirect everything else to canonical HTTPS domain (NOT \$host)
     location / {
-        return 301 https://\$host\$request_uri;
+        return 301 https://${DOMAIN}\$request_uri;
     }
 }
 EOF
