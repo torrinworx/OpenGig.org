@@ -23,7 +23,7 @@ const loadEnv = async (filePath = './.env') => {
 };
 
 if (!isProd) {
-    await loadEnv();
+	await loadEnv();
 }
 
 let stripe;
@@ -46,7 +46,7 @@ const onCon = async (ws, req, user, sync) => {
 	return; // params returned here are fed automatically into all jobs if authenticated (I think)
 };
 
-const onEnter = async ({ email, user }) => {
+const onEnter = async ({ email, name, user }) => {
 	if (!stripe) {
 		console.warn('Stripe is unavailable. Skipping customer creation.');
 		return;
