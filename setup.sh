@@ -81,51 +81,6 @@ systemctl enable "$SERVICE_NAME"
 systemctl restart "$SERVICE_NAME"
 
 ############################
-# Nginx default deny block #
-############################
-
-# Ensure we have a cert for the default_server 443 deny block
-# Prefer snakeoil if present; otherwise generate a self-signed cert.
-SNAKEOIL_CERT="/etc/ssl/certs/ssl-cert-snakeoil.pem"
-SNAKEOIL_KEY="/etc/ssl/private/ssl-cert-snakeoil.key"
-
-if [[ ! -f "$SNAKEOIL_CERT" || ! -f "$SNAKEOIL_KEY" ]]; then
-  echo "snakeoil cert not found; generating a self-signed default cert..."
-  mkdir -p /etc/ssl/localcerts
-  SNAKEOIL_CERT="/etc/ssl/localcerts/default-selfsigned.crt"
-  SNAKEOIL_KEY="/etc/ssl/localcerts/default-selfsigned.key"
-  if [[ ! -f "$SNAKEOIL_CERT" || ! -f "$SNAKEOIL_KEY" ]]; then
-    openssl req -x509 -nodes -newkey rsa:2048 -days 3650 \
-      -keyout "$SNAKEOIL_KEY" \
-      -out "$SNAKEOIL_CERT" \
-      -subj "/CN=invalid.local"
-  fi
-fi
-
-tee "$NGINX_DEFAULT_DENY_AVAIL" > /dev/null <<EOF
-# Catch-all for random domains pointing at this server IP
-server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
-    server_name _;
-    return 444;
-}
-
-server {
-    listen 443 ssl default_server;
-    listen [::]:443 ssl default_server;
-    server_name _;
-
-    ssl_certificate     ${SNAKEOIL_CERT};
-    ssl_certificate_key ${SNAKEOIL_KEY};
-
-    return 444;
-}
-EOF
-
-ln -sf "$NGINX_DEFAULT_DENY_AVAIL" "$NGINX_DEFAULT_DENY_ENAB"
-
-############################
 # Certbot / nginx handling #
 ############################
 

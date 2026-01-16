@@ -94,7 +94,7 @@ const Kebab = ({ children }) => {
 				{children}
 			</Paper>
 		</mark:popup>
-	</Detached>;1
+	</Detached>;
 };
 
 const Gig = StageContext.use(s => ({ each: gigId, gigs }) => {
