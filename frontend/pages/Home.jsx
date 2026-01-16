@@ -1,6 +1,6 @@
 import { Observer, OArray } from "destam-dom";
 import { modReq } from 'destam-web-core/client';
-import { Theme, Button, Paper, Typography, TextField, Icon, Detached, StageContext, suspend, LoadingDots } from "destamatic-ui";
+import { Theme, Button, Paper, Typography, TextField, Icon, Detached, StageContext, suspend, LoadingDots, Shown } from "destamatic-ui";
 
 import AppContext from '../utils/appContext.js';
 
@@ -8,19 +8,36 @@ import LogoLightMode from '/branding/OpenGig_Logo_Light_Mode.svg';
 import LogoDarkMode from '/branding/OpenGig_Logo_Dark_Mode.svg';
 
 Theme.define({
-	gigtile: {
-		background: '$color_main',
-		padding: '10px',
+	grid: {
+		display: "grid",
+		gap: "12px",
+		gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+		alignItems: "stretch",
+		width: "100%",
+	},
+	gridTile: {
+		extends: 'radius',
+		aspectRatio: "1 / 1",
+		width: "100%",
+		minWidth: "180px",
+		maxWidth: "300px",
+		justifySelf: "center",
+		overflow: "hidden",
+	},
+	gridMeta: {
+		extends: 'radius_primary',
+		position: 'absolute',
+		left: 0,
+		right: 0,
+		bottom: 0,
+		margin: 10,
+		padding: 10,
 		boxSizing: 'border-box',
-		maxWidth: '300px',
-		width: '100%',
+		color: '$color',
+		background: '$color_background',
 		display: 'flex',
 		flexDirection: 'column',
-		gap: 10
-	},
-
-	gigtile_hovered: {
-		background: '$color_hover'
+		gap: 8,
 	}
 });
 
@@ -103,45 +120,23 @@ const Gig = StageContext.use(s => ({ each: gigId, gigs }) => {
 
 	return <Button style={{ padding: 0 }} onClick={() => s.open({ name: 'gig', urlProps: { id: gigId }, props: { id: gigId } })}>
 		<div
-			theme={[
-				'radius',
-				'gigtile',
-				hover.map(h => h ? 'hovered' : null),
-			]}
+			theme={['radius', 'gridTile', hover.map(h => h ? 'hovered' : null)]}
 			isHovered={hover}
 		>
-			<div theme='center_radius' style={{
-				height: '150px',
-				backgroundColor: '$color',
-				display: 'flex',
-				justifyContent: 'center',
-				alignItems: 'center',
-				flexShrink: 0
-			}}>
-				<Icon name='feather:image' size={20} style={{ color: '$color_background' }} />
-			</div>
-			<div style={{
-				display: 'flex',
-				alignItems: 'center',
-				gap: '10px',
-				flexShrink: 0
-			}}>
-				<div style={{
-					width: '25px',
-					height: '25px',
-					backgroundColor: '$color',
-					borderRadius: '50%',
-					display: 'flex',
-					justifyContent: 'center',
-					alignItems: 'center',
-				}}>
-					<Icon name='user' size={20} style={{ color: '$color_background' }} />
-				</div>
-				<Typography type='p1' label={gig.userName} style={{ color: '$color_background' }} />
-			</div>
-			<div theme='column' style={{ flexGrow: 1 }}>
-				<Typography type='h6_bold' label={gig.name} style={{ color: '$color_background', textAlign: 'left' }} />
-				<Typography type='p2' label={gig.tagline} style={{ color: '$color_background', textAlign: 'left' }} />
+			<Shown value={gig.coverImg}>
+				<mark:then>
+					<img src={gig.coverImg} alt={`Cover image for gig "${gig.name}`} />
+
+				</mark:then>
+				<mark:else>
+					<div theme='column_fill_center'>
+						<Icon name='feather:image' size={20} style={{ color: '$color_background' }} />
+					</div>
+				</mark:else>
+			</Shown>
+
+			<div theme='gridMeta'>
+				<Typography type='h6' label={gig.name} style={{ textAlign: 'left' }} />
 			</div>
 		</div>
 	</Button>;
@@ -152,7 +147,7 @@ const Gigs = suspend(LoadingDots, async () => {
 
 	const gigKeys = OArray(Object.keys(gigs));
 
-	return <div theme='row_wrap_contentContainer' style={{ gap: 10 }}>
+	return <div theme='grid_contentContainer'>
 		<Gig each={gigKeys} gigs={gigs} />
 	</div>;
 });
@@ -173,7 +168,7 @@ const Home = AppContext.use(app => StageContext.use(s => () => {
 						display: 'block',
 					}}
 				/>
-				<Kebab style={{}} theme='column_tight_center'>
+				<Kebab theme='column_tight_center'>
 					<Button
 						title='Account'
 						type='text'
@@ -190,7 +185,7 @@ const Home = AppContext.use(app => StageContext.use(s => () => {
 						type='text'
 						onClick={() => {
 							app.get().leave();
-							s.open({ name: 'Landing' });
+							s.open({ name: 'landing' });
 						}}
 						icon={<Icon name='feather:log-out' size={30} />}
 					/>

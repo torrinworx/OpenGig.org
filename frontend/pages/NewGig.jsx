@@ -289,7 +289,6 @@ const NewGig = StageContext.use(stage => () => {
 							tags,
 						});
 
-						console.log("NEW GIG RESPONSE: ", response);
 						if (response.error) {
 							error.set(response.error);
 							disabled.set(false);
