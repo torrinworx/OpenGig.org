@@ -1,22 +1,21 @@
 export default () => {
-    return {
-        onMsg: async (_, __, { DB, database }) => {
-            const collection = database.collection('gigs');
-            const recentGigs = await collection.find({})
-                .sort({ 'persistent.createdAt': -1 })
-                .limit(10)
-                .toArray();
+  return {
+    onMsg: async ({ uuid }, __, { DB }) => {
+      if (typeof uuid !== 'string' || !uuid.length) {
+        return { error: "Invalid uuid." };
+      }
 
-            const gigs = {};
+      const gig = await DB('gigs', { uuid });
+      if (!gig) return { error: "Gig not found." };
 
-            for (const post of recentGigs) {
-                const gig = await DB.reuse('gigs', {
-                    uuid: post.persistent.uuid,
-                });
-                gigs[gig.query.uuid] = gig;
-            }
-
-            return gigs;
-        }
-    };
+      return {
+        uuid: gig.query.uuid,
+        user: gig.query.user,
+        type: gig.type,
+        name: gig.name,
+        description: gig.description,
+        tags: gig.tags,
+      };
+    }
+  };
 };

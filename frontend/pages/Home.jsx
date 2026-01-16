@@ -94,18 +94,14 @@ const Kebab = ({ children }) => {
 				{children}
 			</Paper>
 		</mark:popup>
-	</Detached>;
+	</Detached>;1
 };
 
 const Gig = StageContext.use(s => ({ each: gigId, gigs }) => {
-	console.log(gigId);
-	console.log(gigs);
-
 	const gig = gigs[gigId];
-
 	const hover = Observer.mutable(false);
 
-	return <Button style={{ padding: 0 }} onClick={() => s.open({ name: 'Gig', gigId })}>
+	return <Button style={{ padding: 0 }} onClick={() => s.open({ name: 'gig', urlProps: { id: gigId }, props: { id: gigId } })}>
 		<div
 			theme={[
 				'radius',
@@ -152,7 +148,7 @@ const Gig = StageContext.use(s => ({ each: gigId, gigs }) => {
 });
 
 const Gigs = suspend(LoadingDots, async () => {
-	const gigs = await modReq('gigs/Get')
+	const gigs = await modReq('gigs/GetRecent')
 
 	const gigKeys = OArray(Object.keys(gigs));
 

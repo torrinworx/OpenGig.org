@@ -33,6 +33,7 @@ import Auth from './pages/Auth.jsx';
 import Home from './pages/Home.jsx';
 import AppContext from './utils/appContext.js';
 import NewGig from './pages/NewGig.jsx';
+import Gig from './pages/Gig.jsx';
 
 import { syncState } from 'destam-web-core/client';
 
@@ -155,6 +156,7 @@ const stage = {
 		auth: Auth,
 		home: authenticate(Home),
 		'new-gig': authenticate(NewGig),
+		gig: authenticate(Gig),
 		demo: Demo,
 		fallback: NotFound,
 	},

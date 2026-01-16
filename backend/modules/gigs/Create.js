@@ -3,8 +3,8 @@ import { moderateStr } from '../../moderation.js';
 export default () => {
     return {
         onMsg: async ({ type, name, description, tags }, __, { user, DB }) => {
-            if (type !== "gig_service" && type !== "gig_request") {
-                return { error: "Invalid type. Must be 'gig_service' or 'gig_request'." };
+            if (type !== "offer" && type !== "request") {
+                return { error: "Invalid type. Must be 'offer' or 'request'." };
             }
 
             if (typeof name !== 'string' || name.length > 40) {
@@ -51,7 +51,7 @@ export default () => {
 
             await DB.flush(gig);
 
-            return { gig: gig.query.uuid };
+            return gig.query.uuid;
         }
     };
 };

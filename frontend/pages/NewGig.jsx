@@ -283,17 +283,18 @@ const NewGig = StageContext.use(stage => () => {
 						}
 
 						const response = await modReq('gigs/Create', {
-							type: type.get() === 0 ? 'gig_service' : 'gig_request',
+							type: type.get() === 'Offer' ? 'offer' : 'request',
 							name: name.get(),
 							description: description.get(),
 							tags,
 						});
 
+						console.log("NEW GIG RESPONSE: ", response);
 						if (response.error) {
 							error.set(response.error);
 							disabled.set(false);
 						} else {
-							stage.open({ name: 'gig' });
+							stage.open({ name: 'gig', urlProps: { id: response }, props: { id: response } });
 						}
 					}}
 					disabled={disabled}
