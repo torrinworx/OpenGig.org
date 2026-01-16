@@ -1,12 +1,10 @@
 import {
-	Typography,
-	Button,
+
 	Head,
 	Title,
 	Theme,
 	Style,
 	Icons,
-	Icon,
 	Stage,
 	StageContext,
 	Link,
@@ -17,25 +15,28 @@ import {
 	Observer,
 	suspend,
 	LoadingDots,
-	Toggle,
 	PopupContext,
-	Popup,
 } from 'destamatic-ui';
 import IconifyIcons from "destamatic-ui/components/icons/IconifyIcons/IconifyIcons";
+
+import { syncState } from 'destam-web-core/client';
 
 import fonts from './utils/fonts.js';
 import theme from './utils/theme.js';
 import JsonLd from './utils/JsonLd.jsx';
+import AppContext from './utils/appContext.js';
+
+import Header from './components/Header.jsx';
+import Footer from './components/Footer.jsx';
+
 import Landing from './pages/Landing.jsx';
 import NotFound from './pages/NotFound.jsx';
 import Demo from './pages/Demo.jsx';
 import Auth from './pages/Auth.jsx';
 import Home from './pages/Home.jsx';
-import AppContext from './utils/appContext.js';
 import NewGig from './pages/NewGig.jsx';
 import Gig from './pages/Gig.jsx';
-
-import { syncState } from 'destam-web-core/client';
+import User from './pages/User.jsx';
 
 let track;
 
@@ -157,6 +158,7 @@ const stage = {
 		home: authenticate(Home),
 		'new-gig': authenticate(NewGig),
 		gig: authenticate(Gig),
+		user: authenticate(User),
 		demo: Demo,
 		fallback: NotFound,
 	},
@@ -180,69 +182,6 @@ const inputs = {
 	onClick: onClick,
 };
 
-const socialLinks = [
-	{
-		title: 'GitHub',
-		icon: 'simpleIcons:github',
-		href: 'https://github.com/torrinworx/OpenGig.org',
-	},
-	{
-		title: 'Discord',
-		icon: 'simpleIcons:discord',
-		href: 'https://discord.gg/VsZ3gUQCUe',
-	},
-];
-
-const SocialButton = ({ each }) => <Button
-	style={{ height: 50, width: 50 }}
-	title={each.title}
-	type='text'
-	icon={<Icon name={each.icon} size={30} />}
-	onClick={() => window.open(each.href, '_blank')}
-	href={each.href}
-/>;
-
-const Footer = StageContext.use(s => () => <div theme='column_fill_center_contentContainer' style={{ gap: 10 }} >
-	<div theme='column_center_fill' style={{ gap: 10 }}>
-		<div theme='row_wrap_fill_center' style={{ gap: 10 }}>
-			<SocialButton each={socialLinks} />
-			<Toggle value={window.themeMode} style={{ padding: 10 }} />
-		</div>
-	</div>
-	<div theme='row_center_fill_wrap_tight'>
-		<Typography style={{ textAlign: 'center' }} type='p1' label={`© OpenGig 2024-${new Date().getFullYear()} 🇨🇦 | Built by `} />
-		<Button
-			type='link'
-			iconPosition='right'
-			icon={<Icon name='feather:external-link' />}
-			label='Torrin'
-			onClick={() => window.open('https://torrin.me', '_blank')}
-			href='https://torrin.me'
-		/>
-		<Typography style={{ textAlign: 'center' }} type='p1' label=' with ' />
-		<Button
-			type='link'
-			iconPosition='right'
-			icon={<Icon name='feather:external-link' />}
-			label='destamatic-ui'
-			onClick={() => window.open('https://github.com/torrinworx/destamatic-ui', '_blank')}
-			href='https://github.com/torrinworx/destamatic-ui'
-		/>
-	</div>
-	<div theme='row_fill_center' style={{ gap: 10 }}>
-		<Button
-			type='text'
-			label='Privacy'
-		// onMouseDown={() => state.client.openPage = { name: "Privacy" }}
-		/>
-		<Button
-			type='text'
-			label='Terms'
-		// onMouseDown={() => state.client.openPage = { name: "Terms" }}
-		/>
-	</div>
-</div>);
-
 const App = () => <AppContext value={appContext}>
 	<Theme value={theme}>
 		<InputContext value={inputs} >
@@ -251,7 +190,6 @@ const App = () => <AppContext value={appContext}>
 					<HeadTags />
 					<StageContext value={stage}>
 						<PopupContext>
-							<Popup />
 							<div
 								theme="primary"
 								style={{
@@ -271,6 +209,7 @@ const App = () => <AppContext value={appContext}>
 										flex: 1,
 									}}
 								>
+									<Header />
 									<Stage />
 
 									<div style={{ marginTop: 'auto' }}>

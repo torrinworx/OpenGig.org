@@ -1,42 +1,25 @@
-import { Button, Typography, StageContext } from 'destamatic-ui';
+import { Button, Typography, StageContext, Icon } from 'destamatic-ui';
 import { getCookie } from 'destam-web-core/client';
-
-import LogoLightMode from '/branding/OpenGig_Logo_Light_Mode.svg';
-import LogoDarkMode from '/branding/OpenGig_Logo_Dark_Mode.svg';
 
 const Landing = StageContext.use(s => () => {
 	const cookiePresent = getCookie('webcore') || '';
 
 	return <>
-		<div theme='row_center_fill_contentContainer'>
-			<img
-				src={window.themeMode.map(t => t === false ? LogoLightMode : LogoDarkMode)}
-				style={{
-					width: '20vw',
-					maxWidth: 440,
-					minWidth: 220,
-					height: 'auto',
-					objectFit: 'cover',
-					display: 'block',
-				}}
-			/>
-		</div>
-
 		<div theme='column_fill_contentContainer'>
-			<div theme='row_spread_wrap'>
-				<Typography label='Join' type="h1" />
+			<div theme='column_fill_center' style={{ gap: 40, margin: '60px 0' }}>
+				<Typography label='A transparent gig platform.' type="h1_bold" style={{ textAlign: 'center', fontSize: 'clamp(2.4rem, 1.8rem + 2.6vw, 5rem)', }} />
+				<Typography label='OpenGig is an open and fair gig platform where anyone can hire or work, pricing and fees are transparent.' type="h2" style={{ textAlign: 'center' }} />
 				<Button
-					label={cookiePresent ? 'Enter' : 'Join'}
+					label={<Typography type='h2' style={{ color: 'inherit' }} label={cookiePresent ? 'Enter' : 'Join'} />}
 					type="contained"
-					style={{ marginTop: '20px' }}
-					onClick={() => s.open({ name: 'auth' })}
+					style={{ borderRadius: 50, marginTop: '20px', padding: 20 }}
+					iconPosition='right'
+					onClick={() => s.open({ name: cookiePresent ? 'home' : 'auth' })}
+					icon={<Icon style={{ height: 'clamp(1.45rem, 1.2rem + 1.1vw, 1.9rem)', width: 'clamp(1.45rem, 1.2rem + 1.1vw, 1.9rem)' }} name={cookiePresent ? 'feather:log-in' : 'feather:arrow-right'} />}
 				/>
 			</div>
-			<div theme='divider' />
-			<Typography type="p1">
-				OpenGig is a transparent gig platform. Anyone can hire or work. Pricing and fees are transparent.
-			</Typography>
 
+			<div theme='divider' />
 			<ul theme='primary' style={{ color: '$color' }}>
 				<li key={0}>
 					<Typography label={<>Workers <b>set their own rates</b>.</>} type='p1' />

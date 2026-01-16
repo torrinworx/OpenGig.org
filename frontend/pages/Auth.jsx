@@ -117,7 +117,6 @@ const Auth = StageContext.use(s => AppContext.use(app => suspend(LoadingDots, as
 				flexDirection: 'column',
 				justifyContent: 'center',
 				alignItems: 'center',
-				padding: 16,
 				boxSizing: 'border-box',
 			}}
 		>
@@ -133,20 +132,6 @@ const Auth = StageContext.use(s => AppContext.use(app => suspend(LoadingDots, as
 					alignItems: 'stretch',
 				}}
 			>
-				<div theme='row_center_fill_contentContainer'>
-					<img
-						src={window.themeMode.map(t => t === false ? LogoLightMode : LogoDarkMode)}
-						style={{
-							width: '20vw',
-							maxWidth: 440,
-							minWidth: 220,
-							height: 'auto',
-							objectFit: 'cover',
-							display: 'block',
-						}}
-					/>
-				</div>
-
 				<div theme='column_center' style={{ margin: 10, gap: 20 }}>
 					<Shown value={app.map(a => !!a.observer?.path('sync')?.get())} >
 						<mark:then>

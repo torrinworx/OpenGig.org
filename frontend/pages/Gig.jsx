@@ -4,6 +4,10 @@ import { modReq } from 'destam-web-core/client';
 
 const Gig = StageContext.use(stage => suspend(LoadingDots, async () => {
 	const gig = await modReq('gigs/Get', { uuid: stage.observer.path('urlProps').get().id })
+	if (gig.error) {
+		stage.open({ name: 'fallback' })
+		return null;
+	};
 	const user = await modReq('users/get', { uuid: gig.user });
 
 	const Tag = ({ each }) => {
@@ -16,7 +20,7 @@ const Gig = StageContext.use(stage => suspend(LoadingDots, async () => {
 		<div theme='column_fill_start'>
 			<Typography type='h1' label={gig.name} />
 			<div theme='row_fill_spread' style={{ gap: 10 }}>
-				<Button type='text' label={user.name} iconPosition='left' icon={<Icon name='feather:user' />} />
+				<Button type='text' label={user.name} iconPosition='left' icon={<Icon name='feather:user' />} onClick={() => stage.open({ name: 'user', urlProps: { id: gig.user } })} />
 				<div theme='radius_primary' style={{ background: '$color', padding: 10 }}>
 					<Typography type='p1_bold' style={{ color: '$color_background' }} label={gig.type.charAt(0).toUpperCase() + gig.type.slice(1)} />
 				</div>
