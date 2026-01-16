@@ -33,16 +33,12 @@ const theme = OObject({
 		$color_disabled: 'gray'
 	}),
 
-	icon: {
-		color: '$color',
-	},
-
 	paper: {
 		extends: 'primary_radius',
 		boxShadow: 'none',
 		padding: 20,
 		background: '$color_background',
-		color: '$color_text',
+		color: '$color',
 		maxWidth: 'inherit',
 		maxHeight: 'inherit',
 		border: 'solid $color 2px'
@@ -88,6 +84,7 @@ const theme = OObject({
 	contentContainer: {
 		padding: 20,
 		maxWidth: 800,
+		gap: 10,
 	},
 
 	divider: {
