@@ -1,5 +1,4 @@
 import {
-
 	Head,
 	Title,
 	Theme,
@@ -125,25 +124,33 @@ const HeadTags = () => {
 	</>;
 };
 
-const appContext = Observer.mutable(false)
+const appContext = Observer.mutable(null);
+if (!is_node()) queueMicrotask(async () => appContext.set(await syncState()));
+
 window.state = appContext;
 
 const authenticate = (Comp) =>
 	StageContext.use(stage =>
 		AppContext.use(app =>
 			suspend(LoadingDots, async (props) => {
+				let state = app.get();
 
-				const syncExists = !!app.get()?.observer?.path('sync')?.get()
-				if (!syncExists) {
-					const state = await syncState();
+				if (!state) {
+					state = await syncState();
 					app.set(state);
 				}
 
-				const authed = !!app.get()?.observer?.path('sync')?.get();
+				// wait until server responds with auth result
+				await state.authKnown.defined(v => v === true);
 
-				if (!authed) {
+				if (!state.authed.get()) {
 					queueMicrotask(() => stage.open({ name: 'auth' }));
 					return null;
+				}
+
+				// authed, but sync might still be establishing
+				if (!state.sync) {
+					await state.observer.path('sync').defined(v => v != null);
 				}
 
 				return <Comp {...props} />;

@@ -38,11 +38,7 @@ try {
 }
 
 const onCon = async (ws, req, user, sync) => {
-	// server side definition of notifications so we can push notifications directly
-	// to the client.
-	// console.log('sync server side: ', sync);
-	// sync.notifications = OArray([]);
-	return; // params returned here are fed automatically into all jobs if authenticated (I think)
+
 };
 
 const onEnter = async ({ email, name, user }) => {

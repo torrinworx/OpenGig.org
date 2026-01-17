@@ -11,13 +11,15 @@ import {
 	ValidateContext,
 } from 'destamatic-ui';
 
-import AppContext from '../utils/appContext.js';
-import ensureSync from '../utils/ensureSync.js';
+import { syncState } from 'destam-web-core/client';
 
-import LogoLightMode from '/branding/OpenGig_Logo_Light_Mode.svg';
-import LogoDarkMode from '/branding/OpenGig_Logo_Dark_Mode.svg';
+const Auth = StageContext.use(s => suspend(LoadingDots, async () => {
+	const state = await syncState();
 
-const Auth = StageContext.use(s => AppContext.use(app => suspend(LoadingDots, async () => {
+	// Wait until the server tells us whether the token is valid.
+	// Prevents rendering the "Enter" form for a split second when already logged in.
+	await state.authKnown.defined(v => v === true);
+
 	const email = Observer.mutable('');
 	const name = Observer.mutable('');
 	const password = Observer.mutable('');
@@ -27,19 +29,14 @@ const Auth = StageContext.use(s => AppContext.use(app => suspend(LoadingDots, as
 	const exists = Observer.mutable(false);
 	const checked = Observer.mutable(false);
 
-	// validation
 	const submit = Observer.mutable(false);
 	const allValid = Observer.mutable(true);
 
-	// prevents the email watcher from resetting flow during programmatic normalization
 	const suppressEmailReset = Observer.mutable(false);
 
 	const runValidated = async (fn) => {
 		submit.set({ value: true });
-
-		// allow ValidateContext to aggregate
 		await new Promise(r => setTimeout(r, 0));
-
 		if (!allValid.get()) return;
 		await fn();
 	};
@@ -47,66 +44,70 @@ const Auth = StageContext.use(s => AppContext.use(app => suspend(LoadingDots, as
 	const resetToEmailStep = () => {
 		checked.set(false);
 		exists.set(false);
-
-		// clear create/login fields so you're not carrying them across emails
 		name.set('');
 		password.set('');
 		confirmPassword.set('');
 	};
 
-	const checkUser = async () => runValidated(async () => {
-		loading.set(true);
+	const checkUser = async () =>
+		runValidated(async () => {
+			loading.set(true);
 
-		// normalize email before check so validator trimming won't cause weird state flips
-		suppressEmailReset.set(true);
-		email.set((email.get() || '').trim());
+			suppressEmailReset.set(true);
+			email.set((email.get() || '').trim());
 
-		const state = await ensureSync(app);
-		const response = await state.check(email);
+			const response = await state.check(email);
 
-		if (typeof response === 'string') checked.set(false);
-		else { exists.set(response); checked.set(true); }
+			if (typeof response === 'string') checked.set(false);
+			else { exists.set(response); checked.set(true); }
 
-		loading.set(false);
-
-		// release on next tick
-		setTimeout(() => suppressEmailReset.set(false), 0);
-	});
-
-	const enter = async () => runValidated(async () => {
-		loading.set(true);
-		const state = await ensureSync(app);
-		await state.enter({ email, password });
-		loading.set(false);
-		s.open({ name: 'home' });
-	});
-
-	const createAccount = async () => runValidated(async () => {
-		loading.set(true);
-
-		if (password.get() !== confirmPassword.get()) {
 			loading.set(false);
-			return;
-		}
+			setTimeout(() => suppressEmailReset.set(false), 0);
+		});
 
-		const state = await ensureSync(app);
-		await state.enter({ email, name, password });
-		loading.set(false);
-		s.open({ name: 'home' });
-	});
+	const finishLogin = async (response) => {
+		// if server returned an error, don't redirect
+		if (response?.error) {
+			console.log(response.error);
+			return
+		};
 
-	// If user edits email while on "create account" step, kick them back to email check step
-	// (create account step is: checked === true, exists === false)
+		// enter() reconnects the socket; wait for auth answer
+		await state.authKnown.defined(v => v === true);
+
+		if (state.authed.get()) s.open({ name: 'home' });
+		// else: token rejected / auth failed; stay on page
+	};
+
+	const enter = async () =>
+		runValidated(async () => {
+			loading.set(true);
+			const response = await state.enter({ email, password });
+			loading.set(false);
+			await finishLogin(response);
+		});
+
+	const createAccount = async () =>
+		runValidated(async () => {
+			loading.set(true);
+
+			if (password.get() !== confirmPassword.get()) {
+				loading.set(false);
+				return;
+			}
+
+			const response = await state.enter({ email, name, password });
+			loading.set(false);
+			await finishLogin(response);
+		});
+
 	email.watch(ev => {
 		if (suppressEmailReset.get()) return;
 
 		if (checked.get() === true && exists.get() === false) {
-			// only reset if it actually changed
 			if (ev?.value !== ev?.prev) resetToEmailStep();
 		}
 	});
-
-	await ensureSync(app);
 
 	return <ValidateContext value={allValid}>
 		<div
@@ -132,20 +133,24 @@ const Auth = StageContext.use(s => AppContext.use(app => suspend(LoadingDots, as
 					alignItems: 'stretch',
 				}}
 			>
-				<div theme='column_center' style={{ margin: 10, gap: 20 }}>
-					<Shown value={app.map(a => !!a.observer?.path('sync')?.get())} >
+				<div theme="column_center" style={{ margin: 10, gap: 20 }}>
+					<Shown value={state.authed}>
 						<mark:then>
-							<Typography type="h3" label='Your Already Logged In' />
-
+							<Typography type="h3" label="Your Already Logged In" />
 							<Button
-								label='Continue'
-								onClick={() => s.open({ name: 'home' })}
+								label="Continue"
 								type="contained"
+								onClick={async () => {
+									if (!state.sync) {
+										await state.observer.path('sync').defined(v => v != null);
+									}
+									s.open({ name: 'home' });
+								}}
 							/>
 						</mark:then>
 
 						<mark:else>
-							<Typography type="h3" label='Enter' />
+							<Typography type="h3" label="Enter" />
 
 							<TextField
 								onEnter={checkUser}
@@ -178,7 +183,7 @@ const Auth = StageContext.use(s => AppContext.use(app => suspend(LoadingDots, as
 											/>
 
 											<Button
-												label='Enter'
+												label="Enter"
 												onClick={enter}
 												type="contained"
 												disabled={loading}
@@ -187,7 +192,7 @@ const Auth = StageContext.use(s => AppContext.use(app => suspend(LoadingDots, as
 
 										<mark:else>
 											<Button
-												label='Continue'
+												label="Continue"
 												onClick={checkUser}
 												type="contained"
 												disabled={loading}
@@ -251,7 +256,7 @@ const Auth = StageContext.use(s => AppContext.use(app => suspend(LoadingDots, as
 											/>
 
 											<Button
-												label='Create Account'
+												label="Create Account"
 												onClick={createAccount}
 												type="contained"
 												disabled={loading}
@@ -260,7 +265,7 @@ const Auth = StageContext.use(s => AppContext.use(app => suspend(LoadingDots, as
 
 										<mark:else>
 											<Button
-												label='Continue'
+												label="Continue"
 												onClick={checkUser}
 												type="contained"
 												disabled={loading}
@@ -275,6 +280,6 @@ const Auth = StageContext.use(s => AppContext.use(app => suspend(LoadingDots, as
 			</div>
 		</div>
 	</ValidateContext>;
-})));
+}));
 
 export default Auth;
