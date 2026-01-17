@@ -134,165 +134,155 @@ const Auth = StageContext.use(s => suspend(LoadingDots, async () => {
 	});
 
 	return <ValidateContext value={allValid}>
-		<div theme="column_fill_center" style={{
-			minHeight: '100dvh',
-			display: 'flex',
-			flexDirection: 'column',
-			justifyContent: 'center',
-			alignItems: 'center',
-			boxSizing: 'border-box',
-		}}>
-			<div theme="column_center" style={{
-				width: '100%',
-				maxWidth: 420,
-				margin: 10,
+		<div
+			theme="column_center"
+			style={{
+				width: 'min(520px, 100%)',
+				padding: 20,
+				boxSizing: 'border-box',
+				margin: 0,
 				gap: 20,
-				display: 'flex',
-				flexDirection: 'column',
-				alignItems: 'stretch',
-			}}>
-				<div theme="column_center" style={{ margin: 10, gap: 20 }}>
-					<Shown value={state.authed}>
+			}}
+		>
+			<Shown value={state.authed}>
+				<mark:then>
+					<Typography type="h3" label="Your Already Logged In" />
+					<Button
+						label="Continue"
+						type="contained"
+						onClick={async () => {
+							if (!state.sync) await state.observer.path('sync').defined(v => v != null);
+							s.open({ name: 'home' });
+						}}
+					/>
+				</mark:then>
+
+				<mark:else>
+					<Typography type="h3" label="Enter" />
+
+					<TextField
+						onEnter={checkUser}
+						disabled={loading}
+						value={email}
+						placeholder="Email"
+					/>
+					<Validate value={email} signal={submit} validate="email" />
+
+					<Shown value={exists}>
 						<mark:then>
-							<Typography type="h3" label="Your Already Logged In" />
-							<Button
-								label="Continue"
-								type="contained"
-								onClick={async () => {
-									if (!state.sync) await state.observer.path('sync').defined(v => v != null);
-									s.open({ name: 'home' });
-								}}
-							/>
-						</mark:then>
-
-						<mark:else>
-							<Typography type="h3" label="Enter" />
-
-							<TextField
-								onEnter={checkUser}
-								disabled={loading}
-								value={email}
-								placeholder="Email"
-							/>
-							<Validate value={email} signal={submit} validate="email" />
-
-							<Shown value={exists}>
+							<Shown value={checked}>
 								<mark:then>
-									<Shown value={checked}>
-										<mark:then>
-											<TextField
-												style={{ margin: '10px 0px' }}
-												disabled={loading}
-												password
-												value={password}
-												onEnter={enter}
-												placeholder="Password"
-											/>
-											<Validate
-												value={password}
-												signal={submit}
-												validate={val => {
-													const v = (val.get() || '');
-													if (!v) return 'Password is required.';
-													return '';
-												}}
-											/>
+									<TextField
+										style={{ margin: '10px 0px' }}
+										disabled={loading}
+										password
+										value={password}
+										onEnter={enter}
+										placeholder="Password"
+									/>
+									<Validate
+										value={password}
+										signal={submit}
+										validate={val => {
+											const v = (val.get() || '');
+											if (!v) return 'Password is required.';
+											return '';
+										}}
+									/>
 
-											<Shown value={error.map(e => !!e)}>
-												<Typography type="validate" label={error} />
-											</Shown>
-
-											<Button
-												label="Enter"
-												onClick={enter}
-												type="contained"
-												disabled={loading}
-											/>
-										</mark:then>
-
-										<mark:else>
-											<Button
-												label="Continue"
-												onClick={checkUser}
-												type="contained"
-												disabled={loading}
-											/>
-										</mark:else>
+									<Shown value={error.map(e => !!e)}>
+										<Typography type="validate" label={error} />
 									</Shown>
+
+									<Button
+										label="Enter"
+										onClick={enter}
+										type="contained"
+										disabled={loading}
+									/>
 								</mark:then>
 
 								<mark:else>
-									<Shown value={checked}>
-										<mark:then>
-											<TextField disabled={loading} value={name} placeholder="Name" />
-											<Validate
-												value={name}
-												signal={submit}
-												validate={val => {
-													const v = (val.get() || '').trim();
-													if (!v) return 'Name is required.';
-													if (v.length > 20) return 'Name must be 20 characters or less.';
-													return '';
-												}}
-											/>
+									<Button
+										label="Continue"
+										onClick={checkUser}
+										type="contained"
+										disabled={loading}
+									/>
+								</mark:else>
+							</Shown>
+						</mark:then>
 
-											<TextField disabled={loading} password value={password} placeholder="Password" />
-											<Validate
-												value={password}
-												signal={submit}
-												validate={val => {
-													const v = (val.get() || '');
-													if (!v) return 'Password is required.';
-													if (v.length < 8) return 'Password must be at least 8 characters.';
-													return '';
-												}}
-											/>
+						<mark:else>
+							<Shown value={checked}>
+								<mark:then>
+									<TextField disabled={loading} value={name} placeholder="Name" />
+									<Validate
+										value={name}
+										signal={submit}
+										validate={val => {
+											const v = (val.get() || '').trim();
+											if (!v) return 'Name is required.';
+											if (v.length > 20) return 'Name must be 20 characters or less.';
+											return '';
+										}}
+									/>
 
-											<TextField
-												onEnter={createAccount}
-												disabled={loading}
-												password
-												value={confirmPassword}
-												placeholder="Confirm Password"
-											/>
-											<Validate
-												value={confirmPassword}
-												signal={submit}
-												validate={val => {
-													const v = (val.get() || '');
-													if (!v) return 'Please confirm your password.';
-													if (v !== password.get()) return 'Passwords do not match.';
-													return '';
-												}}
-											/>
+									<TextField disabled={loading} password value={password} placeholder="Password" />
+									<Validate
+										value={password}
+										signal={submit}
+										validate={val => {
+											const v = (val.get() || '');
+											if (!v) return 'Password is required.';
+											if (v.length < 8) return 'Password must be at least 8 characters.';
+											return '';
+										}}
+									/>
 
-											<Shown value={error.map(e => !!e)}>
-												<Typography type="validate" label={error} />
-											</Shown>
+									<TextField
+										onEnter={createAccount}
+										disabled={loading}
+										password
+										value={confirmPassword}
+										placeholder="Confirm Password"
+									/>
+									<Validate
+										value={confirmPassword}
+										signal={submit}
+										validate={val => {
+											const v = (val.get() || '');
+											if (!v) return 'Please confirm your password.';
+											if (v !== password.get()) return 'Passwords do not match.';
+											return '';
+										}}
+									/>
 
-											<Button
-												label="Create Account"
-												onClick={createAccount}
-												type="contained"
-												disabled={loading}
-											/>
-										</mark:then>
-
-										<mark:else>
-											<Button
-												label="Continue"
-												onClick={checkUser}
-												type="contained"
-												disabled={loading}
-											/>
-										</mark:else>
+									<Shown value={error.map(e => !!e)}>
+										<Typography type="validate" label={error} />
 									</Shown>
+
+									<Button
+										label="Create Account"
+										onClick={createAccount}
+										type="contained"
+										disabled={loading}
+									/>
+								</mark:then>
+
+								<mark:else>
+									<Button
+										label="Continue"
+										onClick={checkUser}
+										type="contained"
+										disabled={loading}
+									/>
 								</mark:else>
 							</Shown>
 						</mark:else>
 					</Shown>
-				</div>
-			</div>
+				</mark:else>
+			</Shown>
 		</div>
 	</ValidateContext>;
 }));

@@ -217,8 +217,18 @@ const App = () => <AppContext value={appContext}>
 									}}
 								>
 									<Header />
-									<Stage />
-
+									<div
+										theme='column_fill'
+										style={{
+											flex: 1,
+											display: 'flex',
+											alignItems: 'center',
+											justifyContent: 'center',
+											minHeight: 0,
+										}}
+									>
+										<Stage />
+									</div>
 									<div style={{ marginTop: 'auto' }}>
 										<Footer />
 									</div>
