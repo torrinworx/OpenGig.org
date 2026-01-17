@@ -72,7 +72,7 @@ const Gigs = suspend(LoadingDots, async () => {
 
 	const gigKeys = OArray(Object.keys(gigs));
 
-	return <div theme='grid_contentContainer'>
+	return <div theme='grid'>
 		<Gig each={gigKeys} gigs={gigs} />
 	</div>;
 });
