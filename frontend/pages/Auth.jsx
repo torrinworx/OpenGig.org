@@ -15,9 +15,6 @@ import { syncState } from 'destam-web-core/client';
 
 const Auth = StageContext.use(s => suspend(LoadingDots, async () => {
 	const state = await syncState();
-
-	// Wait until the server tells us whether the token is valid.
-	// Prevents rendering the "Enter" form for a split second when already logged in.
 	await state.authKnown.defined(v => v === true);
 
 	const email = Observer.mutable('');
@@ -28,6 +25,8 @@ const Auth = StageContext.use(s => suspend(LoadingDots, async () => {
 	const loading = Observer.mutable(false);
 	const exists = Observer.mutable(false);
 	const checked = Observer.mutable(false);
+
+	const error = Observer.mutable(''); // <-- string
 
 	const submit = Observer.mutable(false);
 	const allValid = Observer.mutable(true);
@@ -47,58 +46,83 @@ const Auth = StageContext.use(s => suspend(LoadingDots, async () => {
 		name.set('');
 		password.set('');
 		confirmPassword.set('');
+		error.set('');
 	};
 
 	const checkUser = async () =>
 		runValidated(async () => {
+			error.set('');
 			loading.set(true);
 
 			suppressEmailReset.set(true);
 			email.set((email.get() || '').trim());
 
-			const response = await state.check(email);
+			try {
+				const response = await state.check(email);
 
-			if (typeof response === 'string') checked.set(false);
-			else { exists.set(response); checked.set(true); }
+				// if your check module returns an error string, show it
+				if (typeof response === 'string') {
+					error.set(response);
+					checked.set(false);
+				} else {
+					exists.set(!!response);
+					checked.set(true);
+				}
+			} catch (e) {
+				error.set(e?.message || 'Failed to check email.');
+			}
 
 			loading.set(false);
 			setTimeout(() => suppressEmailReset.set(false), 0);
 		});
 
 	const finishLogin = async (response) => {
-		// if server returned an error, don't redirect
 		if (response?.error) {
-			console.log(response.error);
-			return
-		};
+			error.set(response.error);
+			return;
+		}
 
-		// enter() reconnects the socket; wait for auth answer
+		// wait for reconnect + auth packet
 		await state.authKnown.defined(v => v === true);
 
 		if (state.authed.get()) s.open({ name: 'home' });
-		// else: token rejected / auth failed; stay on page
+		else error.set('Login failed. Please try again.');
 	};
 
 	const enter = async () =>
 		runValidated(async () => {
+			error.set('');
 			loading.set(true);
-			const response = await state.enter({ email, password });
-			loading.set(false);
-			await finishLogin(response);
+
+			try {
+				const response = await state.enter({ email, password });
+				loading.set(false);
+				await finishLogin(response);
+			} catch (e) {
+				loading.set(false);
+				error.set(e?.message || 'Failed to login.');
+			}
 		});
 
 	const createAccount = async () =>
 		runValidated(async () => {
+			error.set('');
 			loading.set(true);
 
 			if (password.get() !== confirmPassword.get()) {
 				loading.set(false);
+				error.set('Passwords do not match.');
 				return;
 			}
 
-			const response = await state.enter({ email, name, password });
-			loading.set(false);
-			await finishLogin(response);
+			try {
+				const response = await state.enter({ email, name, password });
+				loading.set(false);
+				await finishLogin(response);
+			} catch (e) {
+				loading.set(false);
+				error.set(e?.message || 'Failed to create account.');
+			}
 		});
 
 	email.watch(ev => {
@@ -110,29 +134,23 @@ const Auth = StageContext.use(s => suspend(LoadingDots, async () => {
 	});
 
 	return <ValidateContext value={allValid}>
-		<div
-			theme="column_fill_center"
-			style={{
-				minHeight: '100dvh',
+		<div theme="column_fill_center" style={{
+			minHeight: '100dvh',
+			display: 'flex',
+			flexDirection: 'column',
+			justifyContent: 'center',
+			alignItems: 'center',
+			boxSizing: 'border-box',
+		}}>
+			<div theme="column_center" style={{
+				width: '100%',
+				maxWidth: 420,
+				margin: 10,
+				gap: 20,
 				display: 'flex',
 				flexDirection: 'column',
-				justifyContent: 'center',
-				alignItems: 'center',
-				boxSizing: 'border-box',
-			}}
-		>
-			<div
-				theme="column_center"
-				style={{
-					width: '100%',
-					maxWidth: 420,
-					margin: 10,
-					gap: 20,
-					display: 'flex',
-					flexDirection: 'column',
-					alignItems: 'stretch',
-				}}
-			>
+				alignItems: 'stretch',
+			}}>
 				<div theme="column_center" style={{ margin: 10, gap: 20 }}>
 					<Shown value={state.authed}>
 						<mark:then>
@@ -141,9 +159,7 @@ const Auth = StageContext.use(s => suspend(LoadingDots, async () => {
 								label="Continue"
 								type="contained"
 								onClick={async () => {
-									if (!state.sync) {
-										await state.observer.path('sync').defined(v => v != null);
-									}
+									if (!state.sync) await state.observer.path('sync').defined(v => v != null);
 									s.open({ name: 'home' });
 								}}
 							/>
@@ -182,6 +198,10 @@ const Auth = StageContext.use(s => suspend(LoadingDots, async () => {
 												}}
 											/>
 
+											<Shown value={error.map(e => !!e)}>
+												<Typography type="validate" label={error} />
+											</Shown>
+
 											<Button
 												label="Enter"
 												onClick={enter}
@@ -204,11 +224,7 @@ const Auth = StageContext.use(s => suspend(LoadingDots, async () => {
 								<mark:else>
 									<Shown value={checked}>
 										<mark:then>
-											<TextField
-												disabled={loading}
-												value={name}
-												placeholder="Name"
-											/>
+											<TextField disabled={loading} value={name} placeholder="Name" />
 											<Validate
 												value={name}
 												signal={submit}
@@ -220,12 +236,7 @@ const Auth = StageContext.use(s => suspend(LoadingDots, async () => {
 												}}
 											/>
 
-											<TextField
-												disabled={loading}
-												password
-												value={password}
-												placeholder="Password"
-											/>
+											<TextField disabled={loading} password value={password} placeholder="Password" />
 											<Validate
 												value={password}
 												signal={submit}
@@ -254,6 +265,10 @@ const Auth = StageContext.use(s => suspend(LoadingDots, async () => {
 													return '';
 												}}
 											/>
+
+											<Shown value={error.map(e => !!e)}>
+												<Typography type="validate" label={error} />
+											</Shown>
 
 											<Button
 												label="Create Account"
