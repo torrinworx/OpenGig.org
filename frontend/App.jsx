@@ -125,7 +125,10 @@ const HeadTags = () => {
 };
 
 const appContext = Observer.mutable(null);
-if (!is_node()) queueMicrotask(async () => appContext.set(await syncState()));
+if (!is_node()) queueMicrotask(async () => {
+	appContext.set(await syncState());
+	appContext.get().theme = theme;
+});
 
 window.state = appContext;
 
@@ -137,6 +140,7 @@ const authenticate = (Comp) =>
 
 				if (!state) {
 					state = await syncState();
+					state.theme = theme;
 					app.set(state);
 				}
 
@@ -210,7 +214,7 @@ const App = () => <AppContext value={appContext}>
 									theme="column_fill_center"
 									style={{
 										gap: 20,
-										padding: '20px 10px',
+										padding: 20,
 										display: 'flex',
 										flexDirection: 'column',
 										flex: 1,

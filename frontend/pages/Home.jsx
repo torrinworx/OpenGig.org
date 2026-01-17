@@ -1,8 +1,7 @@
 import { Observer, OArray } from "destam-dom";
 import { modReq } from 'destam-web-core/client';
-import { Theme, Button, Typography, TextField, Icon, StageContext, suspend, LoadingDots, Shown } from "destamatic-ui";
+import { Theme, Button, Typography, Icon, StageContext, suspend, LoadingDots, Shown } from "destamatic-ui";
 
-import AppContext from '../utils/appContext.js';
 import SearchBar from '../components/SearchBar.jsx';
 
 Theme.define({

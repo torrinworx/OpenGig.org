@@ -127,10 +127,8 @@ const Auth = StageContext.use(s => suspend(LoadingDots, async () => {
 
 	email.watch(ev => {
 		if (suppressEmailReset.get()) return;
-
-		if (checked.get() === true && exists.get() === false) {
-			if (ev?.value !== ev?.prev) resetToEmailStep();
-		}
+		if (ev?.value === ev?.prev) return;
+		if (checked.get() === true) resetToEmailStep();
 	});
 
 	return <ValidateContext value={allValid}>
@@ -176,7 +174,16 @@ const Auth = StageContext.use(s => suspend(LoadingDots, async () => {
 							value={email}
 							placeholder="Email"
 						/>
-						<Validate value={email} signal={submit} validate="email" />
+						<Validate
+							value={email}
+							signal={submit}
+							validate={val => {
+								const v = (val.get() || '').trim();
+								if (!v) return 'Email is required.';
+								if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return 'Enter a valid email.';
+								return '';
+							}}
+						/>
 
 						<Shown value={exists}>
 							<mark:then>

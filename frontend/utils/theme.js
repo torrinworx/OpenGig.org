@@ -33,15 +33,23 @@ const theme = OObject({
 		$color_disabled: 'gray'
 	}),
 
+	antiPrimary: OObject({
+		$color_hover: mainColors.$color_slate,
+		$color_disabled: 'gray'
+	}),
+
 	paper: {
 		extends: 'primary_radius',
 		boxShadow: 'none',
 		padding: 20,
-		background: '$color_background',
-		color: '$color',
+		background: '$color',
+		color: '$color_background',
 		maxWidth: 'inherit',
 		maxHeight: 'inherit',
-		border: 'solid $color 2px'
+	},
+
+	paper_typography: {
+		color: '$color_background',
 	},
 
 	typography: {
@@ -84,7 +92,7 @@ const theme = OObject({
 	contentContainer: {
 		padding: 20,
 		maxWidth: 800,
-		gap: 10,
+		gap: 20,
 	},
 
 	divider: {
@@ -103,9 +111,12 @@ window.themeMode = Observer.mutable(window.matchMedia("(prefers-color-scheme:dar
 window.theme = theme;
 document.documentElement.style.backgroundColor = theme.observer.path(['primary', '$color_background']);
 window.themeMode.effect(mode => atomic(() => {
-	mode = mode ? 'dark' : 'light';
-	for (const [key, val] of Object.entries(themeModes[mode])) {
-		theme['primary'][key] = val;
+	const current = mode ? 'dark' : 'light';
+	const opposite = mode ? 'light' : 'dark';
+
+	for (const key of Object.keys(themeModes[current])) {
+		theme.primary[key] = themeModes[current][key];
+		theme.antiPrimary[key] = themeModes[opposite][key];
 	}
 }));
 
