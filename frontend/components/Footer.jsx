@@ -1,5 +1,7 @@
 import { Button, Typography, Icon, Toggle, StageContext } from 'destamatic-ui';
 
+import AppContext from '../utils/appContext.js';
+
 const socialLinks = [
 	{
 		title: 'LinkedIn',
@@ -27,45 +29,47 @@ const SocialButton = ({ each }) => <Button
 	href={each.href}
 />;
 
-const Footer = StageContext.use(s => () => <div theme='column_fill_center_contentContainer' style={{ gap: 10 }} >
-	<div theme='column_center_fill' style={{ gap: 10 }}>
-		<div theme='row_wrap_fill_center' style={{ gap: 10 }}>
-			<SocialButton each={socialLinks} />
-			<Toggle value={window.themeMode} style={{ padding: 10 }} />
+const Footer = AppContext.use(app => StageContext.use(s => () => {
+	return <div theme='column_fill_center_contentContainer' style={{ gap: 10 }} >
+		<div theme='column_center_fill' style={{ gap: 10 }}>
+			<div theme='row_wrap_fill_center' style={{ gap: 10 }}>
+				<SocialButton each={socialLinks} />
+				<Toggle value={app.observer.path(['client', 'themeMode'])} style={{ padding: 10 }} />
+			</div>
+		</div>
+		<div theme='row_center_fill_wrap_tight'>
+			<Typography style={{ textAlign: 'center' }} type='p1' label={`© OpenGig 2024-${new Date().getFullYear()} 🇨🇦 | Built by `} />
+			<Button
+				type='link'
+				iconPosition='right'
+				icon={<Icon name='feather:external-link' />}
+				label='Torrin'
+				onClick={() => window.open('https://torrin.me', '_blank')}
+				href='https://torrin.me'
+			/>
+			<Typography style={{ textAlign: 'center' }} type='p1' label=' with ' />
+			<Button
+				type='link'
+				iconPosition='right'
+				icon={<Icon name='feather:external-link' />}
+				label='destamatic-ui'
+				onClick={() => window.open('https://github.com/torrinworx/destamatic-ui', '_blank')}
+				href='https://github.com/torrinworx/destamatic-ui'
+			/>
+		</div>
+		<div theme='row_fill_center' style={{ gap: 10 }}>
+			<Button
+				type='text'
+				label='Privacy'
+			// onMouseDown={() => state.client.openPage = { name: "Privacy" }}
+			/>
+			<Button
+				type='text'
+				label='Terms'
+			// onMouseDown={() => state.client.openPage = { name: "Terms" }}
+			/>
 		</div>
 	</div>
-	<div theme='row_center_fill_wrap_tight'>
-		<Typography style={{ textAlign: 'center' }} type='p1' label={`© OpenGig 2024-${new Date().getFullYear()} 🇨🇦 | Built by `} />
-		<Button
-			type='link'
-			iconPosition='right'
-			icon={<Icon name='feather:external-link' />}
-			label='Torrin'
-			onClick={() => window.open('https://torrin.me', '_blank')}
-			href='https://torrin.me'
-		/>
-		<Typography style={{ textAlign: 'center' }} type='p1' label=' with ' />
-		<Button
-			type='link'
-			iconPosition='right'
-			icon={<Icon name='feather:external-link' />}
-			label='destamatic-ui'
-			onClick={() => window.open('https://github.com/torrinworx/destamatic-ui', '_blank')}
-			href='https://github.com/torrinworx/destamatic-ui'
-		/>
-	</div>
-	<div theme='row_fill_center' style={{ gap: 10 }}>
-		<Button
-			type='text'
-			label='Privacy'
-		// onMouseDown={() => state.client.openPage = { name: "Privacy" }}
-		/>
-		<Button
-			type='text'
-			label='Terms'
-		// onMouseDown={() => state.client.openPage = { name: "Terms" }}
-		/>
-	</div>
-</div>);
+}));
 
 export default Footer;

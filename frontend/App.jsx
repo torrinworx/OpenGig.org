@@ -11,16 +11,16 @@ import {
 	is_node,
 	Script,
 	InputContext,
-	Observer,
 	suspend,
 	PopupContext,
+	OObject,
 } from 'destamatic-ui';
 import IconifyIcons from "destamatic-ui/components/icons/IconifyIcons/IconifyIcons";
 
-import { syncState } from 'destam-web-core/client';
+import { syncState, clientState } from 'destam-web-core/client';
 
 import fonts from './utils/fonts.js';
-import theme from './utils/theme.js';
+import { themeSetup, theme } from './utils/theme.js';
 import JsonLd from './utils/JsonLd.jsx';
 import AppContext from './utils/appContext.js';
 
@@ -124,24 +124,26 @@ const HeadTags = () => {
 	</>;
 };
 
-const appContext = Observer.mutable(null);
+const appContext = OObject({});
 if (!is_node()) queueMicrotask(async () => {
-	appContext.set(await syncState());
-	appContext.get().theme = theme;
+	appContext.sync = await syncState();
+	appContext.theme = theme;
 });
 
-window.state = appContext;
+appContext.client = await clientState();
+themeSetup(appContext);
+
+window.app = appContext;
 
 const authenticate = (Comp) =>
 	StageContext.use(stage =>
 		AppContext.use(app =>
 			suspend(Stasis, async (props) => {
-				let state = app.get();
+				let state = app.state;
 
 				if (!state) {
 					state = await syncState();
-					state.theme = theme;
-					app.set(state);
+					app.state = state;
 				}
 
 				// wait until server responds with auth result

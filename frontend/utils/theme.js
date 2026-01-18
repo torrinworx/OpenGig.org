@@ -23,7 +23,7 @@ const themeModes = {
 	},
 };
 
-const theme = OObject({
+export const theme = OObject({
 	'*': {
 		fontFamily: '"IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif',
 	},
@@ -107,17 +107,21 @@ const theme = OObject({
 	},
 });
 
-window.themeMode = Observer.mutable(window.matchMedia("(prefers-color-scheme:dark)").matches ? true : false);
-window.theme = theme;
-document.documentElement.style.backgroundColor = theme.observer.path(['primary', '$color_background']);
-window.themeMode.effect(mode => atomic(() => {
-	const current = mode ? 'dark' : 'light';
-	const opposite = mode ? 'light' : 'dark';
+export const themeSetup = (app) => {
+	console.log(app.client.themeMode);
+	if (app.client.themeMode === undefined) {
+		app.client.themeMode = false;
+	};
 
-	for (const key of Object.keys(themeModes[current])) {
-		theme.primary[key] = themeModes[current][key];
-		theme.antiPrimary[key] = themeModes[opposite][key];
-	}
-}));
+	app.theme = theme;
+	document.documentElement.style.backgroundColor = theme.observer.path(['primary', '$color_background']);
+	app.observer.path(['client', 'themeMode']).effect(mode => atomic(() => {
+		const current = mode ? 'dark' : 'light';
+		const opposite = mode ? 'light' : 'dark';
 
-export default theme;
+		for (const key of Object.keys(themeModes[current])) {
+			theme.primary[key] = themeModes[current][key];
+			theme.antiPrimary[key] = themeModes[opposite][key];
+		}
+	}));
+};

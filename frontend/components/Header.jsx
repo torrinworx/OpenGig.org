@@ -11,7 +11,7 @@ const Header = StageContext.use(stage => AppContext.use(app => () => {
 	const current = stage.observer.path('current');
 	return <div theme='row_fill_spread_wrap_contentContainer' style={{ gap: 10 }}>
 		<img
-			src={window.themeMode.map(t => t === false ? LogoLightMode : LogoDarkMode)}
+			src={app.observer.path(['client', 'themeMode']).map(t => t === false ? LogoLightMode : LogoDarkMode)}
 			style={{
 				width: '20vw',
 				maxWidth: 200,
@@ -42,7 +42,7 @@ const Header = StageContext.use(stage => AppContext.use(app => () => {
 					title='Log Out'
 					type='text'
 					onClick={() => {
-						app.get().leave();
+						app.state.leave();
 						stage.open({ name: 'landing' });
 					}}
 					icon={<Icon name='feather:log-out' size={30} />}
