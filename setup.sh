@@ -152,6 +152,14 @@ server {
     include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
+    location /files/ {
+        proxy_set_header Host ${SPACES_BUCKET}.${SPACES_REGION}.digitaloceanspaces.com;
+        proxy_pass https://${SPACES_BUCKET}.${SPACES_REGION}.digitaloceanspaces.com/;
+
+        expires 1y;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+
     location / {
         proxy_pass http://localhost:${PORT};
         proxy_set_header Host \$host;
@@ -168,12 +176,10 @@ server {
     listen 80;
     server_name ${DOMAIN};
 
-    # ACME HTTP-01 challenge
     location /.well-known/acme-challenge/ {
         root ${WEBROOT};
     }
 
-    # Redirect everything else to canonical HTTPS domain (NOT \$host)
     location / {
         return 301 https://${DOMAIN}\$request_uri;
     }
