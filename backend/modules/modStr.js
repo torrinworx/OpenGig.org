@@ -4,7 +4,7 @@ const url = "https://api.openai.com/v1/moderations";
  * Moderates a string for a general business/public marketplace vibe (LinkedIn/Fiverr/TaskRabbit).
  * Returns: { ok: boolean, flagged: boolean, categories, scores, reason, raw }
  */
-export const moderateStr = async (input) => {
+const modStr = async (input) => {
 	// Basic sanity (don’t waste API calls)
 	if (typeof input !== "string") {
 		return { ok: false, flagged: true, reason: "Input must be a string." };
@@ -86,4 +86,10 @@ export const moderateStr = async (input) => {
 	}
 
 	return { ok: true, flagged: false, categories, scores, reason: "Passed.", raw: data };
+};
+
+export default () => {
+	return {
+		int: modStr,
+	};
 };

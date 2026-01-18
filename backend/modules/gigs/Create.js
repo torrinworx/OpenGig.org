@@ -1,6 +1,6 @@
-import { moderateStr } from '../../moderation.js';
+export const deps = ["modStr"];
 
-export default () => {
+export default ({ modStr }) => {
     return {
         onMsg: async ({ type, name, description, tags }, __, { user, DB }) => {
             if (type !== "offer" && type !== "request") {
@@ -19,17 +19,17 @@ export default () => {
                 return { error: "Invalid tags. Must be an array of strings." };
             }
 
-            const nameMod = await moderateStr(name);
+            const nameMod = await modStr(name);
             if (!nameMod.ok) {
                 return { error: "Name violates moderation rules.", details: nameMod.reason };
             }
 
-            const descMod = await moderateStr(description);
+            const descMod = await modStr(description);
             if (!descMod.ok) {
                 return { error: "Description does not pass moderation.", details: descMod.reason };
             }
 
-            const tagChecks = await Promise.all(tags.map(t => moderateStr(t)));
+            const tagChecks = await Promise.all(tags.map(t => modStr(t)));
             const badIndex = tagChecks.findIndex(r => !r.ok);
             if (badIndex !== -1) {
                 return {
