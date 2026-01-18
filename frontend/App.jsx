@@ -126,7 +126,7 @@ const HeadTags = () => {
 
 const appContext = OObject({});
 if (!is_node()) queueMicrotask(async () => {
-	appContext.sync = await syncState();
+	appContext.state = await syncState();
 	appContext.theme = theme;
 });
 
