@@ -41,8 +41,7 @@ const Stasis = () => {
 							icon={<Icon name='feather:arrow-left' />}
 							type="contained"
 							onClick={() => history.back()}
-							iconPosition='right'
-						/>
+							/>
 						<Button
 							label="Refresh"
 							icon={<Icon name='feather:rotate-cw' />}
