@@ -2,7 +2,8 @@ export const deps = ["modStr"];
 
 export default ({ modStr }) => {
     return {
-        onMsg: async ({ type, name, description, tags }, __, { user, DB }) => {
+        onMsg: async ({ type, name, description, tags, image }, __, { user, DB }) => {
+            console.log("CREATE GIG IMAGE: ", image)
             if (type !== "offer" && type !== "request") {
                 return { error: "Invalid type. Must be 'offer' or 'request'." };
             }
@@ -48,7 +49,9 @@ export default ({ modStr }) => {
             gig.name = name;
             gig.description = description;
             gig.tags = tags;
+            gig.image = image;
 
+            console.log("GIG IMAGE: ", gig.image);
             await DB.flush(gig);
 
             return gig.query.uuid;
