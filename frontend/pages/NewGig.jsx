@@ -432,11 +432,13 @@ const NewGig = ThemeContext.use(h => StageContext.use(stage => (_, cleanup) => {
 									return '';
 								}}
 							/>
-							<Typography
-								type='p2'
-								label={curTag.map(t => `20/${t.length}`)}
-								style={{ color: curTag.map(t => t.length > 20 ? '$color_error' : '$color') }}
-							/>
+							<Shown value={tagsLength.map(t => t < 5)}>
+								<Typography
+									type='p2'
+									label={curTag.map(t => `20/${t.length}`)}
+									style={{ color: curTag.map(t => t.length > 20 ? '$color_error' : '$color') }}
+								/>
+							</Shown>
 						</div>
 					</div>
 				</div>
