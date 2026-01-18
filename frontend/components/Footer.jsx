@@ -2,6 +2,11 @@ import { Button, Typography, Icon, Toggle, StageContext } from 'destamatic-ui';
 
 const socialLinks = [
 	{
+		title: 'LinkedIn',
+		icon: 'simpleIcons:linkedin',
+		href: 'https://www.linkedin.com/company/opengig-org',
+	},
+	{
 		title: 'GitHub',
 		icon: 'simpleIcons:github',
 		href: 'https://github.com/torrinworx/OpenGig.org',

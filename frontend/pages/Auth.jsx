@@ -13,7 +13,9 @@ import {
 
 import { syncState } from 'destam-web-core/client';
 
-const Auth = StageContext.use(s => suspend(LoadingDots, async () => {
+import Stasis from '../components/Stasis.jsx';
+
+const Auth = StageContext.use(s => suspend(Stasis, async () => {
 	const state = await syncState();
 	await state.authKnown.defined(v => v === true);
 

@@ -13,7 +13,6 @@ import {
 	InputContext,
 	Observer,
 	suspend,
-	LoadingDots,
 	PopupContext,
 } from 'destamatic-ui';
 import IconifyIcons from "destamatic-ui/components/icons/IconifyIcons/IconifyIcons";
@@ -27,6 +26,7 @@ import AppContext from './utils/appContext.js';
 
 import Header from './components/Header.jsx';
 import Footer from './components/Footer.jsx';
+import Stasis from './components/Stasis.jsx';
 
 import Landing from './pages/Landing.jsx';
 import NotFound from './pages/NotFound.jsx';
@@ -135,7 +135,7 @@ window.state = appContext;
 const authenticate = (Comp) =>
 	StageContext.use(stage =>
 		AppContext.use(app =>
-			suspend(LoadingDots, async (props) => {
+			suspend(Stasis, async (props) => {
 				let state = app.get();
 
 				if (!state) {
