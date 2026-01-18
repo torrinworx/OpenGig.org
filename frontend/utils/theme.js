@@ -1,6 +1,5 @@
 
 import { OObject } from "destam-dom";
-import { Observer } from "destam-dom";
 import { atomic } from "destam/Network";
 
 const mainColors = {
