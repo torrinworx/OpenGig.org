@@ -10,29 +10,11 @@ Theme.define({
 		gap: 20,
 	},
 
-	landing_list: {
+	landingList: {
 		margin: 0,
 		paddingLeft: 18,
 		display: 'grid',
 		gap: 6,
-	},
-
-	landing_callout: {
-		borderRadius: 14,
-		padding: 16,
-		background: '$alpha($color_top, 0.03)',
-		border: '1px solid $alpha($color_top, 0.10)',
-		display: 'flex',
-		flexDirection: 'column',
-		gap: 8,
-	},
-
-	landing_row_wrap: {
-		display: 'flex',
-		flexWrap: 'wrap',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-		gap: 12,
 	},
 });
 const size = 'clamp(1.45rem, 1.8rem + 1.1vw, 4rem)'
@@ -96,9 +78,9 @@ const Landing = StageContext.use(s => () => <>
 			</Paper>
 		</div>
 
-		<Paper theme="landing_callout">
+		<Paper>
 			<Typography type="p1_bold" label="What you can expect" />
-			<ul theme="landing_list">
+			<ul theme="landingList">
 				<li><Typography type="p1" label={<>Workers set their own rates and terms.</>} /></li>
 				<li><Typography type="p1" label={<>Customers get clear, upfront pricing.</>} /></li>
 				<li><Typography type="p1" label={<>A platform built to be transparent and community-aligned.</>} /></li>
