@@ -28,27 +28,30 @@
 	"dependencies": {
 		"@stripe/stripe-js": "^5.7.0",
 		"bcryptjs": "^2.4.3",
-		"destam-db": "file:destam-web-core/db",
+		"cookie-parser": "^1.4.7",
 		"destam": "^0.8.0",
+		"destam-db": "file:destam-web-core/db",
 		"destam-dom": "^0.14.0",
 		"destam-web-core": "file:destam-web-core",
+		"express": "^5.2.1",
+		"multer": "^2.0.2",
 		"stripe": "^17.7.0",
 		"ws": "^8.18.0"
 	},
 	"devDependencies": {
-		"vite": "^7.3.1",
-		"destamatic-ui": "file:destamatic-ui",
 		"@babel/core": "^7.25.2",
 		"@babel/generator": "^7.25.6",
 		"@babel/parser": "^7.25.6",
 		"@babel/plugin-syntax-jsx": "^7.24.7",
-		"esbuild": "^0.24.0",
-		"nodemon": "^3.1.7",
-		"@plausible-analytics/tracker": "^0.4.4",
 		"@iconify-json/feather": "^1.2.1",
 		"@iconify-json/lineicons": "^1.2.6",
 		"@iconify-json/simple-icons": "^1.2.1",
 		"@iconify-json/svg-spinners": "^1.2.4",
-		"@iconify-json/tabler": "^1.2.22"
+		"@iconify-json/tabler": "^1.2.22",
+		"@plausible-analytics/tracker": "^0.4.4",
+		"destamatic-ui": "file:destamatic-ui",
+		"esbuild": "^0.24.0",
+		"nodemon": "^3.1.7",
+		"vite": "^7.3.1"
 	}
 }
