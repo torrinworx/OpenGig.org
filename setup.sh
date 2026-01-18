@@ -46,16 +46,23 @@ else
   exit 1
 fi
 
-# Get PORT from .env
+# Get PORT + SPACES_* from .env
 if [[ -f "$ENV_FILE" ]]; then
   PORT="$(grep -E '^PORT=' "$ENV_FILE" | tail -n1 | cut -d'=' -f2-)"
+  SPACES_BUCKET="$(grep -E '^SPACES_BUCKET=' "$ENV_FILE" | tail -n1 | cut -d'=' -f2-)"
+  SPACES_REGION="$(grep -E '^SPACES_REGION=' "$ENV_FILE" | tail -n1 | cut -d'=' -f2-)"
 else
-  echo "ERROR: $ENV_FILE not found; can't configure Nginx PORT"
+  echo "ERROR: $ENV_FILE not found; can't configure Nginx PORT/SPACES"  
   exit 1
 fi
 
 if [[ -z "${PORT:-}" ]]; then
   echo "ERROR: PORT is empty or not set in $ENV_FILE"
+  exit 1
+fi
+
+if [[ -z "${SPACES_BUCKET:-}" || -z "${SPACES_REGION:-}" ]]; then
+  echo "ERROR: SPACES_BUCKET or SPACES_REGION missing in $ENV_FILE"
   exit 1
 fi
 
