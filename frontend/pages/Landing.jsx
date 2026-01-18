@@ -35,7 +35,6 @@ const Landing = StageContext.use(s => () => <>
 			/>
 		</div>
 
-
 		<Typography type="h2" label="Built for fair work and clear pricing." />
 		<div theme="divider" />
 		<Typography type="p1" label="OpenGig is designed to be simple, transparent, and community-aligned. No surprises, no confusion — just a clean place to hire or work." />
