@@ -1,4 +1,6 @@
-import { Detached, Button, Icon, Paper, Observer } from 'destamatic-ui';
+import { Detached, Button, Icon, Observer } from 'destamatic-ui';
+
+import Paper from './Paper.jsx';
 
 const Hamburger = ({ children }) => {
 	const focused = Observer.mutable(false);
@@ -13,7 +15,7 @@ const Hamburger = ({ children }) => {
 		<mark:popup>
 			<Paper
 				theme='column_tight_center'
-				style={{ padding: 8, gap: 8 }}
+				style={{ padding: 0, gap: 8 }}
 				onPointerDown={e => e.stopPropagation()}
 				onTouchStart={e => e.stopPropagation()}
 				onMouseDown={e => e.stopPropagation()}
