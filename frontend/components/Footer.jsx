@@ -27,7 +27,6 @@ const SocialButton = ({ each }) => <Button
 	href={each.href}
 />;
 
-
 const Footer = StageContext.use(s => () => <div theme='column_fill_center_contentContainer' style={{ gap: 10 }} >
 	<div theme='column_center_fill' style={{ gap: 10 }}>
 		<div theme='row_wrap_fill_center' style={{ gap: 10 }}>
