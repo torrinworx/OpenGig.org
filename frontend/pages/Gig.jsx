@@ -33,6 +33,8 @@ const Gig = StageContext.use(stage => suspend(LoadingDots, async () => {
 		<div theme='row_fill_wrap'>
 			<Tag each={gig.tags} />
 		</div>
+
+		<img src={`/files/${gig.image.slice(1)}`} style={{}} />
 	</div>;
 }));
 
