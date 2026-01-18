@@ -108,9 +108,7 @@ export const theme = OObject({
 });
 
 export const themeSetup = (app) => {
-	if (app.themeMode === undefined) {
-		app.themeMode = false;
-	};
+	app.themeMode = false;
 
 	app.theme = theme;
 	document.documentElement.style.backgroundColor = theme.observer.path(['primary', '$color_background']);

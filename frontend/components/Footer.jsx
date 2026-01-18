@@ -34,7 +34,7 @@ const Footer = AppContext.use(app => StageContext.use(s => () => {
 		<div theme='column_center_fill' style={{ gap: 10 }}>
 			<div theme='row_wrap_fill_center' style={{ gap: 10 }}>
 				<SocialButton each={socialLinks} />
-				<Toggle value={app.observer.path(['client', 'themeMode'])} style={{ padding: 10 }} />
+				<Toggle value={app.observer.path('themeMode')} style={{ padding: 10 }} />
 			</div>
 		</div>
 		<div theme='row_center_fill_wrap_tight'>
