@@ -5,6 +5,8 @@ import { promises as fs } from 'fs';
 import Stripe from 'stripe';
 import { core } from "destam-web-core/server";
 
+import server from 'destam-web-core/server/servers/express.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const isProd = process.env.NODE_ENV === 'production';
@@ -58,6 +60,7 @@ const root = path.resolve(__dirname, process.env.ENV === 'production' ? '../dist
 const modulesDir = path.resolve(__dirname, './modules');
 
 core({
+	server,
 	modulesDir,
 	root,
 	onCon,
