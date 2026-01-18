@@ -214,7 +214,6 @@ const App = () => <AppContext value={appContext}>
 									theme="column_fill_center"
 									style={{
 										gap: 20,
-										padding: 20,
 										display: 'flex',
 										flexDirection: 'column',
 										flex: 1,

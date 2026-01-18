@@ -35,10 +35,12 @@ Theme.define({
 		gap: 12,
 	},
 });
+const size = 'clamp(1.45rem, 1.8rem + 1.1vw, 4rem)'
+const size2 = 'clamp(1.45rem, 1.2rem + 1.1vw, 2rem)'
 
 const Landing = StageContext.use(s => () => <>
 	<div theme='column_fill_contentContainer'>
-		<div theme='column_fill_center' style={{ gap: 40, margin: '60px 0' }}>
+		<div theme='column_fill_center' style={{ gap: 40, margin: '80px 0' }}>
 			<Typography label='A transparent gig platform.' type="h1_bold" style={{ textAlign: 'center', fontSize: 'clamp(2.4rem, 1.8rem + 2.6vw, 5rem)', }} />
 			<Typography label='OpenGig is an open and fair gig platform where anyone can hire or work.' type="h2" style={{ textAlign: 'center' }} />
 			<Button
@@ -47,20 +49,20 @@ const Landing = StageContext.use(s => () => <>
 				style={{ borderRadius: 50, marginTop: '20px', padding: 20 }}
 				iconPosition='right'
 				onClick={() => s.open({ name: wsAuthed.get() ? 'home' : 'auth' })}
-				icon={<Icon style={{ height: 'clamp(1.45rem, 1.2rem + 1.1vw, 1.9rem)', width: 'clamp(1.45rem, 1.2rem + 1.1vw, 1.9rem)' }} name={wsAuthed.map(a => a ? 'feather:log-in' : 'feather:arrow-right')} />}
+				icon={<Icon size={size} name={wsAuthed.map(a => a ? 'feather:log-in' : 'feather:arrow-right')} />}
 			/>
 		</div>
 
-		<div theme="divider" />
 
 		<Typography type="h2" label="Built for fair work and clear pricing." />
+		<div theme="divider" />
 		<Typography type="p1" label="OpenGig is designed to be simple, transparent, and community-aligned. No surprises, no confusion — just a clean place to hire or work." />
 
 		<div theme="landingCards">
 			<Paper>
 				<div theme="row_spread">
-					<Typography type='h3_bold' theme="landing_kicker" label="FOR WORKERS" />
-					<Icon name="feather:tool" size={50} />
+					<Typography type='h2_bold' label="FOR WORKERS" />
+					<Icon size={size} name="feather:tool" />
 				</div>
 				<Typography type="p1_bold" label="Own your rates" />
 				<Typography type="p1" label="Set pricing that makes sense for you. Keep control over your work and your payouts." />
@@ -68,8 +70,8 @@ const Landing = StageContext.use(s => () => <>
 
 			<Paper>
 				<div theme="row_spread">
-					<Typography type='h3_bold' theme="landing_kicker" label="FOR CUSTOMERS" />
-					<Icon name="feather:shopping-bag" size={50} />
+					<Typography type='h2_bold' label="FOR CUSTOMERS" />
+					<Icon size={size} name="feather:shopping-bag" />
 				</div>
 				<Typography type="p1_bold" label="Transparent costs" />
 				<Typography type="p1" label="Know what you're paying for. Clear pricing, and a platform built around trust." />
@@ -77,8 +79,8 @@ const Landing = StageContext.use(s => () => <>
 
 			<Paper>
 				<div theme="row_spread">
-					<Typography type='h3_bold' theme="landing_kicker" label="COOPERATIVE" />
-					<Icon name="feather:users" size={50} />
+					<Typography type='h2_bold' label="COOPERATIVE" />
+					<Icon size={size} name="feather:users" />
 				</div>
 				<Typography type="p1_bold" label="Community-led" />
 				<Typography type="p1" label="We're building toward member-driven governance — users help shape priorities and policies." />
@@ -86,8 +88,8 @@ const Landing = StageContext.use(s => () => <>
 
 			<Paper>
 				<div theme="row_spread">
-					<Typography type='h3_bold' theme="landing_kicker" label="OPEN SOURCE" />
-					<Icon name="feather:code" size={50} />
+					<Typography type='h2_bold' label="OPEN SOURCE" />
+					<Icon size={size} name="feather:code" />
 				</div>
 				<Typography type="p1_bold" label="Auditable platform" />
 				<Typography type="p1" label="The core code is public. Transparency isn't a slogan — it's a design constraint." />
@@ -102,10 +104,81 @@ const Landing = StageContext.use(s => () => <>
 				<li><Typography type="p1" label={<>A platform built to be transparent and community-aligned.</>} /></li>
 			</ul>
 		</Paper>
+
+		<Typography type="h2" label="How it works" />
+		<div theme="landing_divider" />
+
+		<div theme='column_fill' style={{ gap: 20 }}>
+			<Paper>
+				<Typography type='h2_bold' label="1. CREATE" />
+				<Typography type="p1_bold" label="Post a gig or offer a service" />
+				<Typography type="p1" label="Describe the work, set expectations, and add tags so people can find it." />
+			</Paper>
+
+			<Paper>
+				<Typography type='h2_bold' label="2. CONNECT" />
+				<Typography type="p1_bold" label="Get requests or apply" />
+				<Typography type="p1" label="Workers and customers connect directly — no hidden rules or confusing payouts." />
+			</Paper>
+
+			<Paper>
+				<Typography type='h2_bold' label="3. BUILD TRUST" />
+				<Typography type="p1_bold" label="Grow a repeat relationship" />
+				<Typography type="p1" label="The goal is long term local trust, not one-off anonymous churn." />
+			</Paper>
+		</div>
+
+		<Typography type="h2" label="Principles (short version)" />
+		<div theme="landing_divider" />
+
+		<div theme="landingCards">
+			<Paper>
+				<div theme='row_spread'>
+					<Typography type="p1_bold" label="Open Source" />
+					<Icon size={size2} name="feather:code" />
+				</div>
+				<Typography type="p1" label="Core code is public and reviewable." />
+			</Paper>
+			<Paper>
+				<div theme='row_spread'>
+					<Typography type="p1_bold" label="Open Statistics" />
+					<Icon size={size2} name="feather:bar-chart" />
+				</div>
+				<Typography type="p1" label="Platform usage and costs should be visible and understandable." />
+			</Paper>
+			<Paper>
+				<div theme='row_spread'>
+					<Typography type="p1_bold" label="Open Structure" />
+					<Icon size={size2} name="feather:grid" />
+				</div>
+				<Typography type="p1" label="Designed toward member-driven governance and accountability." />
+			</Paper>
+			<Paper>
+				<div theme='row_spread'>
+					<Typography type="p1_bold" label="Open Cost" />
+					<Icon size={size2} name="feather:dollar-sign" />
+				</div>
+				<Typography type="p1" label="Work toward at-cost operation: sustainable, fair, and transparent." />
+			</Paper>
+		</div>
+
+		<div theme='column_fill_center' style={{ gap: 40, margin: '80px 0' }}>
+			<Typography type="h1_bold" label="Join OpenGig" />
+			<Typography type="h2" style={{ textAlign: 'center' }} label={`OpenGig is still being built. If you join now, you're helping shape what “fair” looks like in practice.`} />
+
+			<div theme="column_fill_center" style={{ gap: 12, justifyContent: 'flex-start', flexWrap: 'wrap' }}>
+				<Button
+					label={<Typography type='h2' style={{ color: 'inherit' }} label={wsAuthed.map(a => a ? 'Enter' : 'Join')} />}
+					type="contained"
+					style={{ borderRadius: 50, marginTop: '20px', padding: 20 }}
+					iconPosition='right'
+					onClick={() => s.open({ name: wsAuthed.get() ? 'home' : 'auth' })}
+					icon={<Icon size={size} name={wsAuthed.map(a => a ? 'feather:log-in' : 'feather:arrow-right')} />}
+				/>
+			</div>
+
+		</div>
 	</div>
-
-	{/* TODO: Bottom hero footer section. Ready to join the change? Join OpenGig today! */}
-
 </>);
 
 export default Landing;
