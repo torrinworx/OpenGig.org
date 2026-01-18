@@ -15,6 +15,7 @@ export default () => {
         name: gig.name,
         description: gig.description,
         tags: gig.tags,
+        image: gig.image,
       };
     }
   };
