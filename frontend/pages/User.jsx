@@ -1,27 +1,34 @@
 import { StageContext, suspend, LoadingDots, Typography } from 'destamatic-ui';
 import { modReq } from 'destam-web-core/client';
 
+import NotFound from '../pages/NotFound.jsx';
+
 const User = StageContext.use(stage =>
   suspend(LoadingDots, async () => {
-    const uuid = stage.observer.path('urlProps').get().id;
+    const uuid = stage.observer.path('urlProps').get()?.id;
 
-    const user = await modReq('users/get', { uuid });
+    // IMPORTANT: if you want "my profile", don't send uuid at all
+    const user = await modReq('users/get', uuid ? { uuid } : undefined);
 
-    // your endpoint returns { error: ... } for bad uuid
-    // and returns null if user not found
-    if (!user || user.error) {
-      stage.open({ name: 'fallback' });
-      return null;
+    // public profile lookup: null or error => not found
+    if (uuid) {
+      if (!user || user.error) return <NotFound />;
+    } else {
+      // my profile: session/auth issues come back as { error: ... }
+      if (!user) return <NotFound />; // shouldn't happen often, but safe
+      if (user.error) {
+        stage.open({ name: 'auth' }); // or return <NotFound />
+        return null;
+      }
     }
 
-	// TODO: list all user gigs.
     return <div theme="column_fill_contentContainer" style={{ gap: 10 }}>
-          <Typography type="h1" label={user.name} />
+      <Typography type="h1" label={user.name} />
 
-        <div theme="divider" />
+      <div theme="divider" />
 
-        <Typography type="h2" label="Profile" />
-      </div>;
+      <Typography type="h2" label="Profile" />
+    </div>;
   })
 );
 
