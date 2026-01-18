@@ -11,7 +11,7 @@ const Header = StageContext.use(stage => AppContext.use(app => () => {
 	const current = stage.observer.path('current');
 	return <div theme='row_fill_spread_wrap_contentContainer' style={{ gap: 10 }}>
 		<img
-			src={app.observer.path(['client', 'themeMode']).map(t => t === false ? LogoLightMode : LogoDarkMode)}
+			src={app.observer.path(['themeMode']).map(t => t === false ? LogoLightMode : LogoDarkMode)}
 			style={{
 				width: '20vw',
 				maxWidth: 200,
