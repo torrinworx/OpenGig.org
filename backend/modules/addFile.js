@@ -108,12 +108,7 @@ export default ({ DB }) => {
 			// Persist db doc
 			await DB.flush(store);
 
-			return {
-				ok: true,
-				fileId,
-				path: absPath,
-				store,
-			};
+			return fileId
 		},
 	};
 };
