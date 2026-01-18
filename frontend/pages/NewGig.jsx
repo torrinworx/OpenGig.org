@@ -23,8 +23,8 @@ const NewGig = ThemeContext.use(h => StageContext.use(stage => (_, cleanup) => {
 	const disabled = Observer.mutable(false);
 
 	const type = Observer.mutable('Request');
-	const name = Observer.mutable(''); // 40 character limit
-	const description = Observer.mutable(''); // 2000 character limit.
+	const name = Observer.mutable('');
+	const description = Observer.mutable('');
 	const tags = OArray([]);
 	const curTag = Observer.mutable('');
 	const files = OArray([]);
@@ -354,54 +354,61 @@ const NewGig = ThemeContext.use(h => StageContext.use(stage => (_, cleanup) => {
 				<div theme='row_center_fill_spread_wrap'>
 					<Typography type='h2' label='Tags' />
 					<div theme='column_tight' style={{ marginTop: 25 }}>
-						<div
-							theme={[
-								'row_radius_primary',
-								focused.bool("focused", null),
-							]}
-							style={{ background: hovered.bool("$color_hover", '$color'), gap: 5, overflow: 'clip', paddingRight: 5 }}
-						>
-							<TextField
-								type='contained'
-								value={curTag}
-								style={{ background: 'none', border: 'none', outline: 'none' }}
-								isFocused={focused}
-								isHovered={hovered}
-								placeholder='Add a tag'
-								onKeyDown={e => {
-									if (e.key === 'Enter') {
-										e.preventDefault();
+						<Shown value={tagsLength.map(t => t === 5)}>
+							<mark:then>
+								<Typography type='p1' label='Your tags are filled to the brim! 🍺' />
+							</mark:then>
+							<mark:else>
+								<div
+									theme={[
+										'row_radius_primary',
+										focused.bool("focused", null),
+									]}
+									style={{ background: hovered.bool("$color_hover", '$color'), gap: 5, overflow: 'clip', paddingRight: 5 }}
+								>
+									<TextField
+										type='contained'
+										value={curTag}
+										style={{ background: 'none', border: 'none', outline: 'none' }}
+										isFocused={focused}
+										isHovered={hovered}
+										placeholder='Add a tag'
+										onKeyDown={e => {
+											if (e.key === 'Enter') {
+												e.preventDefault();
 
-										const t = (curTag.get() || '').trim();
-										if (curTag.get().length < 20 && t.length > 0 && tagsLength.get() < 5) {
-											tags.push(t);
-											curTag.set('');
-										}
-									} else if (e.key === 'Escape') {
-										curTag.set('');
-										e.preventDefault();
-									}
-								}}
-								disabled={disabled}
-							/>
-							<Button
-								type='text'
-								hover={buttonHovered}
-								round
-								icon={<Icon name='feather:plus' style={{
-									color: Observer.all([hovered, buttonHovered])
-										.map(([h, bh]) => h ? "$color" : bh ? "$color" : "$color_background")
-								}} />}
-								onClick={() => {
-									const t = (curTag.get() || '').trim();
-									if (t.length > 0) {
-										tags.push(t);
-										curTag.set('');
-									}
-								}}
-								disabled={curTag.map(ct => ct.trim().length === 0 || ct.length > 20)}
-							/>
-						</div>
+												const t = (curTag.get() || '').trim();
+												if (curTag.get().length < 20 && t.length > 0 && tagsLength.get() < 5) {
+													tags.push(t);
+													curTag.set('');
+												}
+											} else if (e.key === 'Escape') {
+												curTag.set('');
+												e.preventDefault();
+											}
+										}}
+										disabled={disabled}
+									/>
+									<Button
+										type='text'
+										hover={buttonHovered}
+										round
+										icon={<Icon name='feather:plus' style={{
+											color: Observer.all([hovered, buttonHovered])
+												.map(([h, bh]) => h ? "$color" : bh ? "$color" : "$color_background")
+										}} />}
+										onClick={() => {
+											const t = (curTag.get() || '').trim();
+											if (t.length > 0) {
+												tags.push(t);
+												curTag.set('');
+											}
+										}}
+										disabled={curTag.map(ct => ct.trim().length === 0 || ct.length > 20)}
+									/>
+								</div>
+							</mark:else>
+						</Shown>
 						<div theme='row_fill_end'>
 							<Validate
 								value={tags.observer}
