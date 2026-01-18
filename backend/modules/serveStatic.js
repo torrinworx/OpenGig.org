@@ -4,12 +4,13 @@ import express from "express";
 export const deps = [];
 
 export default ({ serverProps }) => {
-	const app = serverProps.app;
+	// only needed for local dev filesystem serving
+	if (process.env.NODE_ENV === "production") return;
 
 	const filesPath = process.env.FILES_PATH;
-	if (!filesPath) {
-		throw new Error('Missing env var "FILES_PATH"');
-	}
+	if (!filesPath) return; // don't crash dev if not set
+
+	const app = serverProps.app;
 
 	app.use(
 		"/files",
@@ -19,7 +20,6 @@ export default ({ serverProps }) => {
 		})
 	);
 
-	// optional: nicer 404 for missing files
 	app.use("/files", (req, res) => {
 		res.status(404).json({ ok: false, error: "File not found" });
 	});
