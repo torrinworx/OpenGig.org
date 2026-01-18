@@ -17,7 +17,7 @@ import {
 } from 'destamatic-ui';
 import IconifyIcons from "destamatic-ui/components/icons/IconifyIcons/IconifyIcons";
 
-import { syncState, clientState } from 'destam-web-core/client';
+import { syncState } from 'destam-web-core/client';
 
 import fonts from './utils/fonts.js';
 import { themeSetup, theme } from './utils/theme.js';
@@ -130,7 +130,6 @@ if (!is_node()) queueMicrotask(async () => {
 	appContext.theme = theme;
 });
 
-appContext.client = await clientState();
 themeSetup(appContext);
 
 window.app = appContext;

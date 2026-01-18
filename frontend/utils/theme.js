@@ -108,14 +108,13 @@ export const theme = OObject({
 });
 
 export const themeSetup = (app) => {
-	console.log(app.client.themeMode);
-	if (app.client.themeMode === undefined) {
-		app.client.themeMode = false;
+	if (app.themeMode === undefined) {
+		app.themeMode = false;
 	};
 
 	app.theme = theme;
 	document.documentElement.style.backgroundColor = theme.observer.path(['primary', '$color_background']);
-	app.observer.path(['client', 'themeMode']).effect(mode => atomic(() => {
+	app.observer.path(['themeMode']).effect(mode => atomic(() => {
 		const current = mode ? 'dark' : 'light';
 		const opposite = mode ? 'light' : 'dark';
 
