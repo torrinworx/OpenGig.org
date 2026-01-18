@@ -154,6 +154,8 @@ server {
     listen 443 ssl;
     server_name ${DOMAIN};
 
+    client_max_body_size 50m;
+
     ssl_certificate     ${FULLCHAIN};
     ssl_certificate_key ${PRIVKEY};
     include /etc/letsencrypt/options-ssl-nginx.conf;
