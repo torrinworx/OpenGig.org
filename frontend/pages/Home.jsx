@@ -3,17 +3,19 @@ import { modReq } from 'destam-web-core/client';
 import { Theme, Button, Typography, Icon, StageContext, suspend, LoadingDots, Shown } from "destamatic-ui";
 
 import SearchBar from '../components/SearchBar.jsx';
+import Paper from '../components/Paper.jsx';
 
 Theme.define({
 	grid: {
 		display: "grid",
-		gap: "12px",
+		gap: 10,
 		gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
 		alignItems: "stretch",
 		width: "100%",
+		padding: 20,
 	},
 	gridTile: {
-		extends: 'radius',
+		extends: 'radius_primary',
 		aspectRatio: "1 / 1",
 		width: "100%",
 		minWidth: "180px",
@@ -30,8 +32,6 @@ Theme.define({
 		margin: 10,
 		padding: 10,
 		boxSizing: 'border-box',
-		color: '$color',
-		background: '$color_background',
 		display: 'flex',
 		flexDirection: 'column',
 		gap: 8,
@@ -40,28 +40,54 @@ Theme.define({
 
 const Gig = StageContext.use(s => ({ each: gigId, gigs }) => {
 	const gig = gigs[gigId];
-	const hover = Observer.mutable(false);
 
-	return <Button style={{ padding: 0 }} onClick={() => s.open({ name: 'gig', urlProps: { id: gigId }, props: { id: gigId } })}>
-		<div
-			theme={['radius', 'gridTile', hover.map(h => h ? 'hovered' : null)]}
-			isHovered={hover}
-		>
-			<Shown value={gig.coverImg}>
+	const hovered = Observer.mutable(false);
+
+	return <Button
+		theme='gridTile'
+		style={{ position: 'relative' }}
+		isHovered={hovered}
+		onClick={() => s.open({ name: 'gig', urlProps: { id: gigId }, props: { id: gigId } })}
+	>
+		<div style={{
+			position: 'absolute',
+			inset: 0,
+			overflow: 'hidden',
+			borderRadius: 'inherit',
+		}}>
+			<Shown value={gig?.image}>
 				<mark:then>
-					<img src={gig.coverImg} alt={`Cover image for gig "${gig.name}`} />
-
+					<img
+						src={`/files/${gig?.image?.slice(1)}`}
+						alt={`Cover image for gig "${gig.name}"`}
+						style={{
+							width: '100%',
+							height: '100%',
+							objectFit: 'cover',
+							objectPosition: 'center',
+							display: 'block',
+						}}
+					/>
 				</mark:then>
 				<mark:else>
-					<div theme='column_fill_center'>
-						<Icon name='feather:image' size={20} style={{ color: '$color_background' }} />
+					<div theme='column_fill_center' style={{ width: '100%', height: '100%' }}>
+						<Icon name='feather:image' size={20} />
 					</div>
 				</mark:else>
 			</Shown>
+		</div>
 
-			<div theme='gridMeta'>
-				<Typography type='h6' label={gig.name} style={{ textAlign: 'left' }} />
-			</div>
+		<div style={{
+			position: 'absolute',
+			left: 0,
+			right: 0,
+			bottom: 0,
+			padding: 10,
+			boxSizing: 'border-box',
+		}}>
+			<Paper style={{ padding: 4 }}>
+				<Typography type='p1_bold' label={gig.name} style={{ textAlign: 'left' }} />
+			</Paper>
 		</div>
 	</Button>;
 });
