@@ -1,17 +1,17 @@
-// User.jsx
 import {
 	Button,
 	Icon,
 	Typography,
 	Observer,
 	OObject,
-	ThemeContext,
 	StageContext,
 	suspend,
+	Shown
 } from 'destamatic-ui';
 
 import { modReq } from 'destam-web-core/client';
 import Stasis from '../components/Stasis.jsx';
+import AppContext from '../utils/appContext.js';
 
 const FILE_LIMIT = 10 * 1024 * 1024;
 
@@ -52,14 +52,14 @@ const toFileUrl = (img) => {
 	return `/files/${id}`;
 };
 
-const User = ThemeContext.use(h => StageContext.use(stage =>
+const User = AppContext.use(app => StageContext.use(stage =>
 	suspend(Stasis, async () => {
 		const disabled = Observer.mutable(false);
 		const error = Observer.mutable('');
 
-		const viewedUuid = stage?.urlProps?.id || null;
+		const viewedUuid = stage.urlProps?.id || null;
 
-		const selfProfile = app?.state?.sync?.profile || null;
+		const selfProfile = app.state.sync.profile;
 		const selfUuid = selfProfile?.uuid || null;
 
 		const isSelf =
@@ -115,8 +115,6 @@ const User = ThemeContext.use(h => StageContext.use(stage =>
 			try {
 				const uploadResult = await uploadSingleFile(file);
 				const imageId = uploadResult?.id ?? uploadResult;
-
-				// update synced profile; validator bridges -> users table
 				app.state.sync.profile.image = imageId;
 			} catch (e) {
 				error.set(e?.message || 'Upload failed');
@@ -127,8 +125,18 @@ const User = ThemeContext.use(h => StageContext.use(stage =>
 
 		const imageUrl = user.observer.path('image').map(toFileUrl);
 
-		return <div theme="column_center" style={{ gap: 12 }}>
-			{imageUrl.map(url => {
+		return <div theme="column_center" style={{ gap: 10 }}>
+			<div
+				style={{
+					position: 'relative',
+					width: '20vw',
+					maxWidth: 200,
+					minWidth: 150,
+					aspectRatio: '1 / 1',
+					borderRadius: '50%',
+					margin: '0 auto',
+				}}
+			>				{imageUrl.map(url => {
 				if (!url) {
 					return <div theme="row_center" style={{
 						width: 96,
@@ -139,27 +147,53 @@ const User = ThemeContext.use(h => StageContext.use(stage =>
 					</div>;
 				}
 
-				return <img
-					src={url}
-					alt="Profile"
+				return <div
 					style={{
 						width: '20vw',
 						maxWidth: 200,
 						minWidth: 150,
-						borderRadius: 999,
-						objectFit: 'cover',
+						aspectRatio: '1 / 1',
+						borderRadius: '50%',
+						overflow: 'hidden',
+						margin: '0 auto',
 					}}
-				/>;
+				>
+					<img
+						src={url}
+						alt="Profile"
+						style={{
+							width: '100%',
+							height: '100%',
+							objectFit: 'cover',
+							display: 'block',
+						}}
+					/>
+				</div>;
 			}).unwrap()}
+				<Shown value={app.observer.path(['state', 'sync', 'profile', 'uuid']).map(id => id === viewedUuid)}>
+					<div
+						style={{
+							position: 'absolute',
+							right: 8,
+							bottom: 8,
+							zIndex: 2,
+						}}
+					>
+						<Button
+							title="Upload new profile image."
+							type="contained"
+							onClick={onUploadClick}
+							disabled={disabled}
+							icon={<Icon name="feather:edit" />}
+							round
+							loading={false}
+						/>
+					</div>
+				</Shown>
+			</div>
 
 			<Typography type="h2" label={user.observer.path('name')} />
 
-			<Button
-				type="contained"
-				label="Upload Picture"
-				onClick={onUploadClick}
-				disabled={Observer.all([disabled, Observer.mutable(!isSelf)]).map(([d, notSelf]) => d || notSelf)}
-			/>
 
 			<Typography type="validate" label={error} />
 		</div>;
