@@ -224,7 +224,7 @@ const User = AppContext.use(app => StageContext.use(stage =>
 				<Shown value={canEditObs}>
 					<div theme="row" style={{ gap: 20 }}>
 						<Shown value={editName.map(e => !e)}>
-							<Typography type="h2" label={nameObs} />
+							<Typography type="h2" label={Observer.immutable(nameObs)} />
 						</Shown>
 
 						<Shown value={editName}>
@@ -265,7 +265,7 @@ const User = AppContext.use(app => StageContext.use(stage =>
 				</Shown>
 
 				<Shown value={canEditObs.map(v => !v)}>
-					<Typography type="h2" label={nameObs} />
+					<Typography type="h2" label={Observer.immutable(nameObs)} />
 				</Shown>
 
 				<Typography theme='row_fill_start_primary' type='h2' label='Gigs' />
