@@ -1,9 +1,12 @@
+import { OArray } from 'destam';
+
 export const deps = ["modStr"];
 
 export default ({ modStr }) => {
     return {
         onMsg: async ({ type, name, description, tags, image }, __, { user, DB }) => {
-            console.log("CREATE GIG IMAGE: ", image)
+            console.log("CREATE GIG IMAGE: ", image);
+
             if (type !== "offer" && type !== "request") {
                 return { error: "Invalid type. Must be 'offer' or 'request'." };
             }
@@ -40,6 +43,7 @@ export default ({ modStr }) => {
                 };
             }
 
+            // Create gig
             const gig = await DB('gigs');
 
             gig.query.uuid = gig.query.uuid ?? gig.persistent?.uuid ?? gig.uuid;
@@ -51,8 +55,14 @@ export default ({ modStr }) => {
             gig.tags = tags;
             gig.image = image;
 
-            console.log("GIG IMAGE: ", gig.image);
             await DB.flush(gig);
+
+            const userStore = await DB.instance(user);
+
+            if (!Array.isArray(userStore.gigs)) userStore.gigs = OArray([]);
+            userStore.gigs.push(gig.query.uuid);
+
+            await DB.flush(userStore);
 
             return gig.query.uuid;
         }
