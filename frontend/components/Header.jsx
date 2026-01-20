@@ -1,4 +1,4 @@
-import { Button, Icon, StageContext, Shown, Observer } from 'destamatic-ui';
+import { Button, Icon, StageContext, Shown, Observer, suspend } from 'destamatic-ui';
 import { wsAuthed } from 'destam-web-core/client';
 
 import Hamburger from './Hamburger.jsx';
@@ -7,8 +7,20 @@ import AppContext from '../utils/appContext.js';
 import LogoLightMode from '/branding/OpenGig_Logo_Light_Mode.svg';
 import LogoDarkMode from '/branding/OpenGig_Logo_Dark_Mode.svg';
 
+const User = StageContext.use(stage => AppContext.use(app => suspend(() => null, async () =>
+	<Shown value={stage.observer.path('current').map(() => stage.urlProps?.id != app.state.sync.profile.uuid)}>
+		<Button
+			title='Profile'
+			type='text'
+			onClick={() => stage.open({ name: 'user', urlProps: { id: app.state.sync.profile.uuid } })}
+			icon={<Icon name='feather:user' size={30} />}
+		/>
+	</Shown>
+)));
+
 const Header = StageContext.use(stage => AppContext.use(app => () => {
 	const current = stage.observer.path('current');
+
 	return <div theme='row_fill_spread_wrap_contentContainer' style={{ gap: 10 }}>
 		<img
 			src={app.observer.path(['themeMode']).map(t => t === false ? LogoLightMode : LogoDarkMode)}
@@ -32,12 +44,7 @@ const Header = StageContext.use(stage => AppContext.use(app => () => {
 						icon={<Icon name='feather:home' size={30} />}
 					/>
 				</Shown>
-				<Button
-					title='Profile'
-					type='text'
-					onClick={() => stage.open({ name: 'user', urlProps: { id: app.state.sync.profile.uuid } })}
-					icon={<Icon name='feather:user' size={30} />}
-				/>
+				<User />
 				<Button
 					title='Log Out'
 					type='text'
