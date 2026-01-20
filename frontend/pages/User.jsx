@@ -1,12 +1,13 @@
 import {
-	Button,
 	Icon,
 	Typography,
 	Observer,
 	OObject,
+	OArray,
 	StageContext,
 	suspend,
-	Shown
+	Shown,
+	FileDrop,
 } from 'destamatic-ui';
 
 import { modReq } from 'destam-web-core/client';
@@ -23,15 +24,6 @@ const prettyBytes = (bytes = 0) => {
 	return `${n.toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
 };
 
-const pickImageFile = () => new Promise(ok => {
-	const input = document.createElement('input');
-	input.type = 'file';
-	input.accept = 'image/png,image/jpeg,image/jpg,image/webp';
-	input.multiple = false;
-	input.onchange = () => ok(input.files?.[0] || null);
-	input.click();
-});
-
 const uploadSingleFile = async (file) => {
 	const fd = new FormData();
 	fd.append('file', file, file.name);
@@ -44,12 +36,6 @@ const uploadSingleFile = async (file) => {
 
 	if (!res.ok) throw new Error(await res.text());
 	return await res.json(); // {id} or id/string
-};
-
-const toFileUrl = (img) => {
-	if (!img || typeof img !== 'string') return null;
-	const id = img.startsWith('#') ? img.slice(1) : img;
-	return `/files/${id}`;
 };
 
 const User = AppContext.use(app => StageContext.use(stage =>
@@ -94,36 +80,7 @@ const User = AppContext.use(app => StageContext.use(stage =>
 			}
 		}
 
-		const onUploadClick = async () => {
-			error.set('');
-			if (disabled.get()) return;
-
-			if (!isSelf) {
-				error.set("You can't change another user's picture.");
-				return;
-			}
-
-			const file = await pickImageFile();
-			if (!file) return;
-
-			if (file.size > FILE_LIMIT) {
-				error.set(`Image too big. Max ${prettyBytes(FILE_LIMIT)}.`);
-				return;
-			}
-
-			disabled.set(true);
-			try {
-				const uploadResult = await uploadSingleFile(file);
-				const imageId = uploadResult?.id ?? uploadResult;
-				app.state.sync.profile.image = imageId;
-			} catch (e) {
-				error.set(e?.message || 'Upload failed');
-			} finally {
-				disabled.set(false);
-			}
-		};
-
-		const imageUrl = user.observer.path('image').map(toFileUrl);
+		const imageUrl = user.observer.path('image').map(img => img ? `/files/${img.slice(1)}` : false);
 
 		return <div theme="column_center" style={{ gap: 10 }}>
 			<div
@@ -136,66 +93,114 @@ const User = AppContext.use(app => StageContext.use(stage =>
 					borderRadius: '50%',
 					margin: '0 auto',
 				}}
-			>				{imageUrl.map(url => {
-				if (!url) {
-					return <div theme="row_center" style={{
-						width: 96,
-						height: 96,
-						borderRadius: 999,
-					}}>
-						<Icon name="feather:user" size={40} />
-					</div>;
-				}
+			>
+				{imageUrl.map(url => {
+					if (!url) {
+						return (
+							<div
+								theme='primary'
+								style={{
+									width: '20vw',
+									maxWidth: 200,
+									minWidth: 150,
+									aspectRatio: '1 / 1',
+									borderRadius: '50%',
+									overflow: 'hidden',
+									margin: '0 auto',
+									border: '6px solid $color',
+									display: 'flex',
+									alignItems: 'center',
+									justifyContent: 'center',
+								}}
+							>
+								<Icon
+									style={{ color: '$color' }}
+									name="feather:user"
+									size="50%"
+								/>
+							</div>
+						);
+					}
 
-				return <div
-					style={{
-						width: '20vw',
-						maxWidth: 200,
-						minWidth: 150,
-						aspectRatio: '1 / 1',
-						borderRadius: '50%',
-						overflow: 'hidden',
-						margin: '0 auto',
-					}}
-				>
-					<img
-						src={url}
-						alt="Profile"
+					return <div
+						theme='primary'
 						style={{
-							width: '100%',
-							height: '100%',
-							objectFit: 'cover',
-							display: 'block',
-						}}
-					/>
-				</div>;
-			}).unwrap()}
-				<Shown value={app.observer.path(['state', 'sync', 'profile', 'uuid']).map(id => id === viewedUuid)}>
-					<div
-						style={{
-							position: 'absolute',
-							right: 8,
-							bottom: 8,
-							zIndex: 2,
+							width: '20vw',
+							maxWidth: 200,
+							minWidth: 150,
+							aspectRatio: '1 / 1',
+							borderRadius: '50%',
+							overflow: 'hidden',
+							margin: '0 auto',
+							border: '6px solid $color',
+
 						}}
 					>
-						<Button
-							title="Upload new profile image."
-							type="contained"
-							onClick={onUploadClick}
-							disabled={disabled}
-							icon={<Icon name="feather:edit" />}
-							round
-							loading={false}
+						<img
+							src={url}
+							alt="Profile"
+							style={{
+								width: '100%',
+								height: '100%',
+								objectFit: 'cover',
+								display: 'block',
+							}}
 						/>
+					</div>;
+				}).unwrap()}
+
+				<Shown value={Observer.immutable(isSelf)}>
+					<div style={{ position: 'absolute', right: 10, bottom: 10, }}>
+						<FileDrop
+							files={OArray()}
+							clickable={false}
+							multiple={false}
+							extensions={['image/png', 'image/jpeg', 'image/jpg', 'image/webp']}
+							style={{ display: 'contents' }}
+							loader={async (file) => {
+								disabled.set(true);
+								error.set('');
+
+								try {
+									if (!file) {
+										disabled.set(false);
+										return null;
+									};
+
+									if (file.size > FILE_LIMIT) {
+										throw new Error(`Image too big. Max ${prettyBytes(FILE_LIMIT)}.`);
+									}
+
+									const uploadResult = await uploadSingleFile(file);
+									const imageId = uploadResult?.id ?? uploadResult;
+
+									app.state.sync.profile.image = imageId;
+
+									return imageId;
+								} catch (e) {
+									error.set(e?.message || 'Upload failed');
+									throw e;
+								} finally {
+									disabled.set(false);
+								}
+							}}
+						>
+							<FileDrop.Button
+								title="Upload new profile image."
+								type="contained"
+								icon={<Icon name="feather:edit" />}
+								round
+								disabled={disabled}
+								loading={false}
+								onClick={() => { error.set(''); }}
+							/>
+						</FileDrop>
 					</div>
 				</Shown>
 			</div>
 
-			<Typography type="h2" label={user.observer.path('name')} />
-
-
 			<Typography type="validate" label={error} />
+			<Typography type="h2" label={user.observer.path('name')} />
 		</div>;
 	})
 ));
