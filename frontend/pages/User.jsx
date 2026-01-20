@@ -55,11 +55,11 @@ const User = AppContext.use(app => StageContext.use(stage =>
 			!viewedUuid ||
 			(!!selfUuid && viewedUuid === selfUuid);
 
-			const user = isSelf
+		const user = isSelf
 			? (selfProfile || (app.state.sync.profile = OObject({ uuid: null, name: '', image: null, gigs: [] })))
 			: OObject({ uuid: null, name: '', image: null, gigs: [] });
 
-			if (!isSelf) {
+		if (!isSelf) {
 			try {
 				const data = await modReq('users/get', { uuid: viewedUuid });
 
@@ -218,45 +218,53 @@ const User = AppContext.use(app => StageContext.use(stage =>
 
 				<Typography type="validate" label={error} />
 
-				<div theme="row" style={{ gap: 20 }}>
-					<Shown value={editName.map(e => !e)}>
-						<Typography type="h2" label={Observer.immutable(nameObs)} />
-					</Shown>
+				<Shown value={Observer.immutable(isSelf)}>
+					<mark:then>
+						<div theme="row" style={{ gap: 20 }}>
+							<Shown value={editName.map(e => !e)}>
+								<Typography type="h2" label={Observer.immutable(nameObs)} />
+							</Shown>
 
-					<Shown value={editName}>
-						<TextField
-							type='outlined'
-							value={draftName}
-							onInput={e => draftName.set(e.target.value)}
-						/>
-					</Shown>
+							<Shown value={editName}>
+								<TextField
+									type='outlined'
+									value={draftName}
+									onInput={e => draftName.set(e.target.value)}
+								/>
+							</Shown>
 
-					<Shown value={Observer.immutable(isSelf)}>
-						<Shown value={editName.map(e => !e)}>
-							<Button onClick={() => {
-								draftName.set(nameObs.get() ?? '');
-								editName.set(true);
-							}} icon={<Icon name="feather:edit" />} />
-						</Shown>
+							<Shown value={Observer.immutable(isSelf)}>
+								<Shown value={editName.map(e => !e)}>
+									<Button onClick={() => {
+										draftName.set(nameObs.get() ?? '');
+										editName.set(true);
+									}} icon={<Icon name="feather:edit" />} />
+								</Shown>
 
-						<Shown value={editName}>
-							<Button
-								onClick={() => {
-									nameObs.set(draftName.get());
-									editName.set(false);
-								}}
-								icon={<Icon name="feather:save" />}
-							/>
-							<Button
-								onClick={() => {
-									draftName.set(nameObs.get() ?? '');
-									editName.set(false);
-								}}
-								icon={<Icon name="feather:x" />}
-							/>
-						</Shown>
-					</Shown>
-				</div>
+								<Shown value={editName}>
+									<Button
+										onClick={() => {
+											nameObs.set(draftName.get());
+											editName.set(false);
+										}}
+										icon={<Icon name="feather:save" />}
+									/>
+									<Button
+										onClick={() => {
+											draftName.set(nameObs.get() ?? '');
+											editName.set(false);
+										}}
+										icon={<Icon name="feather:x" />}
+									/>
+								</Shown>
+							</Shown>
+						</div>
+					</mark:then>
+					<mark:else>
+						<Typography type="h2" label={user.name} />
+					</mark:else>
+				</Shown>
+
 
 				<Typography theme='row_fill_start_primary' type='h2' label='Gigs' />
 				<div theme='divider' />
