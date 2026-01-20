@@ -1,4 +1,4 @@
-import { Button, Icon, StageContext, Shown, Observer, suspend, Typography } from 'destamatic-ui';
+import { Button, Icon, StageContext, Shown, suspend, Typography, Observer } from 'destamatic-ui';
 import { wsAuthed } from 'destam-web-core/client';
 
 import Hamburger from './Hamburger.jsx';
@@ -8,16 +8,31 @@ import Paper from './Paper.jsx';
 import LogoLightMode from '/branding/OpenGig_Logo_Light_Mode.svg';
 import LogoDarkMode from '/branding/OpenGig_Logo_Dark_Mode.svg';
 
-const User = StageContext.use(stage => AppContext.use(app => suspend(() => null, async () =>
-	<Shown value={stage.observer.path('current').map(() => stage.urlProps?.id != app.state.sync.profile.uuid)}>
-		<Button
-			title='Profile'
-			type='text'
-			onClick={() => stage.open({ name: 'user', urlProps: { id: app.state.sync.profile.uuid } })}
-			icon={<Icon name='feather:user' size={30} />}
-		/>
-	</Shown>
-)));
+const User = StageContext.use(stage => AppContext.use(app =>
+	suspend(() => null, async () => {
+		const current = stage.observer.path('current');
+
+		// stays undefined until sync/profile is populated, which is fine
+		const selfUuid = app.observer.path(['state', 'sync', 'profile', 'uuid']);
+
+		const showProfile = Observer
+			.all([current, wsAuthed, selfUuid])
+			.map(([_, authed, uuid]) =>
+				!!authed &&
+				!!uuid &&
+				stage.urlProps?.id != uuid
+			);
+
+		return <Shown value={showProfile}>
+			<Button
+				title='Profile'
+				type='text'
+				onClick={() => stage.open({ name: 'user', urlProps: { id: selfUuid.get() } })}
+				icon={<Icon name='feather:user' size={30} />}
+			/>
+		</Shown>;
+	})
+));
 
 const Header = StageContext.use(stage => AppContext.use(app => () => {
 	const current = stage.observer.path('current');
@@ -51,30 +66,43 @@ const Header = StageContext.use(stage => AppContext.use(app => () => {
 					objectFit: 'cover',
 					display: 'block',
 				}}
-				aira-label='OpenGig logo.'
+				aria-label='OpenGig logo.'
 			/>
-			<Shown value={Observer.all([current, wsAuthed]).map(([c, a]) => c != 'landing' && !!a)}>
-				<Hamburger>
-					<Shown value={current.map(c => c != 'home')}>
-						<Button
-							title='Home'
-							type='text'
-							onClick={() => stage.open({ name: 'home' })}
-							icon={<Icon name='feather:home' size={30} />}
-						/>
-					</Shown>
-					<User />
+
+			<Hamburger>
+				<Shown value={current.map(c => c !== 'home')}>
 					<Button
-						title='Log Out'
+						title='Home'
 						type='text'
-						onClick={() => {
-							app.state.leave();
-							stage.open({ name: 'landing' });
-						}}
-						icon={<Icon name='feather:log-out' size={30} />}
+						onClick={() => stage.open({ name: 'home' })}
+						icon={<Icon name='feather:home' size={30} />}
 					/>
-				</Hamburger>
-			</Shown>
+				</Shown>
+
+				<User />
+
+				<Shown value={wsAuthed}>
+					<mark:then>
+						<Button
+							title='Log Out'
+							type='text'
+							onClick={() => {
+								app.state.leave();
+								stage.open({ name: 'landing' });
+							}}
+							icon={<Icon name='feather:log-out' size={30} />}
+						/>
+					</mark:then>
+					<mark:else>
+						<Button
+							title='Log In'
+							type='text'
+							onClick={() => stage.open({ name: 'auth' })}
+							icon={<Icon name='feather:log-in' size={30} />}
+						/>
+					</mark:else>
+				</Shown>
+			</Hamburger>
 		</div>
 	</>;
 }));
