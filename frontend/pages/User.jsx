@@ -15,6 +15,7 @@ import {
 import { modReq } from 'destam-web-core/client';
 import Stasis from '../components/Stasis.jsx';
 import AppContext from '../utils/appContext.js';
+import Gigs from '../components/Gigs.jsx';
 
 const FILE_LIMIT = 10 * 1024 * 1024;
 
@@ -37,7 +38,7 @@ const uploadSingleFile = async (file) => {
 	});
 
 	if (!res.ok) throw new Error(await res.text());
-	return await res.json(); // {id} or id/string
+	return await res.json();
 };
 
 const User = AppContext.use(app => StageContext.use(stage =>
@@ -54,13 +55,11 @@ const User = AppContext.use(app => StageContext.use(stage =>
 			!viewedUuid ||
 			(!!selfUuid && viewedUuid === selfUuid);
 
-		// Use the synced profile object directly when self (reactive, editable)
-		const user = isSelf
-			? (selfProfile || (app.state.sync.profile = OObject({ uuid: null, name: '', image: null })))
-			: OObject({ uuid: null, name: '', image: null });
+			const user = isSelf
+			? (selfProfile || (app.state.sync.profile = OObject({ uuid: null, name: '', image: null, gigs: [] })))
+			: OObject({ uuid: null, name: '', image: null, gigs: [] });
 
-		// If not self, load public user
-		if (!isSelf) {
+			if (!isSelf) {
 			try {
 				const data = await modReq('users/get', { uuid: viewedUuid });
 
@@ -76,11 +75,16 @@ const User = AppContext.use(app => StageContext.use(stage =>
 				user.uuid = data.uuid ?? null;
 				user.name = data.name ?? '';
 				user.image = data.image ?? null;
+				user.gigs = Array.isArray(data.gigs) ? data.gigs : [];
 			} catch (e) {
 				error.set(e?.message || 'Failed to load user');
 				return;
 			}
 		}
+
+		const gigUuids = isSelf
+			? (app.observer.path(['state', 'sync', 'profile', 'gigs']).get())
+			: user?.gigs ? user.gigs : [];
 
 		const imageUrl = user.observer.path('image').map(img => img ? `/files/${img.slice(1)}` : false);
 
@@ -88,172 +92,177 @@ const User = AppContext.use(app => StageContext.use(stage =>
 			uuid: null,
 			name: '',
 			image: null,
+			gigs: [],
 		}));
 
 		const nameObs = profile.observer.path('name');
 		const editName = Observer.mutable(false);
-
 		const draftName = Observer.mutable(nameObs.get() ?? '');
 
-		return <div theme="column_center_fill_contentContainer">
-			<div
-				style={{
-					position: 'relative',
-					width: '20vw',
-					maxWidth: 200,
-					minWidth: 150,
-					aspectRatio: '1 / 1',
-					borderRadius: '50%',
-					margin: '0 auto',
-				}}
-			>
-				{imageUrl.map(url => {
-					if (!url) {
-						return (
-							<div
-								theme='primary'
-								style={{
-									width: '20vw',
-									maxWidth: 200,
-									minWidth: 150,
-									aspectRatio: '1 / 1',
-									borderRadius: '50%',
-									overflow: 'hidden',
-									margin: '0 auto',
-									border: '6px solid $color',
-									display: 'flex',
-									alignItems: 'center',
-									justifyContent: 'center',
-								}}
-							>
-								<Icon
-									style={{ color: '$color' }}
-									name="feather:user"
-									size="50%"
-								/>
-							</div>
-						);
-					}
+		return <>
+			<div theme="column_center_fill_contentContainer">
+				<div
+					style={{
+						position: 'relative',
+						width: '20vw',
+						maxWidth: 200,
+						minWidth: 150,
+						aspectRatio: '1 / 1',
+						borderRadius: '50%',
+						margin: '0 auto',
+					}}
+				>
+					{imageUrl.map(url => {
+						if (!url) {
+							return (
+								<div
+									theme='primary'
+									style={{
+										width: '20vw',
+										maxWidth: 200,
+										minWidth: 150,
+										aspectRatio: '1 / 1',
+										borderRadius: '50%',
+										overflow: 'hidden',
+										margin: '0 auto',
+										border: '6px solid $color',
+										display: 'flex',
+										alignItems: 'center',
+										justifyContent: 'center',
+									}}
+								>
+									<Icon
+										style={{ color: '$color' }}
+										name="feather:user"
+										size="50%"
+									/>
+								</div>
+							);
+						}
 
-					return <div
-						theme='primary'
-						style={{
-							width: '20vw',
-							maxWidth: 200,
-							minWidth: 150,
-							aspectRatio: '1 / 1',
-							borderRadius: '50%',
-							overflow: 'hidden',
-							margin: '0 auto',
-							border: '6px solid $color',
-
-						}}
-					>
-						<img
-							src={url}
-							alt="Profile"
+						return <div
+							theme='primary'
 							style={{
-								width: '100%',
-								height: '100%',
-								objectFit: 'cover',
-								display: 'block',
-							}}
-						/>
-					</div>;
-				}).unwrap()}
-
-				<Shown value={Observer.immutable(isSelf)}>
-					<div style={{ position: 'absolute', right: 10, bottom: 10, }}>
-						<FileDrop
-							files={OArray()}
-							clickable={false}
-							multiple={false}
-							extensions={['image/png', 'image/jpeg', 'image/jpg', 'image/webp']}
-							style={{ display: 'contents' }}
-							loader={async (file) => {
-								disabled.set(true);
-								error.set('');
-
-								try {
-									if (!file) {
-										disabled.set(false);
-										return null;
-									};
-
-									if (file.size > FILE_LIMIT) {
-										throw new Error(`Image too big. Max ${prettyBytes(FILE_LIMIT)}.`);
-									}
-
-									const uploadResult = await uploadSingleFile(file);
-									const imageId = uploadResult?.id ?? uploadResult;
-
-									app.state.sync.profile.image = imageId;
-
-									return imageId;
-								} catch (e) {
-									error.set(e?.message || 'Upload failed');
-									throw e;
-								} finally {
-									disabled.set(false);
-								}
+								width: '20vw',
+								maxWidth: 200,
+								minWidth: 150,
+								aspectRatio: '1 / 1',
+								borderRadius: '50%',
+								overflow: 'hidden',
+								margin: '0 auto',
+								border: '6px solid $color',
 							}}
 						>
-							<FileDrop.Button
-								title="Upload new profile image."
-								type="contained"
-								icon={<Icon name="feather:edit" />}
-								round
-								disabled={disabled}
-								loading={false}
-								onClick={() => { error.set(''); }}
+							<img
+								src={url}
+								alt="Profile"
+								style={{
+									width: '100%',
+									height: '100%',
+									objectFit: 'cover',
+									display: 'block',
+								}}
 							/>
-						</FileDrop>
-					</div>
-				</Shown>
-			</div>
+						</div>;
+					}).unwrap()}
 
-			<Typography type="validate" label={error} />
+					<Shown value={Observer.immutable(isSelf)}>
+						<div style={{ position: 'absolute', right: 10, bottom: 10, }}>
+							<FileDrop
+								files={OArray()}
+								clickable={false}
+								multiple={false}
+								extensions={['image/png', 'image/jpeg', 'image/jpg', 'image/webp']}
+								style={{ display: 'contents' }}
+								loader={async (file) => {
+									disabled.set(true);
+									error.set('');
 
-			<div theme="row" style={{ gap: 20 }}>
-				<Shown value={editName.map(e => !e)}>
-					<Typography type="h2" label={Observer.immutable(nameObs)} />
-				</Shown>
+									try {
+										if (!file) {
+											disabled.set(false);
+											return null;
+										};
 
-				<Shown value={editName}>
-					<TextField
-						type='outlined'
-						value={draftName}
-						onInput={e => draftName.set(e.target.value)}
-					/>
-				</Shown>
+										if (file.size > FILE_LIMIT) {
+											throw new Error(`Image too big. Max ${prettyBytes(FILE_LIMIT)}.`);
+										}
 
-				<Shown value={Observer.immutable(isSelf)}>
+										const uploadResult = await uploadSingleFile(file);
+										const imageId = uploadResult?.id ?? uploadResult;
+
+										app.state.sync.profile.image = imageId;
+
+										return imageId;
+									} catch (e) {
+										error.set(e?.message || 'Upload failed');
+										throw e;
+									} finally {
+										disabled.set(false);
+									}
+								}}
+							>
+								<FileDrop.Button
+									title="Upload new profile image."
+									type="contained"
+									icon={<Icon name="feather:edit" />}
+									round
+									disabled={disabled}
+									loading={false}
+									onClick={() => { error.set(''); }}
+								/>
+							</FileDrop>
+						</div>
+					</Shown>
+				</div>
+
+				<Typography type="validate" label={error} />
+
+				<div theme="row" style={{ gap: 20 }}>
 					<Shown value={editName.map(e => !e)}>
-						<Button onClick={() => {
-							draftName.set(nameObs.get() ?? '');
-							editName.set(true);
-						}} icon={<Icon name="feather:edit" />} />
+						<Typography type="h2" label={Observer.immutable(nameObs)} />
 					</Shown>
 
 					<Shown value={editName}>
-						<Button
-							onClick={() => {
-								nameObs.set(draftName.get());
-								editName.set(false);
-							}}
-							icon={<Icon name="feather:save" />}
-						/>
-						<Button
-							onClick={() => {
-								draftName.set(nameObs.get() ?? '');
-								editName.set(false);
-							}}
-							icon={<Icon name="feather:x" />}
+						<TextField
+							type='outlined'
+							value={draftName}
+							onInput={e => draftName.set(e.target.value)}
 						/>
 					</Shown>
-				</Shown>
+
+					<Shown value={Observer.immutable(isSelf)}>
+						<Shown value={editName.map(e => !e)}>
+							<Button onClick={() => {
+								draftName.set(nameObs.get() ?? '');
+								editName.set(true);
+							}} icon={<Icon name="feather:edit" />} />
+						</Shown>
+
+						<Shown value={editName}>
+							<Button
+								onClick={() => {
+									nameObs.set(draftName.get());
+									editName.set(false);
+								}}
+								icon={<Icon name="feather:save" />}
+							/>
+							<Button
+								onClick={() => {
+									draftName.set(nameObs.get() ?? '');
+									editName.set(false);
+								}}
+								icon={<Icon name="feather:x" />}
+							/>
+						</Shown>
+					</Shown>
+				</div>
+
+				<Typography theme='row_fill_start_primary' type='h2' label='Gigs' />
+				<div theme='divider' />
 			</div>
-		</div>;
+			<Gigs gigUuids={gigUuids} />
+		</>;
 	})
 ));
 

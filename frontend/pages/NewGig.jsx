@@ -334,7 +334,6 @@ const NewGig = ThemeContext.use(h => StageContext.use(stage => (_, cleanup) => {
 						signal={submit}
 						validate={val => {
 							if (files.length === 0) return 'Image is required. Your gig must have an image.';
-							console.log("VAL:", val, FILE_LIMIT)
 							if (val.get() > FILE_LIMIT) return `Image is too big. Max ${prettyBytes(FILE_LIMIT)}.`;
 							return '';
 						}}
