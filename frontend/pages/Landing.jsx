@@ -15,6 +15,7 @@ Theme.define({
 		gap: 6,
 	},
 });
+
 const size = 'clamp(1.45rem, 1.8rem + 1.1vw, 4rem)'
 const size2 = 'clamp(1.45rem, 1.2rem + 1.1vw, 2rem)'
 
