@@ -8,6 +8,8 @@ import {
 	suspend,
 	Shown,
 	FileDrop,
+	Button,
+	TextField,
 } from 'destamatic-ui';
 
 import { modReq } from 'destam-web-core/client';
@@ -82,7 +84,18 @@ const User = AppContext.use(app => StageContext.use(stage =>
 
 		const imageUrl = user.observer.path('image').map(img => img ? `/files/${img.slice(1)}` : false);
 
-		return <div theme="column_center" style={{ gap: 10 }}>
+		const profile = app.state.sync.profile || (app.state.sync.profile = OObject({
+			uuid: null,
+			name: '',
+			image: null,
+		}));
+
+		const nameObs = profile.observer.path('name');
+		const editName = Observer.mutable(false);
+
+		const draftName = Observer.mutable(nameObs.get() ?? '');
+
+		return <div theme="column_center_fill_contentContainer">
 			<div
 				style={{
 					position: 'relative',
@@ -200,7 +213,46 @@ const User = AppContext.use(app => StageContext.use(stage =>
 			</div>
 
 			<Typography type="validate" label={error} />
-			<Typography type="h2" label={user.observer.path('name')} />
+
+			<div theme="row" style={{ gap: 20 }}>
+				<Shown value={editName.map(e => !e)}>
+					<Typography type="h2" label={Observer.immutable(nameObs)} />
+				</Shown>
+
+				<Shown value={editName}>
+					<TextField
+						type='outlined'
+						value={draftName}
+						onInput={e => draftName.set(e.target.value)}
+					/>
+				</Shown>
+
+				<Shown value={Observer.immutable(isSelf)}>
+					<Shown value={editName.map(e => !e)}>
+						<Button onClick={() => {
+							draftName.set(nameObs.get() ?? '');
+							editName.set(true);
+						}} icon={<Icon name="feather:edit" />} />
+					</Shown>
+
+					<Shown value={editName}>
+						<Button
+							onClick={() => {
+								nameObs.set(draftName.get());
+								editName.set(false);
+							}}
+							icon={<Icon name="feather:save" />}
+						/>
+						<Button
+							onClick={() => {
+								draftName.set(nameObs.get() ?? '');
+								editName.set(false);
+							}}
+							icon={<Icon name="feather:x" />}
+						/>
+					</Shown>
+				</Shown>
+			</div>
 		</div>;
 	})
 ));
