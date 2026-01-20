@@ -11,9 +11,9 @@ const normalizeImage = (v) => {
 };
 
 const normalizeGigs = (v) => {
-	if (!v || !v instanceof OArray) return OArray([]);
-	// keep only string uuids, de-dupe
-	return [...new Set(v.filter(x => typeof x === 'string' && x.length))];
+	if (!(v instanceof OArray)) return OArray([]);
+	// keep only string uuids, de-dupe, keep order
+	return OArray([...new Set([...v].filter(x => typeof x === 'string' && x.length))]);
 };
 
 const bridged = new WeakSet();
@@ -24,7 +24,6 @@ export default ({ DB }) => {
 			table: 'state',
 
 			register: async (state) => {
-				// profile shape
 				if (!state.profile) state.profile = OObject({});
 				else if (!(state.profile instanceof OObject)) state.profile = OObject(state.profile);
 
@@ -33,16 +32,14 @@ export default ({ DB }) => {
 				if (!('uuid' in profile)) profile.uuid = null;
 				if (!('name' in profile)) profile.name = '';
 				if (!('image' in profile)) profile.image = null;
-				if (!('gigs' in profile)) profile.gigs = [];
+				if (!('gigs' in profile)) profile.gigs = OArray([]);
 
-				// lock email edits out of synced profile
 				if ('email' in profile) delete profile.email;
 
 				profile.name = normalizeName(profile.name);
 				profile.image = normalizeImage(profile.image);
 				profile.gigs = normalizeGigs(profile.gigs);
 
-				// resolve user uuid
 				const userUuid = state.query?.user || profile.uuid;
 				if (typeof userUuid !== 'string' || !userUuid) return;
 
@@ -57,17 +54,17 @@ export default ({ DB }) => {
 				profile.image = normalizeImage(user.image);
 				profile.gigs = normalizeGigs(user.gigs);
 
-				// only wire watchers once per in-memory doc
 				if (bridged.has(state)) return;
 				bridged.add(state);
 
 				let lock = 0;
 
-				const userName = user.observer.path('name');
-				const userImage = user.observer.path('image');
-				const userGigs = user.observer.path('gigs');
-
-				Observer.all([userName, userImage, userGigs])
+				// user -> profile
+				Observer.all([
+					user.observer.path('name'),
+					user.observer.path('image'),
+					user.observer.path('gigs'),
+				])
 					.throttle(200)
 					.watch(async () => {
 						if (lock) return;
@@ -76,14 +73,6 @@ export default ({ DB }) => {
 						const nextImage = normalizeImage(user.image);
 						const nextGigs = normalizeGigs(user.gigs);
 
-						if (
-							profile.name === nextName &&
-							profile.image === nextImage &&
-							Array.isArray(profile.gigs) &&
-							profile.gigs.length === nextGigs.length &&
-							profile.gigs.every((v, i) => v === nextGigs[i])
-						) return;
-
 						lock++;
 						profile.name = nextName;
 						profile.image = nextImage;
@@ -91,6 +80,29 @@ export default ({ DB }) => {
 						lock--;
 
 						await DB.flush(state);
+					});
+
+				// profile -> user
+				Observer.all([
+					profile.observer.path('name'),
+					profile.observer.path('image'),
+					profile.observer.path('gigs'),
+				])
+					.throttle(200)
+					.watch(async () => {
+						if (lock) return;
+
+						const nextName = normalizeName(profile.name);
+						const nextImage = normalizeImage(profile.image);
+						const nextGigs = normalizeGigs(profile.gigs);
+
+						lock++;
+						user.name = nextName;
+						user.image = nextImage;
+						user.gigs = nextGigs;
+						lock--;
+
+						await DB.flush(user);
 					});
 			},
 		},
