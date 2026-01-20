@@ -1,6 +1,4 @@
 import { Button, Typography, StageContext, Icon, Theme } from 'destamatic-ui';
-import { wsAuthed } from 'destam-web-core/client';
-
 import Paper from '../components/Paper.jsx';
 
 Theme.define({
@@ -26,12 +24,12 @@ const Landing = StageContext.use(s => () => <>
 			<Typography label='A transparent gig platform.' type="h1_bold" style={{ textAlign: 'center', fontSize: 'clamp(2.4rem, 1.8rem + 2.6vw, 5rem)', }} />
 			<Typography label='OpenGig is an open and fair gig platform where anyone can hire or work.' type="h2" style={{ textAlign: 'center' }} />
 			<Button
-				label={<Typography type='h2' style={{ color: 'inherit' }} label={wsAuthed.map(a => a ? 'Enter' : 'Join')} />}
+				label={<Typography type='h2' style={{ color: 'inherit' }} label='Enter' />}
 				type="contained"
 				style={{ borderRadius: 50, marginTop: '20px', padding: 20 }}
 				iconPosition='right'
-				onClick={() => s.open({ name: wsAuthed.get() ? 'home' : 'auth' })}
-				icon={<Icon size={size} name={wsAuthed.map(a => a ? 'feather:log-in' : 'feather:arrow-right')} />}
+				onClick={() => s.open({ name: 'home' })}
+				icon={<Icon size={size} name='feather:arrow-right' />}
 			/>
 		</div>
 
@@ -149,15 +147,14 @@ const Landing = StageContext.use(s => () => <>
 
 			<div theme="column_fill_center" style={{ gap: 12, justifyContent: 'flex-start', flexWrap: 'wrap' }}>
 				<Button
-					label={<Typography type='h2' style={{ color: 'inherit' }} label={wsAuthed.map(a => a ? 'Enter' : 'Join')} />}
+					label={<Typography type='h2' style={{ color: 'inherit' }} label={'Enter'} />}
 					type="contained"
 					style={{ borderRadius: 50, marginTop: '20px', padding: 20 }}
 					iconPosition='right'
-					onClick={() => s.open({ name: wsAuthed.get() ? 'home' : 'auth' })}
-					icon={<Icon size={size} name={wsAuthed.map(a => a ? 'feather:log-in' : 'feather:arrow-right')} />}
+					onClick={() => s.open({ name: 'home'})}
+					icon={<Icon size={size} name='feather:arrow-right' />}
 				/>
 			</div>
-
 		</div>
 	</div>
 </>);
