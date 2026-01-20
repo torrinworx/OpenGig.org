@@ -1,22 +1,17 @@
 export default () => {
     return {
-        onMsg: async (_, __, { DB, database }) => {
+        onMsg: async (_, __, { database }) => {
             const collection = database.collection('gigs');
+
             const recentGigs = await collection.find({})
                 .sort({ 'persistent.createdAt': -1 })
                 .limit(50)
+                .project({ 'persistent.uuid': 1, _id: 0 })
                 .toArray();
 
-            const gigs = {};
-
-            for (const post of recentGigs) {
-                const gig = await DB.reuse('gigs', {
-                    uuid: post.persistent.uuid,
-                });
-                gigs[gig.query.uuid] = gig;
-            }
-
-            return gigs;
+            return recentGigs
+                .map(doc => doc?.persistent?.uuid)
+                .filter(uuid => typeof uuid === 'string' && uuid.length);
         }
     };
 };
