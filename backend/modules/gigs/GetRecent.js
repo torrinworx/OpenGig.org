@@ -1,5 +1,6 @@
 export default () => {
     return {
+        authenticated: false,
         onMsg: async (_, __, { database }) => {
             const collection = database.collection('gigs');
 

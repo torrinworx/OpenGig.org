@@ -1,13 +1,14 @@
-import { StageContext, suspend, LoadingDots, Typography, Button, Icon } from 'destamatic-ui';
+import { StageContext, suspend, Typography, Button, Icon } from 'destamatic-ui';
 
 import { modReq } from 'destam-web-core/client';
 
-const Gig = StageContext.use(stage => suspend(LoadingDots, async () => {
+import NotFound from './NotFound.jsx'
+import Stasis from '../components/Stasis.jsx';
+
+const Gig = StageContext.use(stage => suspend(Stasis, async () => {
 	const gig = await modReq('gigs/Get', { uuid: stage.observer.path('urlProps').get().id })
-	if (gig.error) {
-		stage.open({ name: 'fallback' })
-		return null;
-	};
+	if (gig.error) return NotFound;
+
 	const user = await modReq('users/get', { uuid: gig.user });
 
 	const Tag = ({ each }) => {
@@ -34,7 +35,7 @@ const Gig = StageContext.use(stage => suspend(LoadingDots, async () => {
 			<Tag each={gig.tags} />
 		</div>
 
-		<img src={`/files/${gig?.image?.slice(1)}`} style={{}} />
+		<img src={`/files/${gig?.image?.slice(1)}`}/>
 	</div>;
 }));
 

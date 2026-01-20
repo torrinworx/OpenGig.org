@@ -167,10 +167,10 @@ const stage = {
 	acts: {
 		landing: Landing,
 		auth: Auth,
-		home: authenticate(Home),
+		home: Home,
 		'new-gig': authenticate(NewGig),
-		gig: authenticate(Gig),
-		user: authenticate(User),
+		gig: Gig,
+		user: User,
 		demo: Demo,
 		fallback: NotFound,
 	},

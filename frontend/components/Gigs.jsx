@@ -45,7 +45,7 @@ const Gig = StageContext.use(s => ({ each: gigId, gigsById }) => {
 		theme='gridTile'
 		style={{ position: 'relative' }}
 		isHovered={hovered}
-		onClick={() => s.open({ name: 'gig', urlProps: { id: gigId }, props: { id: gigId } })}
+		onClick={() => s.open({ name: 'gig', urlProps: { id: gigId } })}
 	>
 		<div style={{
 			position: 'absolute',

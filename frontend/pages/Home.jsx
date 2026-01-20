@@ -1,11 +1,12 @@
 import { modReq } from 'destam-web-core/client';
-import { Button, Icon, StageContext, suspend, LoadingDots } from "destamatic-ui";
+import { Button, Icon, StageContext, suspend } from "destamatic-ui";
 
 import SearchBar from '../components/SearchBar.jsx';
 import Gigs from '../components/Gigs.jsx';
+import Stasis from '../components/Stasis.jsx';
 
 const Home = StageContext.use(s => () => {
-	const RecentGigs = suspend(LoadingDots, async () => {
+	const RecentGigs = suspend(Stasis, async () => {
 		const recentIds = await modReq('gigs/GetRecent');
 		return <Gigs gigUuids={recentIds} />;
 	});

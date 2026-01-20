@@ -18,6 +18,7 @@ export default () => {
 				uuid: user.uuid,
 				name: user.name,
 				image: user.image ?? null,
+				gigs: user.gigs,
 			};
 		},
 	};
