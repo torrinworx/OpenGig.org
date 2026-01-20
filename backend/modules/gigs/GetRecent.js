@@ -4,7 +4,7 @@ export default () => {
             const collection = database.collection('gigs');
             const recentGigs = await collection.find({})
                 .sort({ 'persistent.createdAt': -1 })
-                .limit(10)
+                .limit(50)
                 .toArray();
 
             const gigs = {};

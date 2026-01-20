@@ -35,7 +35,7 @@ const Header = StageContext.use(stage => AppContext.use(app => () => {
 				<Button
 					title='Profile'
 					type='text'
-					onClick={() => stage.open({ name: 'user' })}
+					onClick={() => stage.open({ name: 'user', urlProps: { id: app.state.sync.profile.uuid } })}
 					icon={<Icon name='feather:user' size={30} />}
 				/>
 				<Button
