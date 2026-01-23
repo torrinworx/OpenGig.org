@@ -70,6 +70,14 @@ const Header = StageContext.use(stage => AppContext.use(app => () => {
 			/>
 
 			<Hamburger>
+				<Shown value={app.observer.path(['state', 'sync', 'profile', 'role']).map(r => r === 'admin')}>
+					<Button
+						title='Admin'
+						type='text'
+						onClick={() => stage.open({ name: 'admin' })}
+						icon={<Icon name='feather:shield' size={30} />}
+					/>
+				</Shown>
 				<Shown value={current.map(c => c !== 'home')}>
 					<Button
 						title='Home'
