@@ -328,9 +328,9 @@ const Admin = StageContext.use(s =>
 		return <div theme="column_fill_center_contentContainer" style={{ padding: 40, gap: 10 }}>
 			<Typography type="h1" label="Admin" />
 
-			<div theme="row" style={{ gap: 10, alignItems: 'flex-start' }}>
+			<div theme="row_wrap" style={{ gap: 10, alignItems: 'flex-start' }}>
 				{/* Query pane */}
-				<div theme="column" style={{ width: 320, height: 720, gap: 10 }}>
+				<div theme="column" style={{ width: 320, maxHeight: 720, gap: 10 }}>
 					<Typography type="h2" label="Query" />
 					<div theme="divider" />
 
