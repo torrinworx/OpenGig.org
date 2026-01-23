@@ -56,8 +56,6 @@ export default ({ DB }) => {
 				// init: users doc is the master (one-way)
 				profile.uuid = user.uuid;
 				profile.name = normalizeName(user.name);
-				console.log(user)
-				console.log(user.query.role)
 				profile.role = normalizeRole(user.query.role);
 				profile.image = normalizeImage(user.image);
 				profile.gigs = normalizeGigs(user.gigs);
