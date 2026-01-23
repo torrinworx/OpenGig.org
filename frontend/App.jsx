@@ -36,6 +36,8 @@ import Home from './pages/Home.jsx';
 import NewGig from './pages/NewGig.jsx';
 import Gig from './pages/Gig.jsx';
 import User from './pages/User.jsx';
+import ForContractors from './pages/ForContractors.jsx';
+import Admin from './pages/Admin.jsx';
 
 let track;
 
@@ -169,6 +171,8 @@ const stage = {
 		auth: Auth,
 		home: Home,
 		'new-gig': authenticate(NewGig),
+		'for-contractors': ForContractors,
+		admin: authenticate(Admin),
 		gig: Gig,
 		user: User,
 		demo: Demo,
@@ -197,7 +201,9 @@ const inputs = {
 const App = () => <AppContext value={appContext}>
 	<Theme value={theme}>
 		<InputContext value={inputs} >
-			<Icons value={[IconifyIcons]} >
+			<Icons value={[IconifyIcons, {
+				'chevron-down': IconifyIcons('feather:chevron-down'),
+			}]} >
 				<Head>
 					<HeadTags />
 					<StageContext value={stage}>
