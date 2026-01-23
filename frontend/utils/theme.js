@@ -97,12 +97,12 @@ export const theme = OObject({
 	divider: {
 		marginTop: 10,
 		marginBottom: 10,
-		background: '$color_top',
+		background: '$color',
 	},
 
 	divider_secondary: {
 		extends: 'secondary',
-		background: '$color_top',
+		background: '$color_background',
 	},
 });
 
