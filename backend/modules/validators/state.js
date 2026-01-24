@@ -11,13 +11,36 @@ const normalizeImage = (v) => {
 	return null;
 };
 
-const normalizeGigs = (v) => {
-	if (!(v instanceof OArray)) return OArray([]);
-	// keep only string uuids, de-dupe, keep order
-	return OArray([...new Set([...v].filter(x => typeof x === 'string' && x.length))]);
+const normalizeRole = (v) => (v === 'admin' ? 'admin' : null);
+
+// make sure it's an OArray, and return it (possibly replaced ONCE)
+const ensureOArray = (v) => (v instanceof OArray ? v : OArray(Array.isArray(v) ? v : []));
+
+// return a plain JS array of cleaned values
+const cleanGigList = (v) => {
+	const arr = v instanceof OArray ? [...v] : Array.isArray(v) ? v : [];
+	const out = [];
+	const seen = new Set();
+	for (const x of arr) {
+		if (typeof x !== 'string' || !x.length) continue;
+		if (seen.has(x)) continue;
+		seen.add(x);
+		out.push(x);
+	}
+	return out;
 };
 
-const normalizeRole = (v) => (v === 'admin' ? 'admin' : null);
+// mutate target OArray to match cleaned source list, without replacing instance
+const reconcileGigs = (targetOArray, source) => {
+	const next = cleanGigList(source);
+	const cur = [...targetOArray];
+
+	// if already equal, do nothing
+	if (cur.length === next.length && cur.every((v, i) => v === next[i])) return false;
+
+	targetOArray.splice(0, targetOArray.length, ...next);
+	return true;
+};
 
 const bridged = new WeakSet();
 
@@ -27,23 +50,27 @@ export default ({ DB }) => {
 			table: 'state',
 
 			register: async (state) => {
+				// ensure profile is an OObject
 				if (!state.profile) state.profile = OObject({});
 				else if (!(state.profile instanceof OObject)) state.profile = OObject(state.profile);
 
 				const profile = state.profile;
 
+				// ensure base fields exist
 				if (!('uuid' in profile)) profile.uuid = null;
 				if (!('name' in profile)) profile.name = '';
 				if (!('role' in profile)) profile.role = null;
 				if (!('image' in profile)) profile.image = null;
-				if (!('gigs' in profile)) profile.gigs = OArray([]);
+
+				// ensure gigs is an OArray (ONLY replace if it isn't already)
+				profile.gigs = ensureOArray(profile.gigs);
 
 				if ('email' in profile) delete profile.email;
 
+				// normalize scalars
 				profile.name = normalizeName(profile.name);
 				profile.role = normalizeRole(profile.role);
 				profile.image = normalizeImage(profile.image);
-				profile.gigs = normalizeGigs(profile.gigs);
 
 				const userUuid = state.query?.user || profile.uuid;
 				if (typeof userUuid !== 'string' || !userUuid) return;
@@ -53,12 +80,17 @@ export default ({ DB }) => {
 
 				if (!user.uuid) user.uuid = user.query?.uuid || userUuid;
 
-				// init: users doc is the master (one-way)
+				// ensure user's gigs is an OArray too (ONLY replace if needed)
+				user.gigs = ensureOArray(user.gigs);
+
+				// init: users doc is the master
 				profile.uuid = user.uuid;
 				profile.name = normalizeName(user.name);
 				profile.role = normalizeRole(user.query.role);
 				profile.image = normalizeImage(user.image);
-				profile.gigs = normalizeGigs(user.gigs);
+
+				// reconcile gigs in-place (profile.gigs mutated, not replaced)
+				reconcileGigs(profile.gigs, user.gigs);
 
 				if (bridged.has(state)) return;
 				bridged.add(state);
@@ -76,16 +108,12 @@ export default ({ DB }) => {
 					.watch(async () => {
 						if (lock) return;
 
-						const nextName = normalizeName(user.name);
-						const nextRole = normalizeRole(user.query.role);
-						const nextImage = normalizeImage(user.image);
-						const nextGigs = normalizeGigs(user.gigs);
-
 						lock++;
-						profile.name = nextName;
-						profile.role = nextRole;
-						profile.image = nextImage;
-						profile.gigs = nextGigs;
+						profile.name = normalizeName(user.name);
+						profile.role = normalizeRole(user.query.role);
+						profile.image = normalizeImage(user.image);
+
+						reconcileGigs(profile.gigs, user.gigs);
 						lock--;
 
 						await DB.flush(state);
@@ -100,12 +128,9 @@ export default ({ DB }) => {
 					.watch(async () => {
 						if (lock) return;
 
-						const nextName = normalizeName(profile.name);
-						const nextImage = normalizeImage(profile.image);
-
 						lock++;
-						user.name = nextName;
-						user.image = nextImage;
+						user.name = normalizeName(profile.name);
+						user.image = normalizeImage(profile.image);
 						lock--;
 
 						await DB.flush(user);

@@ -57,29 +57,23 @@ const User = AppContext.use(app => StageContext.use(stage =>
 		const authed = !!wsAuthed.get?.();
 		const viewedUuid = stage.urlProps?.id || null;
 
-		if (!authed && !viewedUuid) {
-			return <NotFound />;
-		}
+		if (!authed && !viewedUuid) return <NotFound />;
 
 		const selfProfile = app.state?.sync?.profile;
-		const selfUuid = selfProfile?.uuid || null;
+		const selfUuid = selfProfile?.uuid;
 
 		const isSelf = authed && (
 			!viewedUuid ||
 			(!!selfUuid && viewedUuid === selfUuid)
 		);
 
-		const profile = isSelf
-			? (selfProfile || (app.state.sync.profile = emptyProfile()))
-			: emptyProfile();
+		const profile = isSelf ? selfProfile : emptyProfile();
 
 		if (!isSelf) {
 			try {
 				const data = await modReq('users/get', { uuid: viewedUuid });
 
-				if (!data || data?.error) {
-					return <NotFound />;
-				}
+				if (!data || data?.error) return <NotFound />;
 
 				profile.uuid = data.uuid ?? null;
 				profile.name = data.name ?? '';
@@ -101,10 +95,16 @@ const User = AppContext.use(app => StageContext.use(stage =>
 			.path('image')
 			.map(img => img ? `/files/${img.slice(1)}` : false);
 
-		const gigUuids = isSelf
-			? profile.observer.path('gigs').get()
-			: (profile.gigs || []);
 
+		const uuidCheck = Observer.mutable(false);
+		uuidCheck.watch(() => {
+			if (uuidCheck.get()) {
+				setTimeout(() => {
+					uuidCheck.set(false);
+				}, 5000);
+			}
+		});
+	
 		return <>
 			<div theme="column_center_fill_contentContainer">
 				<div
@@ -268,11 +268,28 @@ const User = AppContext.use(app => StageContext.use(stage =>
 					<Typography type="h2" label={Observer.immutable(nameObs)} />
 				</Shown>
 
+				<Shown value={app.observer.path(['state', 'sync', 'profile', 'role']).map(r => r === 'admin')}>
+					<Button
+						title='Copy users uuid to clipboard.'
+						type='link'
+						iconPosition='right'
+						label={profile.uuid}
+						icon={uuidCheck.map(c => c
+							? <Icon name='feather:check' />
+							: <Icon name='feather:copy' />)}
+						onClick={async () => {
+							uuidCheck.set(true);
+							await navigator.clipboard.writeText(profile.uuid)
+						}}
+						loading={false}
+					/>
+				</Shown>
+
 				<Typography theme='row_fill_start_primary' type='h2' label='Gigs' />
 				<div theme='divider' />
 			</div>
 
-			<Gigs gigUuids={gigUuids} />
+			<Gigs gigUuids={profile.gigs} />
 		</>;
 	})
 ));

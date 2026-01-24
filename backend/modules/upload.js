@@ -79,7 +79,7 @@ export default ({ serverProps, addFile, modImg, DB }) => {
 
 			// ---- Only now persist the file ----
 			const fileId = await addFile({
-				userId: user,
+				user,
 				file: req.file,
 				meta: {
 					ip: req.ip,

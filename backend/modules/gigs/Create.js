@@ -5,8 +5,6 @@ export const deps = ["modStr"];
 export default ({ modStr }) => {
     return {
         onMsg: async ({ type, name, description, tags, image }, __, { user, DB }) => {
-            console.log("CREATE GIG IMAGE: ", image);
-
             if (type !== "offer" && type !== "request") {
                 return { error: "Invalid type. Must be 'offer' or 'request'." };
             }
@@ -57,12 +55,10 @@ export default ({ modStr }) => {
 
             await DB.flush(gig);
 
-            const userStore = await DB.instance(user);
+            if (!(user.gigs instanceof OArray)) user.gigs = OArray([]);
+            user.gigs.push(gig.query.uuid);
 
-            if (!Array.isArray(userStore.gigs)) userStore.gigs = OArray([]);
-            userStore.gigs.push(gig.query.uuid);
-
-            await DB.flush(userStore);
+            await DB.flush(user);
 
             return gig.query.uuid;
         }

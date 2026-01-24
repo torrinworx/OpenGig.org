@@ -21,7 +21,7 @@ const Gig = StageContext.use(stage => suspend(Stasis, async () => {
 		<div theme='column_fill_start'>
 			<Typography type='h1' label={gig.name} />
 			<div theme='row_fill_spread' style={{ gap: 10 }}>
-				<Button type='text' label={user.name} iconPosition='left' icon={<Icon name='feather:user' />} onClick={() => stage.open({ name: 'user', urlProps: { id: gig.user } })} />
+				<Button type='text' label={user?.name ? user.name : 'Unknown'} iconPosition='left' icon={<Icon name='feather:user' />} onClick={() => stage.open({ name: 'user', urlProps: { id: gig.user } })} />
 				<div theme='radius_primary' style={{ background: '$color', padding: 10 }}>
 					<Typography type='p1_bold' style={{ color: '$color_background' }} label={gig.type.charAt(0).toUpperCase() + gig.type.slice(1)} />
 				</div>
@@ -35,7 +35,7 @@ const Gig = StageContext.use(stage => suspend(Stasis, async () => {
 			<Tag each={gig.tags} />
 		</div>
 
-		<img src={`/files/${gig?.image?.slice(1)}`}/>
+		<img src={`/files/${gig?.image?.slice(1)}`} />
 	</div>;
 }));
 

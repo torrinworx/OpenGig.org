@@ -1,4 +1,4 @@
-import { Observer, OArray } from "destam-dom";
+import { Observer } from "destam-dom";
 import { modReq } from 'destam-web-core/client';
 import { Theme, Button, Typography, Icon, StageContext, suspend, LoadingDots, Shown } from "destamatic-ui";
 
@@ -38,7 +38,9 @@ Theme.define({
 });
 
 const Gig = StageContext.use(s => ({ each: gigId, gigsById }) => {
-	const gig = gigsById?.[gigId];
+	// ✅ reactive: updates whenever gigsById changes
+	const gig = gigsById.map(obj => obj?.[gigId] ?? null);
+
 	const hovered = Observer.mutable(false);
 
 	return <Button
@@ -53,11 +55,11 @@ const Gig = StageContext.use(s => ({ each: gigId, gigsById }) => {
 			overflow: 'hidden',
 			borderRadius: 'inherit',
 		}}>
-			<Shown value={gig?.image}>
+			<Shown value={gig.map(g => g?.image)}>
 				<mark:then>
 					<img
-						src={`/files/${gig?.image?.slice(1)}`}
-						alt={`Cover image for gig "${gig?.name || ''}"`}
+						src={gig.map(g => `/files/${(g?.image ?? '').slice(1)}`)}
+						alt={gig.map(g => `Cover image for gig "${g?.name || ''}"`)}
 						style={{
 							width: '100%',
 							height: '100%',
@@ -84,26 +86,36 @@ const Gig = StageContext.use(s => ({ each: gigId, gigsById }) => {
 			boxSizing: 'border-box',
 		}}>
 			<Paper style={{ padding: 4 }}>
-				<Typography type='p1_bold' label={gig?.name || ''} style={{ textAlign: 'left' }} />
+				<Typography
+					type='p1_bold'
+					label={gig.map(g => g?.name || '')}
+					style={{ textAlign: 'left' }}
+				/>
 			</Paper>
 		</div>
 	</Button>;
 });
 
 const Gigs = suspend(LoadingDots, async ({ gigUuids }) => {
-	const ids = Array.isArray(gigUuids) ? gigUuids.filter(Boolean) : [];
-	const gigKeys = OArray(ids);
-	const gigList = await modReq('gigs/Get', { uuids: ids });
+	const gigsById = Observer.mutable({});
 
-	const gigsById = {};
-	for (const g of (Array.isArray(gigList) ? gigList : [])) {
-		if (g?.uuid) gigsById[g.uuid] = g;
-	}
+	const update = async () => {
+		const gigList = await modReq('gigs/Get', { uuids: gigUuids });
+
+		const gigsObj = {};
+		for (const g of (Array.isArray(gigList) ? gigList : [])) {
+			if (g?.uuid) gigsObj[g.uuid] = g;
+		}
+		gigsById.set(gigsObj);
+	};
+
+	gigUuids?.observer?.watch(update);
+
+	await update();
 
 	return <div theme='grid'>
-		<Gig each={gigKeys} gigsById={gigsById} />
+		<Gig each={gigUuids} gigsById={gigsById} />
 	</div>;
 });
-
 
 export default Gigs;

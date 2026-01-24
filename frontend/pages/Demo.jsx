@@ -21,8 +21,11 @@ const Demo = () => {
 		)
 	).map(e => e.default);
 
-	return <div theme='column_fill'>
-		<Paper style={{ width: 500, height: 500 }}><Typography type='h1' label='test' /></Paper>
+	return <div theme='primary_fill' style={{
+		background: '$color_background',
+		height: '100vh',
+		overflowY: 'auto',
+	}}>
 		<ExampleWrapper each:example={example_array} />
 	</div>;
 };
