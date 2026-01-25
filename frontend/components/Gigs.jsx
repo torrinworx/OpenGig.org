@@ -13,6 +13,7 @@ Theme.define({
 		width: "100%",
 		padding: 20,
 	},
+
 	gridTile: {
 		extends: 'radius_primary',
 		aspectRatio: "1 / 1",
@@ -22,6 +23,7 @@ Theme.define({
 		justifySelf: "center",
 		overflow: "hidden",
 	},
+
 	gridMeta: {
 		extends: 'radius_primary',
 		position: 'absolute',
@@ -34,11 +36,24 @@ Theme.define({
 		display: 'flex',
 		flexDirection: 'column',
 		gap: 8,
-	}
+	},
+
+	gig_overlay: {
+		extends: 'primary',
+		position: 'absolute',
+		inset: 0,
+		pointerEvents: 'none',
+		background: '$alpha($color_hover, 0.45)',
+		opacity: 0,
+		transition: 'opacity 120ms ease-in-out',
+	},
+
+	gig_overlay_hovered: {
+		opacity: 1,
+	},
 });
 
 const Gig = StageContext.use(s => ({ each: gigId, gigsById }) => {
-	// ✅ reactive: updates whenever gigsById changes
 	const gig = gigsById.map(obj => obj?.[gigId] ?? null);
 
 	const hovered = Observer.mutable(false);
@@ -46,7 +61,7 @@ const Gig = StageContext.use(s => ({ each: gigId, gigsById }) => {
 	return <Button
 		theme='gridTile'
 		style={{ position: 'relative' }}
-		isHovered={hovered}
+		hover={hovered}
 		onClick={() => s.open({ name: 'gig', urlProps: { id: gigId } })}
 	>
 		<div style={{
@@ -68,6 +83,7 @@ const Gig = StageContext.use(s => ({ each: gigId, gigsById }) => {
 							display: 'block',
 						}}
 					/>
+					<div theme={['gig_overlay', hovered.bool('hovered', null)]} />
 				</mark:then>
 				<mark:else>
 					<div theme='column_fill_center' style={{ width: '100%', height: '100%' }}>
@@ -76,7 +92,6 @@ const Gig = StageContext.use(s => ({ each: gigId, gigsById }) => {
 				</mark:else>
 			</Shown>
 		</div>
-
 		<div style={{
 			position: 'absolute',
 			left: 0,
