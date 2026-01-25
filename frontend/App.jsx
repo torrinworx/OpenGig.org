@@ -126,11 +126,13 @@ const HeadTags = () => {
 	</>;
 };
 
-const appContext = OObject({});
-if (!is_node()) queueMicrotask(async () => {
-	appContext.state = await syncState();
+let appContext;
+if (!is_node()) {
+	appContext = await syncState();
 	appContext.theme = theme;
-});
+}
+
+else appContext = OObject({});
 
 themeSetup(appContext);
 
@@ -140,24 +142,18 @@ const authenticate = (Comp) =>
 	StageContext.use(stage =>
 		AppContext.use(app =>
 			suspend(Stasis, async (props) => {
-				let state = app.state;
-
-				if (!state) {
-					state = await syncState();
-					app.state = state;
+				if (!app) {
+					app = await syncState();
 				}
 
-				// wait until server responds with auth result
-				await state.authKnown.defined(v => v === true);
-
-				if (!state.authed.get()) {
-					queueMicrotask(() => stage.open({ name: 'auth' }));
+				if (!app.authed.get()) {
+					stage.open({ name: 'auth' });
 					return null;
 				}
 
-				// authed, but sync might still be establishing
-				if (!state.sync) {
-					await state.observer.path('sync').defined(v => v != null);
+
+				if (!app.sync) {
+					await app.observer.path('sync').defined(v => v != null);
 				}
 
 				return <Comp {...props} />;
@@ -169,7 +165,7 @@ const stage = {
 	acts: {
 		landing: Landing,
 		auth: Auth,
-		home: Home,
+		home: authenticate(Home),
 		'new-gig': authenticate(NewGig),
 		'for-contractors': ForContractors,
 		admin: authenticate(Admin),

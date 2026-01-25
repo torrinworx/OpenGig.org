@@ -1,4 +1,4 @@
-import { Button, Icon, StageContext, Shown, suspend, Typography, Observer } from 'destamatic-ui';
+import { Button, Icon, StageContext, Shown, suspend, Typography, Observer, Toggle } from 'destamatic-ui';
 import { wsAuthed } from 'destam-web-core/client';
 
 import Hamburger from './Hamburger.jsx';
@@ -13,7 +13,7 @@ const User = StageContext.use(stage => AppContext.use(app =>
 		const current = stage.observer.path('current');
 
 		// stays undefined until sync/profile is populated, which is fine
-		const selfUuid = app.observer.path(['state', 'sync', 'profile', 'uuid']);
+		const selfUuid = app.observer.path(['sync', 'state', 'profile', 'uuid']);
 
 		const showProfile = Observer
 			.all([current, wsAuthed, selfUuid])
@@ -97,7 +97,7 @@ const Header = StageContext.use(stage => AppContext.use(app => () => {
 							style={{ width: '100%' }}
 						/>
 					</Shown>
-					<Shown value={current.map(c => c != 'admin' && app?.state?.sync?.profile?.role === 'admin')} >
+					<Shown value={current.map(c => c != 'admin' && app?.sync?.state?.profile?.role === 'admin')} >
 						<Button
 							title='Admin'
 							label='Admin'
@@ -128,7 +128,7 @@ const Header = StageContext.use(stage => AppContext.use(app => () => {
 								iconPosition='right'
 								type='outlined'
 								onClick={() => {
-									app.state.leave();
+									app.leave();
 									stage.open({ name: 'landing' });
 								}}
 								icon={<Icon name='feather:log-out' size={30} />}
@@ -147,6 +147,7 @@ const Header = StageContext.use(stage => AppContext.use(app => () => {
 							/>
 						</mark:else>
 					</Shown>
+					<Toggle theme='antiPrimary' type='outlined' value={app.observer.path('themeMode')} style={{ padding: 10 }} />
 				</Hamburger>
 			</div>
 		</div >
