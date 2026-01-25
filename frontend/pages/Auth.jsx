@@ -167,7 +167,7 @@ const Auth = StageContext.use(s => suspend(Stasis, async () => {
 					</mark:then>
 
 					<mark:else>
-						<Typography type="h3" label="Enter" />
+						<Typography type="h3" label="Sign In / Sign Up" />
 
 						<TextField
 							onEnter={checkUser}
