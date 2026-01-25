@@ -26,9 +26,12 @@ const User = StageContext.use(stage => AppContext.use(app =>
 		return <Shown value={showProfile}>
 			<Button
 				title='Profile'
-				type='text'
+				label='Profile'
+				iconPosition='right'
+				type='outlined'
 				onClick={() => stage.open({ name: 'user', urlProps: { id: selfUuid.get() } })}
 				icon={<Icon name='feather:user' size={30} />}
+				style={{ width: '100%' }}
 			/>
 		</Shown>;
 	})
@@ -38,7 +41,7 @@ const Header = StageContext.use(stage => AppContext.use(app => () => {
 	const current = stage.observer.path('current');
 
 	return <>
-		<Shown value={current.map(c => c !== 'landing' && c !== 'auth')}>
+		<Shown value={current.map(c => c !== 'landing' && c !== 'auth' && wsAuthed.get())}>
 			<Paper
 				theme="row_fill"
 				style={{
@@ -69,49 +72,84 @@ const Header = StageContext.use(stage => AppContext.use(app => () => {
 				aria-label='OpenGig logo.'
 			/>
 
-			<Hamburger>
-				<Shown value={app.observer.path(['state', 'sync', 'profile', 'role']).map(r => r === 'admin')}>
+			<div theme='row' style={{ gap: 10 }}>
+				<Shown value={wsAuthed} invert>
 					<Button
-						title='Admin'
-						type='text'
-						onClick={() => stage.open({ name: 'admin' })}
-						icon={<Icon name='feather:shield' size={30} />}
-					/>
-				</Shown>
-				<Shown value={current.map(c => c !== 'home')}>
-					<Button
-						title='Home'
-						type='text'
-						onClick={() => stage.open({ name: 'home' })}
-						icon={<Icon name='feather:home' size={30} />}
+						title='Sign Up'
+						label='Sign Up'
+						iconPosition='right'
+						type='contained'
+						onClick={() => stage.open({ name: 'auth' })}
+						icon={<Icon name='feather:user' size={30} />}
+						style={{ width: '100%', borderRadius: 50 }}
 					/>
 				</Shown>
 
-				<User />
-
-				<Shown value={wsAuthed}>
-					<mark:then>
+				<Hamburger>
+					<Shown value={wsAuthed}>
 						<Button
-							title='Log Out'
-							type='text'
-							onClick={() => {
-								app.state.leave();
-								stage.open({ name: 'landing' });
-							}}
-							icon={<Icon name='feather:log-out' size={30} />}
+							title='Create a New Gig'
+							type='contained'
+							label='Create'
+							iconPosition='right'
+							onClick={() => stage.open({ name: 'new-gig' })}
+							icon={<Icon name='feather:plus' size={30} />}
+							style={{ width: '100%' }}
 						/>
-					</mark:then>
-					<mark:else>
+					</Shown>
+					<Shown value={current.map(c => c != 'admin' && app?.state?.sync?.profile?.role === 'admin')} >
 						<Button
-							title='Log In'
-							type='text'
-							onClick={() => stage.open({ name: 'auth' })}
-							icon={<Icon name='feather:log-in' size={30} />}
+							title='Admin'
+							label='Admin'
+							iconPosition='right'
+							type='outlined'
+							onClick={() => stage.open({ name: 'admin' })}
+							icon={<Icon name='feather:shield' size={30} />}
+							style={{ width: '100%' }}
 						/>
-					</mark:else>
-				</Shown>
-			</Hamburger>
-		</div>
+					</Shown>
+					<Shown value={current.map(c => c !== 'home')}>
+						<Button
+							title='Home'
+							type='outlined'
+							label='Home'
+							iconPosition='right'
+							onClick={() => stage.open({ name: 'home' })}
+							icon={<Icon name='feather:home' size={30} />}
+							style={{ width: '100%' }}
+						/>
+					</Shown>
+					<User />
+					<Shown value={wsAuthed}>
+						<mark:then>
+							<Button
+								title='Log Out'
+								label='Log Out'
+								iconPosition='right'
+								type='outlined'
+								onClick={() => {
+									app.state.leave();
+									stage.open({ name: 'landing' });
+								}}
+								icon={<Icon name='feather:log-out' size={30} />}
+								style={{ width: '100%' }}
+							/>
+						</mark:then>
+						<mark:else>
+							<Button
+								title='Log In'
+								label='Log In'
+								iconPosition='right'
+								type='outlined'
+								onClick={() => stage.open({ name: 'auth' })}
+								icon={<Icon name='feather:log-in' size={30} />}
+								style={{ width: '100%' }}
+							/>
+						</mark:else>
+					</Shown>
+				</Hamburger>
+			</div>
+		</div >
 	</>;
 }));
 
