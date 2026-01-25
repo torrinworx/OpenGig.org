@@ -165,7 +165,7 @@ const stage = {
 	acts: {
 		landing: Landing,
 		auth: Auth,
-		home: authenticate(Home),
+		home: Home,
 		'new-gig': authenticate(NewGig),
 		'for-contractors': ForContractors,
 		admin: authenticate(Admin),
