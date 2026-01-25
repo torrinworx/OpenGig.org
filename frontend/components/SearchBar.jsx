@@ -19,12 +19,13 @@ const SearchBar = () => {
 		style={{ background: hovered.bool("$color_hover", '$color'), gap: 5, overflow: 'clip', paddingRight: 5 }}
 	>
 		<TextField
+			disabled
 			type='contained'
 			value={query}
 			style={{ background: 'none', border: 'none', outline: 'none', }}
 			isFocused={focused}
 			isHovered={hovered}
-			placeholder='Search Gigs'
+			placeholder='Search Gigs (TODO)'
 			onKeyDown={e => {
 				if (e.key === 'Enter') {
 					e.preventDefault();
@@ -37,6 +38,7 @@ const SearchBar = () => {
 			}}
 		/>
 		<Button
+			disabled
 			type='text'
 			hover={buttonHovered}
 			round
