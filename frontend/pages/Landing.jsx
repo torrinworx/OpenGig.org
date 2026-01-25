@@ -24,14 +24,24 @@ const Landing = StageContext.use(s => () => <>
 		<div theme='column_fill_center' style={{ gap: 40, margin: '80px 0' }}>
 			<Typography label='A transparent gig platform.' type="h1_bold" style={{ textAlign: 'center', fontSize: 'clamp(2.4rem, 1.8rem + 2.6vw, 5rem)', }} />
 			<Typography label='OpenGig is an open and fair gig platform where anyone can hire or work.' type="h2" style={{ textAlign: 'center' }} />
-			<Button
-				label={<Typography type='h2' style={{ color: 'inherit' }} label='Enter' />}
-				type="contained"
-				style={{ borderRadius: 50, marginTop: '20px', padding: 20 }}
-				iconPosition='right'
-				onClick={() => s.open({ name: 'home' })}
-				icon={<Icon size={size} name='feather:arrow-right' />}
-			/>
+			<div theme='row_fill_center_wrap' style={{ gap: 20 }}>
+				<Button
+					label={<Typography type='h2' style={{ color: 'inherit' }} label='Sign Up' />}
+					type="contained"
+					style={{ borderRadius: 50, marginTop: '20px', padding: 20 }}
+					iconPosition='right'
+					onClick={() => s.open({ name: 'home' })}
+					icon={<Icon size={size} name='feather:user' />}
+				/>
+				<Button
+					label={<Typography type='h2' style={{ color: 'inherit' }} label='Browse' />}
+					type="outlined"
+					style={{ borderRadius: 50, marginTop: '20px', padding: 20 }}
+					iconPosition='right'
+					onClick={() => s.open({ name: 'home' })}
+					icon={<Icon size={size} name='feather:globe' />}
+				/>
+			</div>
 		</div>
 
 		<Typography type="h2" label="Built for fair work and clear pricing." />
@@ -146,14 +156,22 @@ const Landing = StageContext.use(s => () => <>
 			<Typography type="h1_bold" label="Join OpenGig" />
 			<Typography type="h2" style={{ textAlign: 'center' }} label={`OpenGig is still being built. If you join now, you're helping shape what “fair” looks like in practice.`} />
 
-			<div theme="column_fill_center" style={{ gap: 12, justifyContent: 'flex-start', flexWrap: 'wrap' }}>
+			<div theme='row_fill_center_wrap' style={{ gap: 20 }}>
 				<Button
-					label={<Typography type='h2' style={{ color: 'inherit' }} label={'Enter'} />}
+					label={<Typography type='h2' style={{ color: 'inherit' }} label='Sign Up' />}
 					type="contained"
 					style={{ borderRadius: 50, marginTop: '20px', padding: 20 }}
 					iconPosition='right'
-					onClick={() => s.open({ name: 'home'})}
-					icon={<Icon size={size} name='feather:arrow-right' />}
+					onClick={() => s.open({ name: 'home' })}
+					icon={<Icon size={size} name='feather:user' />}
+				/>
+				<Button
+					label={<Typography type='h2' style={{ color: 'inherit' }} label='Browse' />}
+					type="outlined"
+					style={{ borderRadius: 50, marginTop: '20px', padding: 20 }}
+					iconPosition='right'
+					onClick={() => s.open({ name: 'home' })}
+					icon={<Icon size={size} name='feather:globe' />}
 				/>
 			</div>
 		</div>
