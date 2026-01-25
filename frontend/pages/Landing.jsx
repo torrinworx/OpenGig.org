@@ -30,7 +30,7 @@ const Landing = StageContext.use(s => () => <>
 					type="contained"
 					style={{ borderRadius: 50, marginTop: '20px', padding: 20 }}
 					iconPosition='right'
-					onClick={() => s.open({ name: 'home' })}
+					onClick={() => s.open({ name: 'auth' })}
 					icon={<Icon size={size} name='feather:user' />}
 				/>
 				<Button
@@ -162,7 +162,7 @@ const Landing = StageContext.use(s => () => <>
 					type="contained"
 					style={{ borderRadius: 50, marginTop: '20px', padding: 20 }}
 					iconPosition='right'
-					onClick={() => s.open({ name: 'home' })}
+					onClick={() => s.open({ name: 'auth' })}
 					icon={<Icon size={size} name='feather:user' />}
 				/>
 				<Button
