@@ -1,7 +1,7 @@
 export default () => {
 	return {
 		authenticated: false,
-		onMsg: async ({ uuid, uuids }, __, { DB }) => {
+		onMsg: async ({ uuid, uuids }, { DB }) => {
 			const toGigInfo = (gig) => ({
 				uuid: gig.query.uuid,
 				user: gig.query.user,

@@ -1,8 +1,6 @@
 export default () => {
 	return {
-		onMsg: async (props, __, { user, DB }) => {
-			const { table, query, flush = true } = props || {};
-
+		onMsg: async ({ table, query, flush = true }, { user, DB }) => {
 			if (user?.query?.role !== 'admin') {
 				return { error: 'forbidden' };
 			}

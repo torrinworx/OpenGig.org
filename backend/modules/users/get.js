@@ -6,7 +6,7 @@ export default () => {
 	return {
 		authenticated: false,
 
-		onMsg: async ({ uuid } = {}, _, { DB }) => {
+		onMsg: async ({ uuid }, { DB }) => {
 			if (typeof uuid !== 'string' || !uuid.trim()) {
 				return { error: 'Invalid uuid' };
 			}

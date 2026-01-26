@@ -44,7 +44,7 @@ const applyUnset = (root, path) => {
 
 export default () => {
   return {
-    onMsg: async (props, __, { user, DB }) => {
+    onMsg: async (props, { user, DB }) => {
       const { table, query, patch, flush = true, upsert = false, returnDoc = false } = props || {};
 
       if (user?.query?.role !== 'admin') {

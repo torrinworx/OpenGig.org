@@ -1,6 +1,6 @@
 export default () => {
 	return {
-		onMsg: async (_, __, { user, database }) => {
+		onMsg: async (_, { user, database }) => {
 			if (user?.query?.role !== 'admin') {
 				return { error: 'forbidden' };
 			}

@@ -95,8 +95,6 @@ export default ({ serverProps, addFile, modImg, DB }) => {
 				},
 			});
 
-			console.log("UPLOAD IMAGE: ", fileId);
-
 			return res.json(fileId);
 		} catch (err) {
 			console.error("upload error:", err);

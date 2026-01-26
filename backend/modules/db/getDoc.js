@@ -2,7 +2,7 @@ import { stringify } from 'destam-web-core';
 
 export default () => {
 	return {
-		onMsg: async ({ table, query, mode = 'store' }, __, { user, DB, database }) => {
+		onMsg: async ({ table, query, mode = 'store' }, { user, DB, database }) => {
 			if (user?.query?.role !== 'admin') {
 				return { error: 'forbidden' };
 			}

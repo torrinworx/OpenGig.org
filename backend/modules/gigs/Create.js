@@ -4,7 +4,7 @@ export const deps = ["modStr"];
 
 export default ({ modStr }) => {
     return {
-        onMsg: async ({ type, name, description, tags, image }, __, { user, DB }) => {
+        onMsg: async ({ type, name, description, tags, image }, { user, DB }) => {
             if (type !== "offer" && type !== "request") {
                 return { error: "Invalid type. Must be 'offer' or 'request'." };
             }
