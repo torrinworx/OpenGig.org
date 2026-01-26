@@ -38,6 +38,7 @@ import Gig from './pages/Gig.jsx';
 import User from './pages/User.jsx';
 import ForContractors from './pages/ForContractors.jsx';
 import Admin from './pages/Admin.jsx';
+import Chat from './pages/Chat.jsx';
 
 let track;
 
@@ -173,6 +174,7 @@ const stage = {
 		user: User,
 		demo: Demo,
 		fallback: NotFound,
+		chat: authenticate(Chat),
 	},
 	onOpen: () => {
 		window.scrollTo(0, 0);
