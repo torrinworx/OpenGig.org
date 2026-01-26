@@ -1,5 +1,7 @@
-import { Button, TextField, Observer, Typography, StageContext, OObject, OArray } from 'destamatic-ui';
+import { Button, TextField, Observer, Typography, StageContext, suspend } from 'destamatic-ui';
 import AppContext from '../utils/appContext.js';
+
+import Stasis from '../components/Stasis';
 
 const MessageItem = ({ msg }) => <div style={{ padding: 8 }}>
 	<Typography type="p1" label={msg?.get?.() ? msg.get().observer.path('text') : msg.observer.path('text')} />
@@ -12,7 +14,7 @@ const CurrentChat = AppContext.use(app => ({ chatUuid }) => {
 		const text = msgText.get().trim();
 		if (!text) return;
 		msgText.set('');
-		console.log(chatUuid);
+		console.log(chatUuid.get());
 		await app.modReq('chat/CreateMsg', { chatUuid: chatUuid.get(), text });
 	};
 
@@ -30,29 +32,31 @@ const CurrentChat = AppContext.use(app => ({ chatUuid }) => {
 	</div>;
 });
 
-const Chat = AppContext.use(app => StageContext.use(stage => () => {
-	console.log(stage.urlProps)
+const Chat = AppContext.use(app => StageContext.use(stage => suspend(Stasis, async () => {
 	const user = Observer.mutable('');
-	const chatUuid = app.observer.path(['sync', 'currentChat', 'uuid']);
+	app.sync.currentChat.uuid = stage.urlProps.id;
 
-	if (stage?.urlProps?.id) {
-		chatUuid.set(stage.urlProps.id);
-	}
+	const chats = await app.modReq('chat/ListChats');
+	console.log(chats)
 
 	return <>
-		<Typography label={chatUuid.map(v => v || 'no chat yet')} type="p1" />
+		<Typography label={stage.observer.path(['urlProps', 'id']).map(v => v || 'no chat yet')} type="p1" />
 		<TextField placeholder="user uuid" value={user} />
 		<Button
 			type="contained"
 			label="create"
 			onClick={async () => {
-				const res = await app.modReq('chat/CreateChat', { participants: [user.get()] });
-				chatUuid.set(res);
+				const participant = user.get().trim();
+				const participants = participant ? [participant] : [];
+
+				const res = await app.modReq('chat/CreateChat', { participants });
+				console.log(res)
+				stage.open({ name: 'chat', urlProps: { id: res } })
 			}}
 		/>
 
-		<CurrentChat chatUuid={chatUuid} />
+		<CurrentChat chatUuid={stage.observer.path(['urlProps', 'id'])} />
 	</>;
-}));
+})));
 
 export default Chat;

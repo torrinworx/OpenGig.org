@@ -139,7 +139,7 @@ themeSetup(appContext);
 
 window.app = appContext;
 
-const authenticate = (Comp) =>
+const authorize = (Comp) =>
 	StageContext.use(stage =>
 		AppContext.use(app =>
 			suspend(Stasis, async (props) => {
@@ -162,19 +162,52 @@ const authenticate = (Comp) =>
 		)
 	);
 
+const authorizeAdmin = (Comp) =>
+	StageContext.use(stage =>
+		AppContext.use(app =>
+			suspend(Stasis, async (props) => {
+				if (!app) {
+					app = await syncState();
+				}
+
+				if (!app.authed.get()) {
+					stage.open({ name: 'auth' });
+					return null;
+				}
+
+				if (!app.sync) {
+					await app.observer.path('sync').defined(v => v != null);
+				}
+
+				await app.observer
+					.path('sync', 'state', 'profile', 'role')
+					.defined(v => v != null);
+
+				const role = app.sync.state.profile.role;
+
+				if (role !== 'admin') {
+					stage.open({ name: 'home' });
+					return null;
+				}
+
+				return <Comp {...props} />;
+			})
+		)
+	);
+
 const stage = {
 	acts: {
 		landing: Landing,
 		auth: Auth,
 		home: Home,
-		'new-gig': authenticate(NewGig),
+		'new-gig': authorize(NewGig),
 		'for-contractors': ForContractors,
-		admin: authenticate(Admin),
+		admin: authorizeAdmin(Admin),
+		chat: authorize(Chat),
 		gig: Gig,
 		user: User,
 		demo: Demo,
 		fallback: NotFound,
-		chat: authenticate(Chat),
 	},
 	onOpen: () => {
 		window.scrollTo(0, 0);

@@ -119,7 +119,7 @@ const Header = StageContext.use(stage => AppContext.use(app => () => {
 							style={{ width: '100%' }}
 						/>
 					</Shown>
-					<Shown value={current.map(c => c !== 'chat' && wsAuthed.get())}>
+					{/* <Shown value={current.map(c => c !== 'chat' && wsAuthed.get())}>
 						<Button
 							title='Chat'
 							type='outlined'
@@ -129,7 +129,7 @@ const Header = StageContext.use(stage => AppContext.use(app => () => {
 							icon={<Icon name='feather:message-circle' size={30} />}
 							style={{ width: '100%' }}
 						/>
-					</Shown>
+					</Shown> */}
 					<User />
 					<Shown value={wsAuthed}>
 						<mark:then>
