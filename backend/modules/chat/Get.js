@@ -53,6 +53,8 @@ export default () => ({
 
 				const chat = await DB('chats', { uuid: chatUuid });
 
+				if (!chat) return; // TODO: error or something
+
 				const results = await DB.queryAll('messages', { chatUuid });
 				const stores = await Promise.all(results.map(q => DB.instance(q)));
 				stores.forEach(addMsg);

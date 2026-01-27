@@ -19,6 +19,8 @@ import Stasis from '../components/Stasis.jsx';
 import AppContext from '../utils/appContext.js';
 import Gigs from '../components/Gigs.jsx';
 
+import UserProfileCircleImage from '../components/UserProfileCircleImage.jsx';
+
 const FILE_LIMIT = 10 * 1024 * 1024;
 
 const prettyBytes = (bytes = 0) => {
@@ -67,19 +69,15 @@ const User = AppContext.use(app => StageContext.use(stage =>
 			stage.observer?.path(['urlProps', 'id'])?.def(null)
 			?? Observer.mutable(stage.urlProps?.id ?? null);
 
-		// This is the real observer for the self profile (when it exists)
 		const selfProfilePathObs = app.observer
 			.path(['sync', 'state', 'profile'])
 			.def(null);
 
-		// Build a query tuple
 		const queryObs = Observer.all([wsAuthed, viewedUuidObs, selfUuidObs, selfProfilePathObs]);
 
-		// Returns an Observer whose VALUE is another Observer (ref to profile source)
 		const activeProfileRefObs = asyncSwitch(queryObs, async ([authed, viewedUuid, selfUuid, selfProfile]) => {
 			error.set('');
 
-			// not authed and no viewed user => 404
 			if (!authed && !viewedUuid) return Observer.immutable(null);
 
 			const isSelf =
@@ -89,23 +87,18 @@ const User = AppContext.use(app => StageContext.use(stage =>
 				);
 
 			if (isSelf) {
-				// If sync not ready yet, just return null until it is
 				if (!selfProfile) return Observer.immutable(null);
-
-				// IMPORTANT: return the actual chain observer (keeps it fully reactive)
 				return app.observer.path(['sync', 'state', 'profile']);
 			}
 
 			if (!viewedUuid) return Observer.immutable(null);
 
-			// Fetch other profile
 			const data = await modReq('users/get', { uuid: viewedUuid });
 			if (!data || data?.error) return Observer.immutable(null);
 
 			return Observer.immutable(normalizeOtherProfile(data));
 		});
 
-		// Unwrap => Observer resolving to OObject|null
 		const profileObs = activeProfileRefObs.unwrap();
 
 		const canEditObs = Observer.all([wsAuthed, viewedUuidObs, selfUuidObs]).map(([authed, viewedUuid, selfUuid]) => {
@@ -124,7 +117,6 @@ const User = AppContext.use(app => StageContext.use(stage =>
 			{profileObs.map(p => {
 				if (!p) return <NotFound />;
 
-				// These are now ALWAYS derived from the active profile object
 				const nameObs = p.observer.path('name');
 				const editName = Observer.mutable(false);
 				const draftName = Observer.mutable(nameObs.get() ?? '');
@@ -135,70 +127,13 @@ const User = AppContext.use(app => StageContext.use(stage =>
 
 				return <>
 					<div theme="column_center_fill_contentContainer">
-						<div
-							style={{
-								position: 'relative',
-								width: '20vw',
-								maxWidth: 200,
-								minWidth: 150,
-								aspectRatio: '1 / 1',
-								borderRadius: '50%',
-								margin: '0 auto',
-							}}
-						>
-							{imageUrl.map(url => {
-								if (!url) {
-									return (
-										<div
-											theme='primary'
-											style={{
-												width: '20vw',
-												maxWidth: 200,
-												minWidth: 150,
-												aspectRatio: '1 / 1',
-												borderRadius: '50%',
-												overflow: 'hidden',
-												margin: '0 auto',
-												border: '6px solid $color',
-												display: 'flex',
-												alignItems: 'center',
-												justifyContent: 'center',
-											}}
-										>
-											<Icon
-												style={{ color: '$color' }}
-												name="feather:user"
-												size="50%"
-											/>
-										</div>
-									);
-								}
-
-								return <div
-									theme='primary'
-									style={{
-										width: '20vw',
-										maxWidth: 200,
-										minWidth: 150,
-										aspectRatio: '1 / 1',
-										borderRadius: '50%',
-										overflow: 'hidden',
-										margin: '0 auto',
-										border: '6px solid $color',
-									}}
-								>
-									<img
-										src={url}
-										alt="Profile"
-										style={{
-											width: '100%',
-											height: '100%',
-											objectFit: 'cover',
-											display: 'block',
-										}}
-									/>
-								</div>;
-							}).unwrap()}
+						<div style={{ position: 'relative', margin: '0 auto' }}>
+							<UserProfileCircleImage
+								size="20vw"
+								maxSize={200}
+								minSize={150}
+								imageUrl={imageUrl}
+							/>
 
 							<Shown value={canEditObs}>
 								<div style={{ position: 'absolute', right: 10, bottom: 10 }}>
@@ -222,7 +157,6 @@ const User = AppContext.use(app => StageContext.use(stage =>
 												const uploadResult = await uploadSingleFile(file);
 												const imageId = uploadResult?.id ?? uploadResult;
 
-												// write directly to active profile object
 												p.image = imageId;
 
 												return imageId;
@@ -258,7 +192,7 @@ const User = AppContext.use(app => StageContext.use(stage =>
 
 								<Shown value={editName}>
 									<TextField
-										type='outlined'
+										type="outlined"
 										value={draftName}
 										onInput={e => draftName.set(e.target.value)}
 									/>
@@ -297,15 +231,32 @@ const User = AppContext.use(app => StageContext.use(stage =>
 							<Typography type="h2" label={Observer.immutable(nameObs)} />
 						</Shown>
 
+						<Shown value={canEditObs} invert>
+							<Button
+								onClick={async () => {
+									const viewedUuid = viewedUuidObs.get();
+									const selfUuid = selfUuidObs.get();
+
+									if (viewedUuid != selfUuid) {
+										const res = await app.modReq('chat/CreateChat', { participants: [viewedUuid] });
+										stage.open({ name: 'chat', urlProps: { id: res } })
+									}
+								}}
+								label='Message'
+								iconPosition='right'
+								icon={<Icon name="feather:message-circle" />}
+							/>
+						</Shown>
+
 						<Shown value={selfRoleObs.map(r => r === 'admin')}>
 							<Button
-								title='Copy users uuid to clipboard.'
-								type='link'
-								iconPosition='right'
+								title="Copy users uuid to clipboard."
+								type="link"
+								iconPosition="right"
 								label={p.observer.path('uuid')}
 								icon={uuidCheck.map(c => c
-									? <Icon name='feather:check' />
-									: <Icon name='feather:copy' />)}
+									? <Icon name="feather:check" />
+									: <Icon name="feather:copy" />)}
 								onClick={async () => {
 									uuidCheck.set(true);
 									await navigator.clipboard.writeText(p.uuid);
@@ -314,8 +265,8 @@ const User = AppContext.use(app => StageContext.use(stage =>
 							/>
 						</Shown>
 
-						<Typography theme='row_fill_start_primary' type='h2' label='Gigs' />
-						<div theme='divider' />
+						<Typography theme="row_fill_start_primary" type="h2" label="Gigs" />
+						<div theme="divider" />
 					</div>
 
 					<Gigs gigUuids={p.gigs} />
