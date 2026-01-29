@@ -34,7 +34,7 @@ const Gig = AppContext.use(app => StageContext.use(stage => suspend(Stasis, asyn
 			</div>
 		</div>
 
-		<Shown value={app.sync.state.profile.uuid != gig.user}>
+		<Shown value={app?.sync?.state?.profile?.uuid != gig.user}>
 			<div theme='column_fill_contentContainer' style={{ marginTop: 12, gap: 8 }}>
 				<Typography type='h2' label={gig.type === 'offer'
 					? 'Need a quote for this gig offer?'
@@ -44,7 +44,18 @@ const Gig = AppContext.use(app => StageContext.use(stage => suspend(Stasis, asyn
 					type="contained"
 					label="Send"
 					onClick={async () => {
+						if (!app?.sync?.state?.profile?.uuid) {
+							stage.open({ name: 'auth' });
+							return;
+						}
+
 						const res = await app.modReq('chat/CreateChat', { participants: [gig.user] });
+
+						const text = msgText.get().trim();
+						if (text) {
+							await app.modReq('chat/CreateMsg', { chatUuid: res, text });
+						}
+
 						stage.open({ name: 'chat', urlProps: { id: res } });
 					}}
 				/>
