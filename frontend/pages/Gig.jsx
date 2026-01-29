@@ -23,6 +23,22 @@ const Gig = AppContext.use(app => StageContext.use(stage => suspend(Stasis, asyn
 		: 'Hi there! I can offer my services, would you like a quote?'
 	);
 
+	const send = async () => {
+		if (!app?.sync?.state?.profile?.uuid) {
+			stage.open({ name: 'auth' });
+			return;
+		}
+
+		const res = await app.modReq('chat/CreateChat', { participants: [gig.user] });
+
+		const text = msgText.get().trim();
+		if (text) {
+			await app.modReq('chat/CreateMsg', { chatUuid: res, text });
+		}
+
+		stage.open({ name: 'chat', urlProps: { id: res } });
+	};
+
 	return <div theme='column_fill_contentContainer' style={{ gap: 10 }} >
 		<div theme='column_fill_start'>
 			<Typography type='h1' label={gig.name} />
@@ -40,25 +56,15 @@ const Gig = AppContext.use(app => StageContext.use(stage => suspend(Stasis, asyn
 					? 'Need a quote for this gig offer?'
 					: 'Can you fullfill this gig request?'} />
 				<TextArea type='outlined' maxHeight='200' style={{ height: 200 }} value={msgText} placeholder='Message' />
-				<Button
-					type="contained"
-					label="Send"
-					onClick={async () => {
-						if (!app?.sync?.state?.profile?.uuid) {
-							stage.open({ name: 'auth' });
-							return;
-						}
-
-						const res = await app.modReq('chat/CreateChat', { participants: [gig.user] });
-
-						const text = msgText.get().trim();
-						if (text) {
-							await app.modReq('chat/CreateMsg', { chatUuid: res, text });
-						}
-
-						stage.open({ name: 'chat', urlProps: { id: res } });
-					}}
-				/>
+				<div theme='row_fill_center' style={{ gap: 8, marginTop: 12 }}>
+					<Button
+						type='contained'
+						label='Send'
+						iconPosition='right'
+						icon={<Icon name='feather:send' />}
+						onClick={send}
+					/>
+				</div>
 			</div>
 		</Shown>
 		<div theme='divider' />
