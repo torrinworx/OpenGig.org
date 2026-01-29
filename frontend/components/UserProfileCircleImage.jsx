@@ -11,8 +11,6 @@ const UserProfileCircleImage = ({
     ? imageUrl
     : Observer.immutable(imageUrl);
 
-  console.log(urlObs)
-
   const boxStyle = {
     width: size,
     maxWidth: maxSize,

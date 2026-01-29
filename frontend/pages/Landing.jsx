@@ -118,7 +118,7 @@ const Landing = StageContext.use(s => () => <>
 			</Paper>
 		</div>
 
-		<Typography type="h2" label="Principles (short version)" />
+		<Typography type="h2" label="Principles" />
 		<div theme="landing_divider" />
 
 		<div theme="landingCards">

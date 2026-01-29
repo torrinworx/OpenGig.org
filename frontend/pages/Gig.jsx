@@ -1,11 +1,12 @@
-import { StageContext, suspend, Typography, Button, Icon } from 'destamatic-ui';
+import { StageContext, suspend, Typography, Button, Icon, TextArea, Observer, Shown } from 'destamatic-ui';
 
 import { modReq } from 'destam-web-core/client';
 
 import NotFound from './NotFound.jsx'
 import Stasis from '../components/Stasis.jsx';
+import AppContext from '../utils/appContext.js';
 
-const Gig = StageContext.use(stage => suspend(Stasis, async () => {
+const Gig = AppContext.use(app => StageContext.use(stage => suspend(Stasis, async () => {
 	const gig = await modReq('gigs/Get', { uuid: stage.observer.path('urlProps').get().id })
 	if (gig.error) return NotFound;
 
@@ -17,6 +18,11 @@ const Gig = StageContext.use(stage => suspend(Stasis, async () => {
 		</div>;
 	};
 
+	const msgText = Observer.mutable(gig.type === 'offer'
+		? 'Hi there! Could I get a quote for this gig?'
+		: 'Hi there! I can offer my services, would you like a quote?'
+	);
+
 	return <div theme='column_fill_contentContainer' style={{ gap: 10 }} >
 		<div theme='column_fill_start'>
 			<Typography type='h1' label={gig.name} />
@@ -27,6 +33,23 @@ const Gig = StageContext.use(stage => suspend(Stasis, async () => {
 				</div>
 			</div>
 		</div>
+
+		<Shown value={app.sync.state.profile.uuid != gig.user}>
+			<div theme='column_fill_contentContainer' style={{ marginTop: 12, gap: 8 }}>
+				<Typography type='h2' label={gig.type === 'offer'
+					? 'Need a quote for this gig offer?'
+					: 'Can you fullfill this gig request?'} />
+				<TextArea type='outlined' maxHeight='200' style={{ height: 200 }} value={msgText} placeholder='Message' />
+				<Button
+					type="contained"
+					label="Send"
+					onClick={async () => {
+						const res = await app.modReq('chat/CreateChat', { participants: [gig.user] });
+						stage.open({ name: 'chat', urlProps: { id: res } });
+					}}
+				/>
+			</div>
+		</Shown>
 		<div theme='divider' />
 		<Typography type='p1' label={gig.description} />
 		<Typography type='h2' label='Tags' />
@@ -37,6 +60,6 @@ const Gig = StageContext.use(stage => suspend(Stasis, async () => {
 
 		<img src={`/files/${gig?.image?.slice(1)}`} />
 	</div>;
-}));
+})));
 
 export default Gig;

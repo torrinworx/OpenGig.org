@@ -57,10 +57,6 @@ const User = AppContext.use(app => StageContext.use(stage =>
 		const disabled = Observer.mutable(false);
 		const error = Observer.mutable('');
 
-		const selfRoleObs = app.observer
-			.path(['sync', 'state', 'profile', 'role'])
-			.def(null);
-
 		const selfUuidObs = app.observer
 			.path(['sync', 'state', 'profile', 'uuid'])
 			.def(null);
@@ -106,11 +102,6 @@ const User = AppContext.use(app => StageContext.use(stage =>
 			if (!viewedUuid) return true;
 			if (!selfUuid) return false;
 			return viewedUuid === selfUuid;
-		});
-
-		const uuidCheck = Observer.mutable(false);
-		uuidCheck.watch(() => {
-			if (uuidCheck.get()) setTimeout(() => uuidCheck.set(false), 5000);
 		});
 
 		return <>
@@ -245,23 +236,6 @@ const User = AppContext.use(app => StageContext.use(stage =>
 								label='Message'
 								iconPosition='right'
 								icon={<Icon name="feather:message-circle" />}
-							/>
-						</Shown>
-
-						<Shown value={selfRoleObs.map(r => r === 'admin')}>
-							<Button
-								title="Copy users uuid to clipboard."
-								type="link"
-								iconPosition="right"
-								label={p.observer.path('uuid')}
-								icon={uuidCheck.map(c => c
-									? <Icon name="feather:check" />
-									: <Icon name="feather:copy" />)}
-								onClick={async () => {
-									uuidCheck.set(true);
-									await navigator.clipboard.writeText(p.uuid);
-								}}
-								loading={false}
 							/>
 						</Shown>
 
