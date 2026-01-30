@@ -14,6 +14,7 @@ export default () => ({
 		const msg = await DB('messages');
 		msg.query.chatUuid = chatUuid;
 		msg.query.user = user.query.uuid
+		msg.user = user.query.uuid
 		msg.text = String(text);
 		await DB.flush(msg);
 

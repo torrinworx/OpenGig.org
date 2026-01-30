@@ -2,7 +2,6 @@ import { OArray } from 'destam';
 
 export default () => ({
 	onMsg: async ({ participants, title = "New Chat" }, { DB, user }) => {
-		console.log(participants);
 		const list = Array.isArray(participants) ? [...participants] : [participants];
 		if (!list.includes(user.query.uuid)) list.push(user.query.uuid);
 

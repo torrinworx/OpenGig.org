@@ -1,37 +1,35 @@
-import { Button, TextField, Observer, Typography, StageContext, suspend, Icon } from 'destamatic-ui';
+import { Button, TextField, Observer, Typography, StageContext, suspend, Icon, Shown } from 'destamatic-ui';
 import AppContext from '../utils/appContext.js';
 
 import Stasis from '../components/Stasis.jsx';
 import UserProfileCircleImage from '../components/UserProfileCircleImage.jsx';
 
-const MessageItem = ({ msg, imageUrlForUuid, nameForUuid }) => {
-	const m = msg?.get?.() ? msg.get() : msg;
-
-	const senderUuidObs = m.observer.path('user');
-
-	console.log(imageUrlForUuid())
-
+const MessageItem = ({ msg, userIndex }) => {
+	console.log(msg)
+	const user = userIndex.find(u => u.uuid === msg.query.user);
+	console.log(user)
 	return <div theme="row" style={{ padding: 8, gap: 10, alignItems: 'flex-start' }}>
 		<div theme="column" style={{ gap: 4, alignItems: 'center', width: 60 }}>
 			<UserProfileCircleImage
+				imageUrl={`/files/${user.image.slice(1)}`}
 				size="32px"
 				borderWidth={0}
-				imageUrl={senderUuidObs.map(imageUrlForUuid)}
+
 			/>
 			<Typography
 				type="p2"
-				label={senderUuidObs.map(nameForUuid)}
+				label={user.name}
 				style={{ textAlign: 'center', maxWidth: 60 }}
 			/>
 		</div>
 
 		<div theme="column" style={{ gap: 2 }}>
-			<Typography type="p1" label={m.observer.path('text')} />
+			<Typography type="p1" label={msg.observer.path('text')} />
 		</div>
 	</div>;
 };
 
-const CurrentChat = AppContext.use(app => ({ chatUuid, imageUrlForUuid, nameForUuid }) => {
+const CurrentChat = AppContext.use(app => ({ chatUuid, userIndex }) => {
 	const msgText = Observer.mutable('');
 
 	const send = async () => {
@@ -45,13 +43,12 @@ const CurrentChat = AppContext.use(app => ({ chatUuid, imageUrlForUuid, nameForU
 	const hovered = Observer.mutable(false);
 
 	return <div theme='column_fill_contentContainer' style={{ marginTop: 16 }}>
-		<Typography type="h2" label={chatUuid.map(c => `Chat: ${c}`)} />
+		<Typography type="h2" label={app.observer.path(['sync', 'currentChat', 'title'])} />
 
 		<div theme='primary' style={{ marginTop: 12, height: 420, overflowY: 'auto', border: '4px solid $color', borderRadius: 8 }}>
 			<MessageItem
 				each:msg={app.observer.path(['sync', 'currentChat', 'messages'])}
-				imageUrlForUuid={imageUrlForUuid}
-				nameForUuid={nameForUuid}
+				userIndex={userIndex}
 			/>
 		</div>
 
@@ -102,7 +99,6 @@ const Chat = AppContext.use(app => StageContext.use(stage => suspend(Stasis, asy
 		? await app.modReq('chat/GetChats', { uuids: chatUuids })
 		: [];
 
-	// include self + everyone else
 	const userUuids = [...new Set(
 		chats
 			.flatMap(x => x.participants || [])
@@ -113,32 +109,6 @@ const Chat = AppContext.use(app => StageContext.use(stage => suspend(Stasis, asy
 	const userIndex = userUuids.length
 		? await app.modReq('users/get', { uuids: userUuids })
 		: [];
-
-	const selfUuid = app.sync.state.profile.uuid;
-
-	// These two are the key changes: use the reactive profile fields for self
-	const imageUrlForUuid = (uuid) => {
-		if (!uuid) return false;
-
-		if (uuid === selfUuid) {
-			const img = app.observer.path(['sync', 'state', 'profile', 'image']).get();
-			return img ? `/files/${img.slice(1)}` : false;
-		}
-
-		const u = userIndex?.find?.(x => x.uuid === uuid);
-		return u?.image ? `/files/${u.image.slice(1)}` : false;
-	};
-
-	const nameForUuid = (uuid) => {
-		if (!uuid) return '';
-
-		if (uuid === selfUuid) {
-			return app.observer.path(['sync', 'state', 'profile', 'name']).get() || 'You';
-		}
-
-		const u = userIndex?.find?.(x => x.uuid === uuid);
-		return u?.name || uuid;
-	};
 
 	const ChatItem = ({ each }) => {
 		const partSet = new Set(each.participants || []);
@@ -161,21 +131,25 @@ const Chat = AppContext.use(app => StageContext.use(stage => suspend(Stasis, asy
 	return <>
 		<div theme='row_fill_spread'>
 			<div theme='column_fill' style={{ minWidth: 280 }}>
-				{chats.length
-					? <ChatItem each={chats} />
-					: <div theme='column_fill_contentContainer' style={{ padding: 12, gap: 8 }}>
-						<Typography type="h3" label="No chats yet" />
-						<Typography type="p1" label="Create one below to get started." />
-					</div>
-				}
+
+				<Shown value={chats.map(() => chats.length > 0)}>
+					<mark:then>
+						<ChatItem each={chats} />
+					</mark:then>
+					<mark:else>
+						<div theme='column_fill_contentContainer' style={{ padding: 12, gap: 8 }}>
+							<Typography type="h3" label="No chats yet" />
+							<Typography type="p1" label="Create one below to get started." />
+						</div>
+					</mark:else>
+				</Shown>
 			</div>
 
 			{activeChatId.map(id =>
 				id
 					? <CurrentChat
 						chatUuid={stage.observer.path(['urlProps', 'id'])}
-						imageUrlForUuid={imageUrlForUuid}
-						nameForUuid={nameForUuid}
+						userIndex={userIndex}
 					/>
 					: <div theme='column_fill_contentContainer' style={{ marginTop: 16, padding: 12 }}>
 						<Typography type="h2" label="Select a chat" />
