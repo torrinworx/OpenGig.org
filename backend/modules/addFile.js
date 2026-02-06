@@ -1,13 +1,26 @@
-import fs from "fs/promises";
-import path from "path";
-import UUID from "destam/UUID.js";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+// addFile.js (ODB version)
+import fs from 'fs/promises';
+import path from 'path';
+import UUID from 'destam/UUID.js';
+import { OObject } from 'destam';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 
-const ensureDir = async (dir) => {
+const ensureDir = async dir => {
 	await fs.mkdir(dir, { recursive: true });
 };
 
-export default ({ DB }) => {
+const toHexUuid = v => {
+	// keep behavior close to old code: accept UUID-ish inputs
+	if (typeof v === 'string') {
+		const s = v.trim();
+		if (!s) return null;
+		// if someone passed raw hex without '#', make it a UUID string
+		return UUID(s[0] === '#' ? s : `#${s}`).toHex();
+	}
+	return UUID(v).toHex();
+};
+
+export default ({ odb }) => {
 	const s3 = new S3Client({
 		region: process.env.SPACES_REGION,
 		endpoint: process.env.SPACES_ENDPOINT,
@@ -18,8 +31,8 @@ export default ({ DB }) => {
 	});
 
 	return {
-		async int({ userId, file, originalName, mimeType, meta = {} }) {
-			const isProd = process.env.NODE_ENV === "production";
+		async int({ userId, user, file, originalName, mimeType, meta = {} }) {
+			const isProd = process.env.NODE_ENV === 'production';
 
 			let buffer;
 			let size;
@@ -32,7 +45,7 @@ export default ({ DB }) => {
 				} else if (file.path) {
 					buffer = await fs.readFile(file.path);
 				} else {
-					throw new Error("Unsupported file input: stream not handled (pass a Buffer)");
+					throw new Error('Unsupported file input: stream not handled (pass a Buffer)');
 				}
 
 				size = file.size ?? buffer.byteLength;
@@ -43,34 +56,34 @@ export default ({ DB }) => {
 				size = buffer?.byteLength;
 			}
 
-			if (!buffer || typeof size !== "number") {
-				throw new Error("No file data provided (expected Buffer/Uint8Array or multer file object)");
+			if (!buffer || typeof size !== 'number') {
+				throw new Error('No file data provided (expected Buffer/Uint8Array or multer file object)');
 			}
 
-			const userUUID = UUID(userId);
+			const userHex = toHexUuid(userId ?? user);
+			if (!userHex) throw new Error('Missing userId');
 
-			const fileUUID = UUID()
-			const fileId = fileUUID.toHex();
-			const fileIdRaw = fileUUID.rawHex()
+			const fileUUID = UUID();
+			const fileId = fileUUID.toHex();     // "#...."
+			const fileIdRaw = fileUUID.rawHex(); // "...." (no #) for storage key
 
-			const store = await DB("files");
-
+			let storage;
 			if (isProd) {
 				const bucket = process.env.SPACES_BUCKET;
-				if (!bucket) throw new Error("SPACES_BUCKET env var is not set");
+				if (!bucket) throw new Error('SPACES_BUCKET env var is not set');
 
 				await s3.send(
 					new PutObjectCommand({
 						Bucket: bucket,
 						Key: fileIdRaw,
 						Body: buffer,
-						ContentType: inferredMime || "application/octet-stream",
-						ACL: "public-read",
+						ContentType: inferredMime || 'application/octet-stream',
+						ACL: 'public-read',
 					})
 				);
 
-				store.storage = {
-					provider: "spaces",
+				storage = {
+					provider: 'spaces',
 					bucket,
 					fileId,
 					endpoint: process.env.SPACES_ENDPOINT,
@@ -84,33 +97,42 @@ export default ({ DB }) => {
 					const absPath = path.resolve(filesPath, fileIdRaw);
 					await fs.writeFile(absPath, buffer);
 
-					store.storage = {
-						provider: "fs",
+					storage = {
+						provider: 'fs',
 						root: filesPath,
 						fileId,
 						path: absPath,
 					};
 				} else {
-					store.storage = {
-						provider: "none",
-						reason: "FILES_PATH not set; skipping dev write",
+					storage = {
+						provider: 'none',
+						reason: 'FILES_PATH not set; skipping dev write',
 					};
 				}
 			}
 
-			store.query.fileId = fileId;
-			store.query.userId = userUUID.toHex();
-			store.query.uploadedAt = Date.now();
+			const uploadedAt = Date.now();
 
-			store.fileId = fileId;
-			store.userId = userUUID.toHex();
-			store.uploadedAt = new Date().toISOString();
-			store.originalName = inferredOriginal || null;
-			store.mimeType = inferredMime || null;
-			store.size = size;
-			store.meta = meta;
+			// ODB doc (no more store.query.*)
+			const doc = await odb.open({
+				collection: 'files',
+				query: { fileId },
+				value: OObject({
+					fileId,
+					userId: userHex,
+					uploadedAt,               // index-friendly number
+					uploadedAtIso: new Date(uploadedAt).toISOString(),
 
-			await DB.flush(store);
+					originalName: inferredOriginal || null,
+					mimeType: inferredMime || null,
+					size,
+
+					storage,
+					meta,
+				}),
+			});
+
+			await doc.$odb.flush();
 			return fileId;
 		},
 	};
