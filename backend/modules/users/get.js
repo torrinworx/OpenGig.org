@@ -1,45 +1,50 @@
-/* 
-Public user lookup by uuid.
+/*
+Public user lookup by id (new system).
+
+Input:
+- { uuid }   (back-compat name; treated as id)
+- { uuids }  (back-compat name; treated as ids)
+
 Returns:
-- single uuid: { uuid, name, image, gigs } | null | { error }
-- uuids[]: Array<{ uuid, name, image, gigs }> | { error }
+- single: { id, name, image, gigs } | null | { error }
+- many: Array<{ id, name, image, gigs }> | { error }
 */
 export default () => {
 	return {
 		authenticated: false,
 
 		onMsg: async ({ uuid, uuids }, { odb }) => {
+			console.log(uuid);
+
 			const toUserInfo = user => ({
-				uuid: user.uuid,
-				name: user.name,
+				id: user.id ?? user.$odb?.key ?? null,
+				name: user.name ?? '',
 				image: user.image ?? null,
-				gigs: user.gigs,
+				gigs: user.gigs ?? [],
 			});
 
+			const getById = id =>
+				odb.findOne({ collection: 'users', query: { id } });
+
+			// single (back-compat: param name `uuid`)
 			if (typeof uuid === 'string' && uuid.trim()) {
-				const user = await odb.findOne({ collection: 'users', query: { uuid: uuid.trim() } });
+				const id = uuid.trim();
+				const user = await getById(id);
 				if (!user) return null;
 				return toUserInfo(user);
 			}
 
+			// many (back-compat: param name `uuids`)
 			if (Array.isArray(uuids)) {
-				const cleaned = uuids
+				const ids = uuids
 					.filter(u => typeof u === 'string')
 					.map(u => u.trim())
 					.filter(Boolean);
 
-				if (cleaned.length === 0) return { error: 'Invalid uuids' };
+				if (!ids.length) return { error: 'Invalid uuids' };
 
-				// If your ODB supports it efficiently, you could do a single findMany with $in,
-				// but assuming simple query matching, keep it as N lookups.
-				const users = await Promise.all(
-					cleaned.map(async id => {
-						const user = await odb.findOne({ collection: 'users', query: { uuid: id } });
-						return user ? toUserInfo(user) : null;
-					})
-				);
-
-				return users.filter(Boolean);
+				const users = await Promise.all(ids.map(getById));
+				return users.filter(Boolean).map(toUserInfo);
 			}
 
 			return { error: 'Invalid uuid' };

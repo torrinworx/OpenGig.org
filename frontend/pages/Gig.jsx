@@ -10,7 +10,9 @@ const Gig = AppContext.use(app => StageContext.use(stage => suspend(Stasis, asyn
 	const gig = await modReq('gigs/Get', { uuid: stage.observer.path('urlProps').get().id })
 	if (gig.error) return NotFound;
 
+	console.log("THIS IS THE GIG USER: ", gig.user);
 	const user = await modReq('users/get', { uuid: gig.user });
+	console.log("THIS IS THE USER: ", user);
 
 	const Tag = ({ each }) => {
 		return <div theme='radius_primary' style={{ background: '$color', padding: 10 }}>
@@ -24,7 +26,7 @@ const Gig = AppContext.use(app => StageContext.use(stage => suspend(Stasis, asyn
 	);
 
 	const send = async () => {
-		if (!app?.sync?.state?.profile?.uuid) {
+		if (!app?.sync?.state?.profile?.id) {
 			stage.open({ name: 'auth' });
 			return;
 		}
@@ -50,7 +52,7 @@ const Gig = AppContext.use(app => StageContext.use(stage => suspend(Stasis, asyn
 			</div>
 		</div>
 
-		<Shown value={app?.sync?.state?.profile?.uuid != gig.user}>
+		<Shown value={app?.sync?.state?.profile?.id != gig.user}>
 			<div theme='column_fill_contentContainer' style={{ marginTop: 12, gap: 8 }}>
 				<Typography type='h2' label={gig.type === 'offer'
 					? 'Need a quote for this gig offer?'

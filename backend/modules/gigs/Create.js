@@ -4,7 +4,6 @@ export const deps = ['modStr'];
 
 export default ({ modStr }) => ({
     onMsg: async ({ type, name, description, tags, image }, { user, odb }) => {
-        if (!user?.uuid) return { error: 'not_authenticated' };
         if (type !== 'offer' && type !== 'request') return { error: "Invalid type. Must be 'offer' or 'request'." };
 
         if (typeof name !== 'string' || name.length > 40) {
@@ -46,7 +45,7 @@ export default ({ modStr }) => ({
         const gig = await odb.open({
             collection: 'gigs',
             value: OObject({
-                user: user.uuid,
+                user: user.observer.id.toHex(),
                 type,
                 name,
                 description,

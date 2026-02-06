@@ -40,12 +40,11 @@ export default ({ odb }) => ({
 		table: 'state',
 
 		register: async state => {
-			// canonical fields
 			state.profile = ensureOObject(state.profile);
 			const profile = state.profile;
 
-			// ensure profile shape + types (don’t replace instances)
-			if (!('uuid' in profile)) profile.uuid = null;
+			// canonical profile shape
+			if (!('id' in profile)) profile.id = null;
 			if (!('name' in profile)) profile.name = '';
 			if (!('role' in profile)) profile.role = null;
 			if (!('image' in profile)) profile.image = null;
@@ -56,23 +55,28 @@ export default ({ odb }) => ({
 			profile.role = normalizeRole(profile.role);
 			profile.image = normalizeImage(profile.image);
 
-			// state.user is the source of truth for “who is this state for”
-			const userUuid = state.user ?? profile.uuid;
-			if (typeof userUuid !== 'string' || !userUuid) return;
+			// canonical user id comes from state.user (or legacy profile.id)
+			const userId = state.user ?? profile.id;
+			if (typeof userId !== 'string' || !userId) return;
 
-			const user = await odb.findOne({ collection: 'users', query: { uuid: userUuid } });
+			// new system: users are found by index.id
+			const user = await odb.findOne({ collection: 'users', query: { id: userId } });
 			if (!user) return;
 
 			user.gigs = ensureOArray(user.gigs);
 
 			const syncFromUser = () => {
-				profile.uuid = user.uuid ?? userUuid;
+				// new system: user id is the ODB key (or user.id if you also store it in state)
+				const id = user.id ?? user.$odb?.key ?? userId;
+
+				profile.id = id;
 				profile.name = normalizeName(user.name);
 				profile.role = normalizeRole(user.role);
 				profile.image = normalizeImage(user.image);
+
 				reconcileGigs(profile.gigs, user.gigs);
 
-				if (!state.user) state.user = profile.uuid;
+				if (!state.user) state.user = id;
 			};
 
 			const syncToUser = () => {
@@ -80,19 +84,18 @@ export default ({ odb }) => ({
 				user.image = normalizeImage(profile.image);
 			};
 
-			// initial hydrate from user doc
+			// initial hydrate
 			syncFromUser();
 
-			// only bridge once per state instance
 			if (bridged.has(state)) return;
 			bridged.add(state);
 
 			let lock = 0;
 
-			// user -> profile (includes gigs/role/uuid)
+			// user -> profile
 			const stopUserToProfile =
 				Observer.all([
-					user.observer.path('uuid'),
+					user.observer.path('id'),
 					user.observer.path('name'),
 					user.observer.path('role'),
 					user.observer.path('image'),
@@ -108,11 +111,10 @@ export default ({ odb }) => ({
 							lock--;
 						}
 
-						// optional: keep this if you rely on “profile updates immediately persisted”
 						try { await state.$odb.flush(); } catch { }
 					});
 
-			// profile -> user (only allow editing name/image from client profile)
+			// profile -> user (only name/image)
 			const stopProfileToUser =
 				Observer.all([
 					profile.observer.path('name'),

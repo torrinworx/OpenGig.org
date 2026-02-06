@@ -13,7 +13,7 @@ const User = StageContext.use(stage => AppContext.use(app =>
 		const current = stage.observer.path('current');
 
 		// stays undefined until sync/profile is populated, which is fine
-		const selfUuid = app.observer.path(['sync', 'state', 'profile', 'uuid']);
+		const selfUuid = app.observer.path(['sync', 'state', 'profile', 'id']);
 
 		const showProfile = Observer
 			.all([current, wsAuthed, selfUuid])

@@ -58,7 +58,7 @@ const User = AppContext.use(app => StageContext.use(stage =>
 		const error = Observer.mutable('');
 
 		const selfUuidObs = app.observer
-			.path(['sync', 'state', 'profile', 'uuid'])
+			.path(['sync', 'state', 'profile', 'id'])
 			.def(null);
 
 		const viewedUuidObs =
