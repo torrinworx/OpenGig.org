@@ -1,41 +1,39 @@
 export default () => {
 	return {
 		authenticated: false,
-		onMsg: async ({ uuid, uuids }, { DB }) => {
-			const toGigInfo = (gig) => ({
-				uuid: gig.query.uuid,
-				user: gig.query.user,
-				type: gig.type,
-				name: gig.name,
-				description: gig.description,
-				tags: gig.tags,
-				image: gig.image,
-				createdAt: gig.persistent?.createdAt ?? null,
-			});
+		onMsg: async ({ uuid, uuids }, { odb }) => {
+			const toGigInfo = gig => {
+				return ({
+					id: gig.observer.id.toHex(),
+					user: gig.user ?? null,
+					type: gig.type ?? null,
+					name: gig.name ?? null,
+					description: gig.description ?? null,
+					tags: gig.tags ?? null,
+					image: gig.image ?? null,
+					createdAt: gig.createdAt ?? null,
+					modifiedAt: gig.modifiedAt ?? null,
+				})
+			};
 
-			// Single uuid (backwards compatible)
+			const getById = id => odb.findOne({ collection: 'gigs', query: { id } });
+
+			// single
 			if (typeof uuid === 'string' && uuid.length) {
-				const gig = await DB('gigs', { uuid });
-				if (!gig) return { error: "Gig not found." };
+				const gig = await getById(uuid);
+				if (!gig) return { error: 'Gig not found.' };
 				return toGigInfo(gig);
 			}
 
-			// Multiple uuids
+			// many
 			if (Array.isArray(uuids)) {
-				const cleaned = uuids.filter(u => typeof u === 'string' && u.length);
-				if (cleaned.length === 0) return { error: "Invalid uuids." };
-
-				const gigs = await Promise.all(
-					cleaned.map(async (id) => {
-						const gig = await DB('gigs', { uuid: id });
-						return gig ? toGigInfo(gig) : null;
-					})
-				);
-
-				return gigs.filter(Boolean);
+				const ids = uuids.filter(u => typeof u === 'string' && u.length);
+				if (!ids.length) return { error: 'Invalid uuids.' };
+				const gigs = await Promise.all(ids.map(getById));
+				return gigs.filter(Boolean).map(toGigInfo);
 			}
 
-			return { error: "Invalid uuid." };
+			return { error: 'Invalid uuid.' };
 		}
 	};
 };

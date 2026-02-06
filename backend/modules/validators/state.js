@@ -1,27 +1,23 @@
 import { Observer, OObject, OArray } from 'destam';
 
 const normalizeName = v => (typeof v === 'string' ? v.trim() : '');
-
 const normalizeImage = v => {
 	if (v == null) return null;
-	if (typeof v === 'string') {
-		const s = v.trim();
-		return s.length ? s : null;
-	}
-	return null;
+	if (typeof v !== 'string') return null;
+	const s = v.trim();
+	return s.length ? s : null;
 };
-
 const normalizeRole = v => (v === 'admin' ? 'admin' : null);
 
+const ensureOObject = v => (v instanceof OObject ? v : OObject(v && typeof v === 'object' ? v : {}));
 const ensureOArray = v => (v instanceof OArray ? v : OArray(Array.isArray(v) ? v : []));
 
-// return a plain JS array of cleaned values
 const cleanGigList = v => {
 	const arr = v instanceof OArray ? [...v] : Array.isArray(v) ? v : [];
 	const out = [];
 	const seen = new Set();
 	for (const x of arr) {
-		if (typeof x !== 'string' || !x.length) continue;
+		if (typeof x !== 'string' || !x) continue;
 		if (seen.has(x)) continue;
 		seen.add(x);
 		out.push(x);
@@ -29,134 +25,116 @@ const cleanGigList = v => {
 	return out;
 };
 
-// mutate target OArray to match cleaned source list, without replacing instance
-const reconcileGigs = (targetOArray, source) => {
+const reconcileGigs = (target, source) => {
 	const next = cleanGigList(source);
-	const cur = [...targetOArray];
-
+	const cur = [...target];
 	if (cur.length === next.length && cur.every((v, i) => v === next[i])) return false;
-
-	targetOArray.splice(0, targetOArray.length, ...next);
+	target.splice(0, target.length, ...next);
 	return true;
 };
 
 const bridged = new WeakSet();
 
-export default ({ odb }) => {
-	return {
-		validate: {
-			table: 'state',
+export default ({ odb }) => ({
+	validate: {
+		table: 'state',
 
-			register: async state => {
-				// ---- migrate legacy shape -> new shape ----
-				// old system used state.query.user; new system should store state.user
-				if (state?.query && typeof state.query === 'object') {
-					if (!state.user && state.query.user) state.user = state.query.user;
-				}
+		register: async state => {
+			// canonical fields
+			state.profile = ensureOObject(state.profile);
+			const profile = state.profile;
 
-				// ---- ensure profile is an OObject ----
-				if (!state.profile) state.profile = OObject({});
-				else if (!(state.profile instanceof OObject)) state.profile = OObject(state.profile);
+			// ensure profile shape + types (don’t replace instances)
+			if (!('uuid' in profile)) profile.uuid = null;
+			if (!('name' in profile)) profile.name = '';
+			if (!('role' in profile)) profile.role = null;
+			if (!('image' in profile)) profile.image = null;
+			profile.gigs = ensureOArray(profile.gigs);
 
-				const profile = state.profile;
+			// normalize profile scalars
+			profile.name = normalizeName(profile.name);
+			profile.role = normalizeRole(profile.role);
+			profile.image = normalizeImage(profile.image);
 
-				// ensure base fields exist
-				if (!('uuid' in profile)) profile.uuid = null;
-				if (!('name' in profile)) profile.name = '';
-				if (!('role' in profile)) profile.role = null;
-				if (!('image' in profile)) profile.image = null;
+			// state.user is the source of truth for “who is this state for”
+			const userUuid = state.user ?? profile.uuid;
+			if (typeof userUuid !== 'string' || !userUuid) return;
 
-				// ensure gigs is an OArray (ONLY replace if it isn't already)
-				profile.gigs = ensureOArray(profile.gigs);
+			const user = await odb.findOne({ collection: 'users', query: { uuid: userUuid } });
+			if (!user) return;
 
-				// remove email if it exists
-				if ('email' in profile) delete profile.email;
+			user.gigs = ensureOArray(user.gigs);
 
-				// normalize scalars (profile-local)
-				profile.name = normalizeName(profile.name);
-				profile.role = normalizeRole(profile.role);
-				profile.image = normalizeImage(profile.image);
-
-				// ---- resolve user ----
-				const userUuid = state.user || profile.uuid;
-				if (typeof userUuid !== 'string' || !userUuid) return;
-
-				const user = await odb.findOne({ collection: 'users', query: { uuid: userUuid } });
-				if (!user) return;
-
-				// migrate legacy user.query.uuid -> user.uuid if needed
-				if (!user.uuid && user?.query?.uuid) user.uuid = user.query.uuid;
-
-				// ensure user's gigs is an OArray too (ONLY replace if needed)
-				user.gigs = ensureOArray(user.gigs);
-
-				const userRole = normalizeRole(user.role ?? user?.query?.role);
-
-				// init: users doc is the master
-				profile.uuid = user.uuid || userUuid;
+			const syncFromUser = () => {
+				profile.uuid = user.uuid ?? userUuid;
 				profile.name = normalizeName(user.name);
-				profile.role = userRole;
+				profile.role = normalizeRole(user.role);
 				profile.image = normalizeImage(user.image);
-
 				reconcileGigs(profile.gigs, user.gigs);
 
-				// Make sure state.user is actually set going forward
 				if (!state.user) state.user = profile.uuid;
+			};
 
-				if (bridged.has(state)) return;
-				bridged.add(state);
+			const syncToUser = () => {
+				user.name = normalizeName(profile.name);
+				user.image = normalizeImage(profile.image);
+			};
 
-				let lock = 0;
+			// initial hydrate from user doc
+			syncFromUser();
 
-				// user -> profile
-				const stopUserToProfile =
-					Observer.all([
-						user.observer.path('name'),
-						user.observer.path('role'),
-						user.observer.path(['query', 'role']), // legacy
-						user.observer.path('image'),
-						user.observer.path('gigs'),
-					])
-						.throttle(200)
-						.watch(async () => {
-							if (lock) return;
+			// only bridge once per state instance
+			if (bridged.has(state)) return;
+			bridged.add(state);
 
-							lock++;
-							profile.name = normalizeName(user.name);
-							profile.role = normalizeRole(user.role ?? user?.query?.role);
-							profile.image = normalizeImage(user.image);
+			let lock = 0;
 
-							reconcileGigs(profile.gigs, user.gigs);
+			// user -> profile (includes gigs/role/uuid)
+			const stopUserToProfile =
+				Observer.all([
+					user.observer.path('uuid'),
+					user.observer.path('name'),
+					user.observer.path('role'),
+					user.observer.path('image'),
+					user.observer.path('gigs'),
+				])
+					.throttle(200)
+					.watch(async () => {
+						if (lock) return;
+						lock++;
+						try {
+							syncFromUser();
+						} finally {
 							lock--;
+						}
 
-							// old code flushed; keep same behavior
-							try { await state.$odb.flush(); } catch { }
-						});
+						// optional: keep this if you rely on “profile updates immediately persisted”
+						try { await state.$odb.flush(); } catch { }
+					});
 
-				// profile -> user
-				const stopProfileToUser =
-					Observer.all([
-						profile.observer.path('name'),
-						profile.observer.path('image'),
-					])
-						.throttle(200)
-						.watch(async () => {
-							if (lock) return;
-
-							lock++;
-							user.name = normalizeName(profile.name);
-							user.image = normalizeImage(profile.image);
+			// profile -> user (only allow editing name/image from client profile)
+			const stopProfileToUser =
+				Observer.all([
+					profile.observer.path('name'),
+					profile.observer.path('image'),
+				])
+					.throttle(200)
+					.watch(async () => {
+						if (lock) return;
+						lock++;
+						try {
+							syncToUser();
+						} finally {
 							lock--;
+						}
 
-							try { await user.$odb.flush(); } catch { }
-						});
+						try { await user.$odb.flush(); } catch { }
+					});
 
-				// allow validation system to clean up watchers on dispose/remove, todo: universal validator cleanup thing like onCon.
-				return () => {
-					try { stopUserToProfile?.(); } catch { }
-					try { stopProfileToUser?.(); } catch { }
-				};
-			},
+			return () => {
+				try { stopUserToProfile?.(); } catch { }
+				try { stopProfileToUser?.(); } catch { }
+			};
 		},
-	};
-};
+	},
+});

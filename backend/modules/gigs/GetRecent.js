@@ -1,18 +1,19 @@
 export default () => {
     return {
         authenticated: false,
-        onMsg: async (_, { database }) => {
-            const collection = database.collection('gigs');
 
-            const recentGigs = await collection.find({})
-                .sort({ 'persistent.createdAt': -1 })
+        onMsg: async (_, { odb }) => {
+            const col = odb.driver.database.collection('gigs');
+
+            const docs = await col
+                .find({}, { projection: { _id: 0, key: 1 } })
+                .sort({ 'index.createdAt': -1 })
                 .limit(50)
-                .project({ 'persistent.uuid': 1, _id: 0 })
                 .toArray();
 
-            return recentGigs
-                .map(doc => doc?.persistent?.uuid)
-                .filter(uuid => typeof uuid === 'string' && uuid.length);
+            return docs
+                .map(d => d?.key)
+                .filter(id => typeof id === 'string' && id.length);
         }
     };
 };

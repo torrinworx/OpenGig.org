@@ -116,11 +116,11 @@ const Gigs = suspend(LoadingDots, async ({ gigUuids }) => {
 
 	const update = async () => {
 		const gigList = await modReq('gigs/Get', { uuids: gigUuids });
-
 		const gigsObj = {};
-		for (const g of (Array.isArray(gigList) ? gigList : [])) {
-			if (g?.uuid) gigsObj[g.uuid] = g;
+		for (const g of gigList) {
+			gigsObj[g.id] = g;
 		}
+
 		gigsById.set(gigsObj);
 	};
 
