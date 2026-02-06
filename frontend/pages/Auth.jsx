@@ -86,7 +86,6 @@ const Auth = StageContext.use(s => suspend(Stasis, async () => {
 		// wait for reconnect + auth packet
 		await state.authKnown.defined(v => v === true);
 
-		console.log(response)
 		if (state.authed.get()) s.open({ name: 'home' });
 		else error.set('Login failed. Please try again.');
 	};
