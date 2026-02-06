@@ -1,6 +1,8 @@
 import { OObject, OArray } from 'destam';
 import { Obridge } from 'destam-web-core';
 
+export const deps = ['paginate'];
+
 const normalizeTitle = (v) => (typeof v === 'string' ? v.trim() : '');
 
 // Always create a mirror with the same shape for all messages.
@@ -53,7 +55,7 @@ const exposeMsg = (msg, { isOwner, DB }) => {
 			aToB: true,
 			bToA: isOwner,
 			throttle: 50,
-			flushA: isOwner ? () => DB.flush(msg) : null, // flush msg when mirror edits push into msg
+			flushA: isOwner ? () => DB.flush(msg) : null,
 		})
 	);
 
@@ -63,49 +65,53 @@ const exposeMsg = (msg, { isOwner, DB }) => {
 	};
 };
 
-export default () => ({
+export default ({ paginate }) => ({
 	authenticated: false,
-	onCon: async ({ sync, DB, user }) => {
+	onCon: async ({ sync, DB, user, database }) => {
 		const removers = [];
-		const msgRemovers = new Map();
 
 		let removeChatScoped = () => { };
+
+		if (!sync) return;
 
 		sync.currentChat = OObject({
 			uuid: null,
 			messages: OArray([]),
 			title: '',
+
+			// paging control watched by paginate()
+			page: OObject({
+				anchor: null,   // { createdAt, _id } (or null)
+				before: 0,
+				after: 50,
+				follow: true,
+			}),
 		});
-
-		const clearMsgs = () => {
-			for (const r of msgRemovers.values()) r();
-			msgRemovers.clear();
-			sync.currentChat.messages.splice(0, sync.currentChat.messages.length);
-		};
-
-		const addMsg = (msg) => {
-			if (!msg) return;
-
-			const isOwner = msg.query.user === user.query.uuid;
-
-			const { mirror, remove } = exposeMsg(msg, { isOwner, DB });
-			sync.currentChat.messages.push(mirror);
-
-			// key by msg uuid (from real store)
-			msgRemovers.set(msg.query.uuid, remove);
-		};
 
 		removers.push(
 			sync.observer.path(['currentChat', 'uuid']).watch(async () => {
-				clearMsgs();
 				removeChatScoped();
 				removeChatScoped = () => { };
 
 				const chatUuid = sync.currentChat.uuid;
-				if (!chatUuid) return;
+				if (!chatUuid) {
+					sync.currentChat.title = '';
+					sync.currentChat.messages.splice(0, sync.currentChat.messages.length);
+					return;
+				}
 
 				const chat = await DB('chats', { uuid: chatUuid });
-				if (!chat) return;
+				if (!chat) {
+					sync.currentChat.title = '';
+					sync.currentChat.messages.splice(0, sync.currentChat.messages.length);
+					return;
+				}
+
+				// reset paging defaults on chat change
+				sync.currentChat.page.anchor = null;
+				sync.currentChat.page.before = 0;
+				sync.currentChat.page.after = 50;
+				sync.currentChat.page.follow = true;
 
 				if (typeof chat.title !== 'string') chat.title = '';
 				sync.currentChat.title = normalizeTitle(chat.title);
@@ -114,6 +120,7 @@ export default () => ({
 
 				const scoped = [];
 
+				// title bridge
 				scoped.push(
 					Obridge({
 						a: chat.observer.path('title'),
@@ -127,18 +134,46 @@ export default () => ({
 					})
 				);
 
-				const results = await DB.queryAll('messages', { chatUuid });
-				const stores = await Promise.all(results.map(q => DB.instance(q)));
-				stores.forEach(addMsg);
+				// messages paging + watcher lifecycle
+				const removePager = paginate({
+					array: sync.currentChat.messages,
+					signal: sync.currentChat.page.observer,
 
-				scoped.push(
-					chat.observer.watch(async (d) => {
-						if (d.value?.type === 'create') {
-							const msg = await DB('messages', { uuid: d.value.msgUuid });
-							addMsg(msg);
-						}
-					})
-				);
+					mongo: {
+						table: 'messages',
+
+						// IMPORTANT: destam-db mongo driver stores query fields under "persistent"
+						filter: { 'persistent.chatUuid': chatUuid },
+
+						// Use createdAt + _id tiebreak for stable paging
+						sort: { 'persistent.createdAt': -1, _id: -1 },
+						cursorField: 'persistent.createdAt',
+						idField: '_id',
+						keyField: 'persistent.uuid', // add this
+					},
+
+					// simplest invalidate trigger
+					changes: chat.observer.path('seq'),
+
+					middle: async (doc) => {
+						const uuid = doc?.persistent?.uuid;
+						if (!uuid) { console.log('no uuid in doc', doc?._id); return { item: null, remove: () => { } }; }
+
+						const msg = await DB('messages', { uuid });
+						if (!msg) { console.log('DB messages lookup failed for uuid', uuid); return { item: null, remove: () => { } }; }
+
+						const isOwner = msg.query.user === user.query.uuid;
+						const { mirror, remove } = exposeMsg(msg, { isOwner, DB });
+						return { item: mirror, remove };
+					},
+
+					key: (doc) => doc?.persistent?.uuid ?? String(doc?._id),
+
+					throttle: 80,
+					refreshOnChanges: 'follow',
+				});
+
+				scoped.push(removePager);
 
 				removeChatScoped = () => scoped.forEach(r => r());
 			})
@@ -146,7 +181,7 @@ export default () => ({
 
 		removers.push(() => {
 			removeChatScoped();
-			clearMsgs();
+			sync.currentChat.messages.splice(0, sync.currentChat.messages.length);
 		});
 
 		return removers;
