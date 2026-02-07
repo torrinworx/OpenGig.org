@@ -1,7 +1,5 @@
 import { OObject, OArray } from 'destam';
-import { Obridge } from 'destam-web-core';
-
-export const deps = ['paginate'];
+import { Obridge, paginate } from 'destam-web-core';
 
 const normalizeTitle = (v) => (typeof v === 'string' ? v.trim() : '');
 
@@ -69,7 +67,7 @@ const exposeMsg = (msg, { isOwner }) => {
 	};
 };
 
-export default ({ paginate }) => ({
+export default () => ({
 	authenticated: false,
 
 	// remove `database`/`DB` usage; assume you have `odb` on connection now
