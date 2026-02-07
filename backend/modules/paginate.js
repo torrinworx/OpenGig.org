@@ -1,315 +1,323 @@
-// paginate_odb.js
-// Pagination for ODB (mongodb driver) using raw mongo filters on record.index.
+// paginate.js
+// Generic capped window paginator (extend-only).
+// Works with any backend as long as you provide a `source` with keyset methods.
 //
-// Key changes vs old version:
-// - No direct `database.collection(table)` usage from module consumers.
-// - Uses `odb.driver.rawFindOne/rawFindMany` (mongo filter) OR `odb.findMany` (index query).
-// - Items are ODB live OObjects (stable refs) opened through ODB.
-// - Cursor/anchor reads come from `doc` (OObject) instead of `doc.query.*`.
+// Expected record shape (from source):
+//   { key: string, cursor: number, id: string }    // cursor usually createdAt; id breaks ties
 //
-// Assumes your mongodbDriver implements rawFindOne/rawFindMany (your new one does).
+// Expected ordering from source results:
+//   Always return records in chronological order (oldest -> newest).
+//
+// Page signal shape (recommended):
+//   page: OObject({
+//     follow: true,
+//     want: null,        // 'older' | 'newer' | null
+//     pageSize: 50,
+//     cap: 200,
+//     anchor: null,      // optional: {cursor,id} or {id} for jump; used only when follow=false
+//   })
+//
+// Usage pattern:
+//   - scroll near top:    page.want = 'older'
+//   - scroll near bottom: page.want = 'newer' (only if follow=false)
+//   - at bottom:          page.follow = true
+//   - scroll away:        page.follow = false
+//
+// Note: UI should handle scroll-jump compensation when prepending.
 
-const getPath = (obj, path) => {
-	if (!obj) return undefined;
-	if (!path || typeof path !== 'string') return obj?.[path];
-	return path.split('.').reduce((o, k) => o?.[k], obj);
-};
+const noop = () => { };
+const clampInt = (n, d) => (Number.isFinite(n) ? Math.max(0, n | 0) : d);
 
-const isPlainObject = v =>
-	v && typeof v === 'object' && (v.constructor === Object || Object.getPrototypeOf(v) === null);
+export default function paginate({
+	array,               // OArray to append/prepend into
+	signal,              // Observer of the page object (usually page.observer)
+	source,              // { tail, older, newer, around? }
+	attach,              // async (record) => { item, remove? | dispose? } | item
+	changes = null,      // optional Observer (ex: chat.observer.path('seq'))
+	throttle = 80,
 
-// turns {a:{b:1}} into {"a.b":1}
-const withDotNotation = (obj, prefix = '') => {
-	const out = {};
-	for (const [k, v] of Object.entries(obj || {})) {
-		const key = prefix ? `${prefix}.${k}` : k;
-		if (isPlainObject(v)) Object.assign(out, withDotNotation(v, key));
-		else out[key] = v;
-	}
-	return out;
-};
+	// record helpers
+	getKey = r => r?.key,
+	getCursor = r => r?.cursor,
+	getId = r => r?.id,
 
-const opFor = ({ sortDir, want }) => {
-	const desc = sortDir === -1;
-	if (want === 'newer') return desc ? '$gt' : '$lt';
-	return desc ? '$lt' : '$gt';
-};
+	// called when follow=false and new messages arrive (discord-style "new messages" indicator)
+	onNewWhileUnfollowed = null,
+} = {}) {
+	if (!array) throw new Error('paginate requires { array }');
+	if (!signal) throw new Error('paginate requires { signal }');
+	if (!source) throw new Error('paginate requires { source }');
+	if (typeof source.tail !== 'function') throw new Error('paginate: source.tail(limit) required');
+	if (typeof source.older !== 'function') throw new Error('paginate: source.older(beforeTuple, limit) required');
+	if (typeof source.newer !== 'function') throw new Error('paginate: source.newer(afterTuple, limit) required');
+	if (typeof attach !== 'function') throw new Error('paginate requires { attach(record) }');
 
-// Normalizes sort keys from "createdAt" to "index.createdAt" etc.
-const normalizeIndexSort = (sort = {}) => {
-	const out = {};
-	for (const [k, v] of Object.entries(sort)) {
-		out[k.startsWith('index.') ? k : `index.${k}`] = v;
-	}
-	return out;
-};
+	// key -> { item, dispose, cursor, id }
+	const attached = new Map();
+	// ordered keys matching `array` order (oldest -> newest)
+	const orderedKeys = [];
 
-const normalizeCursorField = (cursorField) =>
-	cursorField.startsWith('index.') ? cursorField : `index.${cursorField}`;
+	let req = 0;
+	let disposed = false;
+	let newerAvailable = false;
 
-const normalizeFilterToIndex = (filter = {}) => {
-	// if user already passed index.* keys, keep them
-	const hasIndexPrefix = Object.keys(filter).some(k => k.startsWith('index.'));
-	if (hasIndexPrefix) return filter;
+	const pathWant = typeof signal.path === 'function' ? signal.path('want') : null;
+	const pathFollow = typeof signal.path === 'function' ? signal.path('follow') : null;
 
-	// otherwise treat it as index-query-like object and dot it under index.
-	// ex: { ownerId: 'u1', meta: { projectId:'p1' } } => { 'index.ownerId': 'u1', 'index.meta.projectId': 'p1' }
-	return withDotNotation(filter, 'index');
-};
+	const disposeKey = async (k) => {
+		const rec = attached.get(k);
+		if (!rec) return;
+		attached.delete(k);
+		try { await rec.dispose?.(); } catch { }
+	};
 
-export default function paginateODB({ odb }) {
-	if (!odb) throw new Error('paginateODB requires { odb }');
+	let lastWantKey = null;
 
-	return {
-		int: ({
-			array,                  // OArray to overwrite with current window
-			signal,                 // Observer<{anchor,before,after,follow}>
-			odb: odbSpec = {
-				collection: null,
-				filter: {},           // mongo filter OR "index query object" (we’ll put it under index.*)
-				sort: { createdAt: -1, id: -1 }, // cursor sort; will be applied to record.index.* (id maps to index.id)
-				project: null,        // mongo projection on record (rarely needed)
-				cursorField: 'createdAt', // field on index (ex: createdAt)
-				idField: 'id',        // field on index to disambiguate ties; default index.id (ODB key)
-				keyField: 'id',       // unique identity field on index; typically "id"
-			},
-			middle = async (doc) => ({ item: doc, remove: async () => { await doc?.$odb?.dispose?.(); } }),
-			changes = null,
-			throttle = 80,
-			refreshOnChanges = 'follow',
-			key = (doc) => doc?.id ?? doc?.key ?? doc?.$odb?.key, // doc is OObject
-		} = {}) => {
-			if (!array || !signal) throw new Error('paginate.int requires { array, signal }');
-			if (!odbSpec?.collection) throw new Error('paginate.int requires odb.collection');
+	const wantKeyOf = (want) => {
+		if (!want) return null;
+		if (typeof want === 'string') return want; // 'older' | 'newer'
+		if (typeof want === 'object') {
+			// allow { dir:'older', seq:123 } style commands
+			const dir = want.dir ?? want.want;
+			const seq = want.seq ?? want.at ?? want.ts ?? '';
+			return `${dir}:${seq}`;
+		}
+		return String(want);
+	};
 
-			const collection = odbSpec.collection;
-			const cursorField = normalizeCursorField(odbSpec.cursorField || 'createdAt');
-			const idField = normalizeCursorField(odbSpec.idField || 'id');
-			const keyField = normalizeCursorField(odbSpec.keyField || 'id');
+	const trimToCap = async (cap, dropFrom /* 'start' | 'end' */) => {
+		cap = clampInt(cap, 200);
+		const extra = orderedKeys.length - cap;
+		if (extra <= 0) return;
 
-			const filter = normalizeFilterToIndex(odbSpec.filter || {});
-			const sort = normalizeIndexSort(odbSpec.sort || { createdAt: -1, id: -1 });
-			const project = odbSpec.project;
+		if (dropFrom === 'start') {
+			const dropKeys = orderedKeys.splice(0, extra);
+			array.splice(0, extra);
+			for (const k of dropKeys) await disposeKey(k);
+		} else {
+			const start = orderedKeys.length - extra;
+			const dropKeys = orderedKeys.splice(start, extra);
+			array.splice(array.length - extra, extra);
+			for (const k of dropKeys) await disposeKey(k);
+		}
+	};
 
-			// Active attachments keyed by doc key/id
-			const attached = new Map(); // k -> { item, remove }
-			const detachAll = async () => {
-				for (const { remove } of attached.values()) await remove?.();
-				attached.clear();
-				array.splice(0, array.length);
-			};
+	const boundary = () => {
+		const oldestKey = orderedKeys[0];
+		const newestKey = orderedKeys[orderedKeys.length - 1];
+		const oldest = oldestKey ? attached.get(oldestKey) : null;
+		const newest = newestKey ? attached.get(newestKey) : null;
+		return {
+			oldest: oldest ? { cursor: oldest.cursor, id: oldest.id } : null,
+			newest: newest ? { cursor: newest.cursor, id: newest.id } : null,
+		};
+	};
 
-			let req = 0;
+	const normalizeAttachResult = (res) => {
+		if (!res) return null;
+		// allow attach() to return just an item
+		if (!res.item && res.dispose == null && res.remove == null) {
+			return { item: res, dispose: null };
+		}
+		const dispose = res.dispose ?? res.remove ?? null;
+		return { item: res.item, dispose };
+	};
 
-			const rawFindOne = odb.driver?.rawFindOne;
-			const rawFindMany = odb.driver?.rawFindMany;
-			if (typeof rawFindOne !== 'function' || typeof rawFindMany !== 'function') {
-				throw new Error('paginateODB: requires mongodb driver with rawFindOne/rawFindMany (odb.driver.*)');
+	const attachRecords = async (records, where /* 'prepend' | 'append' */) => {
+		const items = [];
+		const keys = [];
+
+		for (const r of records) {
+			if (disposed) return { items: [], keys: [] };
+
+			const k = getKey(r);
+			if (!k) continue;
+			if (attached.has(k)) continue; // dedupe
+
+			const cursor = getCursor(r);
+			const id = getId(r);
+
+			const myReq = req;
+			const out = normalizeAttachResult(await attach(r));
+			if (disposed || myReq !== req) {
+				// canceled; clean up what we created
+				try { await out?.dispose?.(); } catch { }
+				return { items: [], keys: [] };
+			}
+			if (!out?.item) {
+				try { await out?.dispose?.(); } catch { }
+				continue;
 			}
 
-			const resolveAnchor = async (spec) => {
-				if (spec?.follow) {
-					const rec = await rawFindOne({
-						collection,
-						filter,
-						options: {
-							sort,
-							projection: {
-								_id: 0,
-								key: 1,
-								state_tree: 1,
-								index: 1,
-								...(project ?? {}),
-							},
-						},
-					});
-					if (!rec) return null;
+			attached.set(k, { item: out.item, dispose: out.dispose, cursor, id });
+			items.push(out.item);
+			keys.push(k);
+		}
 
-					const cursor = getPath(rec, cursorField);
-					const id = getPath(rec, idField);
-					if (cursor == null || id == null) return null;
-					return { cursor, id };
-				}
+		if (!keys.length) return { items: [], keys: [] };
 
-				const a = spec?.anchor;
-				if (!a) return null;
+		if (where === 'prepend') {
+			orderedKeys.splice(0, 0, ...keys);
+			array.splice(0, 0, ...items);
+		} else {
+			orderedKeys.push(...keys);
+			array.splice(array.length, 0, ...items);
+		}
 
-				// allow {cursor, id} or {createdAt, id} shapes
-				const cursor = a.cursor ?? a.createdAt;
-				const id = a.id ?? a._id ?? a.key;
-				if (cursor != null && id != null) return { cursor, id };
-
-				// allow anchor lookup by uuid/id string: { uuid: '...' } or { id:'...' }
-				const anchorId = a.uuid ?? a.id;
-				if (typeof anchorId === 'string') {
-					const rec = await rawFindOne({
-						collection,
-						filter: { ...filter, [keyField]: anchorId },
-						options: { projection: { _id: 0, key: 1, index: 1 } },
-					});
-					if (!rec) return null;
-					return { cursor: getPath(rec, cursorField), id: getPath(rec, idField) };
-				}
-
-				return null;
-			};
-
-			const fetchWindowRecords = async (spec) => {
-				const before = Math.max(0, spec?.before ?? 0); // newer
-				const after = Math.max(0, spec?.after ?? 0);   // older
-
-				const sortDir = sort?.[cursorField] ?? -1;
-				const opNewer = opFor({ sortDir, want: 'newer' });
-				const opOlder = opFor({ sortDir, want: 'older' });
-
-				const anchor = await resolveAnchor(spec);
-
-				// No anchor: top page
-				if (!anchor) {
-					const limit = Math.max(0, before + after + 1) || 50;
-					return await rawFindMany({
-						collection,
-						filter,
-						options: {
-							sort,
-							limit,
-							projection: { _id: 0, key: 1, state_tree: 1, index: 1, ...(project ?? {}) },
-						},
-					});
-				}
-
-				// tuple compare (cursorField, idField)
-				const newerFilter = before
-					? {
-						$and: [
-							filter,
-							{
-								$or: [
-									{ [cursorField]: { [opNewer]: anchor.cursor } },
-									{ [cursorField]: anchor.cursor, [idField]: { [opNewer]: anchor.id } },
-								],
-							},
-						],
-					}
-					: null;
-
-				const olderFilter = after
-					? {
-						$and: [
-							filter,
-							{
-								$or: [
-									{ [cursorField]: { [opOlder]: anchor.cursor } },
-									{ [cursorField]: anchor.cursor, [idField]: { [opOlder]: anchor.id } },
-								],
-							},
-						],
-					}
-					: null;
-
-				const [newer, anchorRec, older] = await Promise.all([
-					newerFilter
-						? rawFindMany({
-							collection,
-							filter: newerFilter,
-							options: { sort, limit: before, projection: { _id: 0, key: 1, state_tree: 1, index: 1, ...(project ?? {}) } },
-						})
-						: Promise.resolve([]),
-
-					rawFindOne({
-						collection,
-						filter: { ...filter, [idField]: anchor.id },
-						options: { projection: { _id: 0, key: 1, state_tree: 1, index: 1, ...(project ?? {}) } },
-					}),
-
-					olderFilter
-						? rawFindMany({
-							collection,
-							filter: olderFilter,
-							options: { sort, limit: after, projection: { _id: 0, key: 1, state_tree: 1, index: 1, ...(project ?? {}) } },
-						})
-						: Promise.resolve([]),
-				]);
-
-				const out = [];
-				out.push(...newer);
-				if (anchorRec) out.push(anchorRec);
-				out.push(...older);
-				return out;
-			};
-
-			const reconcile = async () => {
-				const spec = signal.get();
-				const myReq = ++req;
-
-				const records = await fetchWindowRecords(spec);
-				if (myReq !== req) return;
-
-				// open records into live ODB docs
-				const docs = await Promise.all(records.map(rec => odb.driver.findOne({
-					collection,
-					filter: { key: rec.key }, // raw-find by key then open live doc
-				})));
-
-				// odb.driver.findOne returns doc or false; filter out falsy
-				const liveDocs = docs.filter(Boolean);
-
-				const desiredKeys = liveDocs.map(key);
-				const desiredSet = new Set(desiredKeys);
-
-				for (const [k, rec] of attached.entries()) {
-					if (!desiredSet.has(k)) {
-						await rec.remove?.();
-						attached.delete(k);
-					}
-				}
-
-				const items = [];
-				for (const doc of liveDocs) {
-					const k = key(doc);
-					const existing = attached.get(k);
-					if (existing) {
-						items.push(existing.item);
-						continue;
-					}
-
-					const { item, remove } = await middle(doc, { odb, collection });
-					if (myReq !== req) {
-						await remove?.();
-						return;
-					}
-
-					attached.set(k, { item, remove });
-					items.push(item);
-				}
-
-				array.splice(0, array.length, ...items);
-			};
-
-			const stopSignal = signal.throttle(throttle).watch(() => {
-				reconcile().catch(e => console.error('paginate reconcile error:', e));
-			});
-
-			const stopChanges = changes
-				? changes.watch(() => {
-					const spec = signal.get();
-					const should =
-						refreshOnChanges === 'always' ||
-						(refreshOnChanges === 'follow' && spec?.follow) ||
-						refreshOnChanges === true;
-
-					if (!should) return;
-					reconcile().catch(e => console.error('paginate changes reconcile error:', e));
-				})
-				: () => { };
-
-			reconcile().catch(e => console.error('paginate initial reconcile error:', e));
-
-			return () => {
-				stopSignal?.();
-				stopChanges?.();
-				detachAll().catch(() => { });
-			};
-		},
+		return { items, keys };
 	};
+
+	const replaceWithRecords = async (records) => {
+		// full reset (only used for initial / anchor jump)
+		const myReq = req;
+		const oldKeys = orderedKeys.splice(0, orderedKeys.length);
+		array.splice(0, array.length);
+
+		// dispose old
+		for (const k of oldKeys) await disposeKey(k);
+
+		if (disposed || myReq !== req) return;
+		await attachRecords(records, 'append');
+	};
+
+	const fetchInitial = async (spec) => {
+		const pageSize = clampInt(spec?.pageSize, 50);
+		const cap = clampInt(spec?.cap, 200);
+		const limit = Math.min(cap, pageSize);
+
+		// if not following and anchor exists and source supports around(), prefer it
+		if (!spec?.follow && spec?.anchor && typeof source.around === 'function') {
+			return await source.around(spec.anchor, limit);
+		}
+
+		return await source.tail(limit);
+	};
+
+	const step = async (reason /* 'signal' | 'changes' */) => {
+		const spec = signal.get();
+		const pageSize = clampInt(spec?.pageSize, 50);
+		const cap = clampInt(spec?.cap, 200);
+
+		// If follow toggled on (or we get any signal update while follow=true),
+		// snap window back to tail. This keeps the model simple and predictable.
+		if (spec?.follow && reason === 'signal') {
+			lastWantKey = null;
+			newerAvailable = false;
+
+			const records = await fetchInitial(spec);
+			await replaceWithRecords(records);
+			await trimToCap(cap, 'start'); // drop oldest
+			return;
+		}
+
+		// Changes while unfollowed: don't mutate the list, just notify UI
+		// so it can show "new messages" / "scroll to latest".
+		if (!spec?.follow && reason === 'changes') {
+			newerAvailable = true;
+			onNewWhileUnfollowed?.();
+			return;
+		}
+
+		// Initial fill if empty (handles follow=false startup too)
+		if (!orderedKeys.length) {
+			const records = await fetchInitial(spec);
+			await replaceWithRecords(records);
+			await trimToCap(cap, 'start');
+			return;
+		}
+
+		// Follow=true: on changes, fetch newer than newest and append.
+		if (spec?.follow && reason === 'changes') {
+			const { newest } = boundary();
+			if (!newest) return;
+
+			const records = await source.newer(newest, pageSize);
+			await attachRecords(records, 'append');
+			await trimToCap(cap, 'start'); // drop oldest if over cap
+			return;
+		}
+
+		// Manual paging commands
+		const want = spec?.want;
+		const wantKey = wantKeyOf(want);
+
+		// If UI doesn't clear `want`, ignore repeats so we don't spam fetches.
+		if (wantKey && wantKey === lastWantKey) return;
+
+		// Support either 'older' or {dir:'older', seq:...} style
+		const wantDir =
+			typeof want === 'string' ? want :
+				(want && typeof want === 'object' ? (want.dir ?? want.want) : null);
+
+		if (wantDir === 'older') {
+			lastWantKey = wantKey;
+
+			const { oldest } = boundary();
+			if (!oldest) return;
+
+			const records = await source.older(oldest, pageSize);
+			await attachRecords(records, 'prepend');
+			await trimToCap(cap, 'end'); // loading older => drop newest if over cap
+			return;
+		}
+
+		if (wantDir === 'newer') {
+			lastWantKey = wantKey;
+
+			const { newest } = boundary();
+			if (!newest) return;
+
+			newerAvailable = false;
+
+			const records = await source.newer(newest, pageSize);
+			await attachRecords(records, 'append');
+			await trimToCap(cap, 'start'); // loading newer => drop oldest if over cap
+			return;
+		}
+
+		// Optional: anchor jump when follow=false and source supports around().
+		// Only do this on 'signal' changes (not on 'changes' ticks).
+		if (!spec?.follow && spec?.anchor && typeof source.around === 'function' && reason === 'signal') {
+			lastWantKey = null;
+
+			const limit = Math.min(cap, pageSize);
+			const records = await source.around(spec.anchor, limit);
+			await replaceWithRecords(records);
+			await trimToCap(cap, 'start');
+		}
+	};
+
+	const run = (reason) => {
+		const myReq = ++req;
+		Promise.resolve()
+			.then(async () => {
+				if (disposed || myReq !== req) return;
+				await step(reason);
+			})
+			.catch(e => console.error('paginate error:', e));
+	};
+
+	const stopSignal = signal.throttle(throttle).watch(() => run('signal'));
+	const stopChanges = changes ? changes.watch(() => run('changes')) : noop;
+
+	// initial
+	run('signal');
+
+	const stop = () => {
+		disposed = true;
+		stopSignal?.();
+		stopChanges?.();
+
+		(async () => {
+			const keys = orderedKeys.splice(0, orderedKeys.length);
+			array.splice(0, array.length);
+			for (const k of keys) await disposeKey(k);
+			attached.clear();
+		})();
+	};
+
+	// convenience info for UI (optional)
+	stop.getNewerAvailable = () => newerAvailable;
+
+	return stop;
 }
