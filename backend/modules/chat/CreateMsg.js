@@ -1,3 +1,5 @@
+import { OObject } from 'destam';
+
 const pushChange = (chat, change, cap = 200) => {
 	chat.seq = (chat.seq ?? 0) + 1;
 	const evt = { ...change, seq: chat.seq, at: Date.now() };
@@ -7,20 +9,34 @@ const pushChange = (chat, change, cap = 200) => {
 };
 
 export default () => ({
-	onMsg: async ({ chatUuid, text = '' }, { DB, user }) => {
-		const chat = await DB('chats', { uuid: chatUuid });
+	onMsg: async ({ chatId, text = '' }, { odb, user }) => {
+		const userId = user.observer.id.toHex();
+
+		const chat = await odb.findOne({
+			collection: 'chats',
+			query: { id: chatId },
+		});
 		if (!chat) return { error: 'chat_not_found' };
 
-		const msg = await DB('messages');
-		msg.query.chatUuid = chatUuid;
-		msg.query.user = user.query.uuid
-		msg.user = user.query.uuid
-		msg.text = String(text);
-		await DB.flush(msg);
+		// create message doc
+		const msg = await odb.open({
+			collection: 'messages',
+			value: OObject({
+				chatId,
+				userId,
+				text: String(text),
 
-		pushChange(chat, { type: 'create', msgUuid: msg.query.uuid });
-		await DB.flush(chat);
+				createdAt: Date.now(),
+				modifiedAt: Date.now(),
+			}),
+		});
 
-		return { ok: true, msgUuid: msg.query.uuid };
-	}
+		await msg.$odb.flush();
+
+		// bump chat seq + changes so clients can refresh pagination when follow=true
+		pushChange(chat, { type: 'create', msgId: msg.observer.id.toHex() });
+		await chat.$odb.flush();
+
+		return { ok: true, msgId: msg.observer.id.toHex() };
+	},
 });

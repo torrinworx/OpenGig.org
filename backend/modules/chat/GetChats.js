@@ -1,28 +1,32 @@
 export default () => {
 	return {
-		onMsg: async ({ uuid, uuids }, { DB }) => {
+		onMsg: async ({ id, ids }, { odb }) => {
+			if (!odb) throw new Error('chat/GetChats requires ctx.odb');
+
 			const toChatInfo = (chat) => ({
-				uuid: chat.query.uuid,
-				creator: chat.query.creator,
+				id: chat.id ?? chat.$odb.key,
+				creatorId: chat.creatorId,
 				title: chat.title,
-				participants: chat.query.participants,
-				createdAt: chat.query.createdAt,
-				modifiedAt: chat.query.modifiedAt,
+				participants: chat.participants,
+				createdAt: chat.createdAt,
+				modifiedAt: chat.modifiedAt,
 			});
 
-			if (typeof uuid === 'string' && uuid.length) {
-				const chat = await DB('chats', { uuid });
-				if (!chat) return { error: "Chat not found." };
+			// single
+			if (typeof id === 'string' && id.length) {
+				const chat = await odb.findOne({ collection: 'chats', query: { id } });
+				if (!chat) return { error: 'Chat not found.' };
 				return toChatInfo(chat);
 			}
 
-			if (Array.isArray(uuids)) {
-				const cleaned = uuids.filter(u => typeof u === 'string' && u.length);
-				if (cleaned.length === 0) return { error: "Invalid uuids." };
+			// many
+			if (Array.isArray(ids)) {
+				const cleaned = ids.filter(v => typeof v === 'string' && v.length);
+				if (cleaned.length === 0) return { error: 'Invalid ids.' };
 
 				const chats = await Promise.all(
-					cleaned.map(async (id) => {
-						const chat = await DB('chats', { uuid: id });
+					cleaned.map(async (cid) => {
+						const chat = await odb.findOne({ collection: 'chats', query: { id: cid } });
 						return chat ? toChatInfo(chat) : null;
 					})
 				);
@@ -30,7 +34,7 @@ export default () => {
 				return chats.filter(Boolean);
 			}
 
-			return { error: "Invalid uuid." };
-		}
+			return { error: 'Invalid id.' };
+		},
 	};
 };

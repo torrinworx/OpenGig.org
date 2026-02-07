@@ -1,4 +1,3 @@
-// upload.js (ODB version)
 import multer from 'multer';
 import cookieParser from 'cookie-parser';
 

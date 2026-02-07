@@ -14,8 +14,6 @@ export default () => {
 		authenticated: false,
 
 		onMsg: async ({ uuid, uuids }, { odb }) => {
-			console.log(uuid);
-
 			const toUserInfo = user => ({
 				id: user.id ?? user.$odb?.key ?? null,
 				name: user.name ?? '',

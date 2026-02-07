@@ -10,9 +10,7 @@ const Gig = AppContext.use(app => StageContext.use(stage => suspend(Stasis, asyn
 	const gig = await modReq('gigs/Get', { uuid: stage.observer.path('urlProps').get().id })
 	if (gig.error) return NotFound;
 
-	console.log("THIS IS THE GIG USER: ", gig.user);
 	const user = await modReq('users/get', { uuid: gig.user });
-	console.log("THIS IS THE USER: ", user);
 
 	const Tag = ({ each }) => {
 		return <div theme='radius_primary' style={{ background: '$color', padding: 10 }}>

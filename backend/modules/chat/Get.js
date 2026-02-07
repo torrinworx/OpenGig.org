@@ -5,49 +5,53 @@ export const deps = ['paginate'];
 
 const normalizeTitle = (v) => (typeof v === 'string' ? v.trim() : '');
 
+// New ODB world notes:
+// - no `query` / `persistent` nesting anymore
+// - messages/chats are plain ODB docs (OObject) with index fields mirroring top-level where needed
+// - we should use doc.$odb.flush() instead of DB.flush(doc)
+// - paginate.js (ODB version) returns live ODB docs already, so middle(doc) gets the actual message doc
+
 // Always create a mirror with the same shape for all messages.
-// query fields: msg -> mirror (read-only)
+// id fields: msg -> mirror (read-only)
 // text: msg <-> mirror if owner, else msg -> mirror
-const exposeMsg = (msg, { isOwner, DB }) => {
+const exposeMsg = (msg, { isOwner }) => {
 	const mirror = OObject({
-		query: OObject({
-			uuid: null,
-			user: null,
-			chatUuid: null,
-			createdAt: null,
-			modifiedAt: null,
-		}),
+		id: null,
+		userId: null,
+		chatId: null,
+		createdAt: null,
+		modifiedAt: null,
 		text: '',
 	});
 
-	// set initial values immediately (don’t rely on bridge initial push)
-	mirror.query.uuid = msg?.query?.uuid ?? null;
-	mirror.query.user = msg?.query?.user ?? null;
-	mirror.query.chatUuid = msg?.query?.chatUuid ?? null;
-	mirror.query.createdAt = msg?.query?.createdAt ?? null;
-	mirror.query.modifiedAt = msg?.query?.modifiedAt ?? null;
+	// initial values
+	mirror.id = msg?.id ?? msg?.$odb?.key ?? null;
+	mirror.userId = msg?.userId ?? null;
+	mirror.chatId = msg?.chatId ?? null;
+	mirror.createdAt = msg?.createdAt ?? null;
+	mirror.modifiedAt = msg?.modifiedAt ?? null;
 	mirror.text = msg?.text ?? '';
 
 	const removers = [];
 
-	// route query fields (read-only)
+	// read-only field bridges
 	removers.push(
-		Obridge({ a: msg.observer.path(['query', 'uuid']), b: mirror.query.observer.path('uuid'), aToB: true, bToA: false })
+		Obridge({ a: msg.observer.path('id'), b: mirror.observer.path('id'), aToB: true, bToA: false })
 	);
 	removers.push(
-		Obridge({ a: msg.observer.path(['query', 'user']), b: mirror.query.observer.path('user'), aToB: true, bToA: false })
+		Obridge({ a: msg.observer.path('userId'), b: mirror.observer.path('userId'), aToB: true, bToA: false })
 	);
 	removers.push(
-		Obridge({ a: msg.observer.path(['query', 'chatUuid']), b: mirror.query.observer.path('chatUuid'), aToB: true, bToA: false })
+		Obridge({ a: msg.observer.path('chatId'), b: mirror.observer.path('chatId'), aToB: true, bToA: false })
 	);
 	removers.push(
-		Obridge({ a: msg.observer.path(['query', 'createdAt']), b: mirror.query.observer.path('createdAt'), aToB: true, bToA: false })
+		Obridge({ a: msg.observer.path('createdAt'), b: mirror.observer.path('createdAt'), aToB: true, bToA: false })
 	);
 	removers.push(
-		Obridge({ a: msg.observer.path(['query', 'modifiedAt']), b: mirror.query.observer.path('modifiedAt'), aToB: true, bToA: false })
+		Obridge({ a: msg.observer.path('modifiedAt'), b: mirror.observer.path('modifiedAt'), aToB: true, bToA: false })
 	);
 
-	// route text (two-way only for owner)
+	// text bridge (two-way only for owner)
 	removers.push(
 		Obridge({
 			a: msg.observer.path('text'),
@@ -55,7 +59,7 @@ const exposeMsg = (msg, { isOwner, DB }) => {
 			aToB: true,
 			bToA: isOwner,
 			throttle: 50,
-			flushA: isOwner ? () => DB.flush(msg) : null,
+			flushA: isOwner ? () => msg.$odb.flush() : null,
 		})
 	);
 
@@ -67,21 +71,22 @@ const exposeMsg = (msg, { isOwner, DB }) => {
 
 export default ({ paginate }) => ({
 	authenticated: false,
-	onCon: async ({ sync, DB, user, database }) => {
-		const removers = [];
 
+	// remove `database`/`DB` usage; assume you have `odb` on connection now
+	onCon: async ({ sync, odb, user }) => {
+		const removers = [];
 		let removeChatScoped = () => { };
 
 		if (!sync) return;
 
 		sync.currentChat = OObject({
-			uuid: null,
+			id: null,
 			messages: OArray([]),
 			title: '',
 
 			// paging control watched by paginate()
 			page: OObject({
-				anchor: null,   // { createdAt, _id } (or null)
+				anchor: null, // { cursor, id } or null (see paginate_odb.js)
 				before: 0,
 				after: 50,
 				follow: true,
@@ -89,38 +94,40 @@ export default ({ paginate }) => ({
 		});
 
 		removers.push(
-			sync.observer.path(['currentChat', 'uuid']).watch(async () => {
+			sync.observer.path(['currentChat', 'id']).watch(async () => {
 				removeChatScoped();
 				removeChatScoped = () => { };
 
-				const chatUuid = sync.currentChat.uuid;
-				if (!chatUuid) {
+				const chatId = sync.currentChat.id; // ✅ use the field, not observer.id
+				if (!chatId) {
 					sync.currentChat.title = '';
 					sync.currentChat.messages.splice(0, sync.currentChat.messages.length);
 					return;
 				}
 
-				const chat = await DB('chats', { uuid: chatUuid });
+				const chat = await odb.findOne({
+					collection: 'chats',
+					query: { id: chatId },
+				});
+
 				if (!chat) {
 					sync.currentChat.title = '';
 					sync.currentChat.messages.splice(0, sync.currentChat.messages.length);
 					return;
 				}
 
-				// reset paging defaults on chat change
 				sync.currentChat.page.anchor = null;
 				sync.currentChat.page.before = 0;
 				sync.currentChat.page.after = 50;
 				sync.currentChat.page.follow = true;
 
-				if (typeof chat.title !== 'string') chat.title = '';
-				sync.currentChat.title = normalizeTitle(chat.title);
+				sync.currentChat.title = normalizeTitle(chat.title ?? '');
 
-				const isCreator = chat.query.creator === user.query.uuid;
+				const userId = user.observer.id.toHex();
+				const isCreator = chat.creatorId === userId;
 
 				const scoped = [];
 
-				// title bridge
 				scoped.push(
 					Obridge({
 						a: chat.observer.path('title'),
@@ -130,50 +137,44 @@ export default ({ paginate }) => ({
 						normalizeA: normalizeTitle,
 						normalizeB: normalizeTitle,
 						throttle: 150,
-						flushA: isCreator ? () => DB.flush(chat) : null,
+						flushA: isCreator ? () => chat.$odb.flush() : null,
 					})
 				);
 
-				// messages paging + watcher lifecycle
 				const removePager = paginate({
 					array: sync.currentChat.messages,
 					signal: sync.currentChat.page.observer,
 
-					mongo: {
-						table: 'messages',
-
-						// IMPORTANT: destam-db mongo driver stores query fields under "persistent"
-						filter: { 'persistent.chatUuid': chatUuid },
-
-						// Use createdAt + _id tiebreak for stable paging
-						sort: { 'persistent.createdAt': -1, _id: -1 },
-						cursorField: 'persistent.createdAt',
-						idField: '_id',
-						keyField: 'persistent.uuid', // add this
+					odb: {
+						collection: 'messages',
+						filter: { chatId },
+						sort: { createdAt: -1, id: -1 },
+						cursorField: 'createdAt',
+						idField: 'id',
+						keyField: 'id',
 					},
 
-					// simplest invalidate trigger
 					changes: chat.observer.path('seq'),
 
-					middle: async (doc) => {
-						const uuid = doc?.persistent?.uuid;
-						if (!uuid) { console.log('no uuid in doc', doc?._id); return { item: null, remove: () => { } }; }
-
-						const msg = await DB('messages', { uuid });
-						if (!msg) { console.log('DB messages lookup failed for uuid', uuid); return { item: null, remove: () => { } }; }
-
-						const isOwner = msg.query.user === user.query.uuid;
-						const { mirror, remove } = exposeMsg(msg, { isOwner, DB });
-						return { item: mirror, remove };
+					middle: async (msg) => {
+						const isOwner = msg.userId === userId;
+						const { mirror, remove } = exposeMsg(msg, { isOwner });
+						return {
+							item: mirror,
+							remove: async () => {
+								remove?.();
+								await msg.$odb.dispose();
+							}
+						};
 					},
 
-					key: (doc) => doc?.persistent?.uuid ?? String(doc?._id),
-
-					throttle: 80,
-					refreshOnChanges: 'follow',
+					key: (msg) => msg.id ?? msg.$odb.key,
 				});
 
 				scoped.push(removePager);
+
+				// also dispose chat doc when switching chats
+				scoped.push(async () => { try { await chat.$odb.dispose(); } catch { } });
 
 				removeChatScoped = () => scoped.forEach(r => r());
 			})

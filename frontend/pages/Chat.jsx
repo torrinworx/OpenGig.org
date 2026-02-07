@@ -1,20 +1,35 @@
-import { Button, TextField, Observer, Typography, StageContext, suspend, Icon, Shown, ThemeContext } from 'destamatic-ui';
+import {
+	Button,
+	TextField,
+	Observer,
+	Typography,
+	StageContext,
+	suspend,
+	Shown,
+	ThemeContext,
+} from 'destamatic-ui';
+
 import AppContext from '../utils/appContext.js';
 import Stasis from '../components/Stasis.jsx';
 import UserProfileCircleImage from '../components/UserProfileCircleImage.jsx';
 
+const hexId = (thing) => thing?.observer?.id?.toHex?.() ?? null;
+
 const MessageItem = ({ msg, userIndex }) => {
-	if (!msg) return null;
+	console.log('msg', msg)
+	if (!msg) return null; 
 
-	const userUuid = msg?.query?.user;
-	const user = (Array.isArray(userIndex) ? userIndex : []).find(u => u.uuid === userUuid);
+	// new format
+	const userId = msg?.userId;
+	const user = (Array.isArray(userIndex) ? userIndex : []).find(u => u.id === userId);
 
+	console.log(user);
 	return <div theme="row" style={{ padding: 8, gap: 10, alignItems: 'flex-start' }}>
 		<div theme="column" style={{ gap: 4, alignItems: 'center', width: 60 }}>
 			<UserProfileCircleImage
 				imageUrl={user?.image ? `/files/${user.image.slice(1)}` : null}
 				size="32px"
-				borderWidth={0}
+				borderWidth={2}
 			/>
 			<Typography
 				type="p2"
@@ -30,7 +45,7 @@ const MessageItem = ({ msg, userIndex }) => {
 };
 
 const CurrentChat = ThemeContext.use(h => AppContext.use(app => (props, cleanup, mounted) => {
-	const { chatUuid, userIndex } = props;
+	const { chatId, userIndex } = props;
 
 	const msgText = Observer.mutable('');
 
@@ -41,9 +56,6 @@ const CurrentChat = ThemeContext.use(h => AppContext.use(app => (props, cleanup,
 	const anchor = page.path('anchor');
 
 	const scroller = Observer.mutable(null);
-
-	// Sentinel that sits at the "older edge"
-	// With column-reverse, the visually-top (oldest) is the LAST DOM child.
 	const olderSentinel = Observer.mutable(null);
 
 	const dbg = Observer.mutable({
@@ -115,28 +127,29 @@ const CurrentChat = ThemeContext.use(h => AppContext.use(app => (props, cleanup,
 
 		// Slide window by setting anchor (drops some newest)
 		const anchorMsg = msgs?.[STEP];
-		const uuid = anchorMsg?.query?.uuid;
 
-		if (uuid) {
-			anchor.set({ uuid });
+		// paginate_odb expects anchor like { cursor, id }
+		const id = hexId(anchorMsg) ?? anchorMsg?.id ?? null;
+		const cursor = anchorMsg?.createdAt ?? null;
+
+		if (id && cursor != null) {
+			anchor.set({ id, cursor });
 			after.set(WINDOW - 1);
 			before.set(0);
 		} else {
-			console.log('[chat] no anchorMsg at STEP', { STEP, len: msgs?.length });
+			console.log('[chat] no anchorMsg at STEP', { STEP, len: msgs?.length, id, cursor });
 		}
 	};
 
-	// reset paging on chat change (CLEANED UP)
-	cleanup(chatUuid.watch(() => {
+	// reset paging on chat change
+	cleanup(chatId.watch(() => {
 		follow.set(true);
 		after.set(50);
 		before.set(0);
 		anchor.set(null);
-		queueMicrotask(() => readDbg('chatUuid reset'));
+		queueMicrotask(() => readDbg('chatId reset'));
 	}));
 
-	// Maintain scroll “pin to older edge” when older msgs are inserted
-	// This is optional but helps make it feel seamless.
 	let prevScrollHeight = 0;
 	let prevWasNearOlder = false;
 
@@ -155,7 +168,6 @@ const CurrentChat = ThemeContext.use(h => AppContext.use(app => (props, cleanup,
 	});
 
 	cleanup(app.observer.path(['sync', 'currentChat', 'messages']).watch(() => {
-		// update dbg after DOM paint
 		const el = scroller.get();
 		if (!el) return;
 
@@ -166,7 +178,6 @@ const CurrentChat = ThemeContext.use(h => AppContext.use(app => (props, cleanup,
 			const el2 = scroller.get();
 			if (!el2) return;
 
-			// If user was at older edge and not following, keep them pinned to older edge
 			if (!follow.get() && wasNear) {
 				const deltaH = el2.scrollHeight - oldH;
 				if (deltaH > 0) el2.scrollTop += deltaH;
@@ -177,7 +188,6 @@ const CurrentChat = ThemeContext.use(h => AppContext.use(app => (props, cleanup,
 		});
 	}));
 
-	// IntersectionObserver to trigger paging even when scroll events stop firing at edge
 	mounted(() => {
 		const root = scroller.get();
 		const target = olderSentinel.get();
@@ -224,7 +234,6 @@ const CurrentChat = ThemeContext.use(h => AppContext.use(app => (props, cleanup,
 					const atNewest = pos <= (isFollow ? LEAVE_NEWEST : ENTER_NEWEST);
 					if (atNewest !== isFollow) follow.set(atNewest);
 
-					// edge detect for older
 					const nearOlder = (max - pos) <= 200;
 					prevWasNearOlder = nearOlder;
 
@@ -233,26 +242,21 @@ const CurrentChat = ThemeContext.use(h => AppContext.use(app => (props, cleanup,
 					prevScrollHeight = el.scrollHeight;
 					readDbg('scroll');
 				}}
-				// Helps when user wheels at the boundary and scroll doesn't change
 				onWheel={(e) => {
-					// wheel up usually means deltaY < 0 (older direction)
 					if (e.deltaY < 0) {
 						prevWasNearOlder = nearOlderEdge();
 						if (prevWasNearOlder && !follow.get()) loadOlder('wheel@edge');
 					}
 				}}
 			>
-				{/* newest edge is first DOM child in column-reverse */}
 				<MessageItem
 					each:msg={app.observer.path(['sync', 'currentChat', 'messages'])}
 					userIndex={userIndex}
 				/>
 
-				{/* older edge sentinel = last DOM child in column-reverse */}
 				<div ref={olderSentinel} style={{ height: 1 }} />
 			</div>
 
-			{/* Debug HUD */}
 			<pre
 				style={{
 					position: 'absolute',
@@ -284,46 +288,50 @@ const CurrentChat = ThemeContext.use(h => AppContext.use(app => (props, cleanup,
 						const text = msgText.get().trim();
 						if (!text) return;
 						msgText.set('');
-						await app.modReq('chat/CreateMsg', { chatUuid: chatUuid.get(), text });
+						await app.modReq('chat/CreateMsg', { chatId: chatId.get(), text });
 					}
 				}}
 			/>
 		</div>
 	</div>;
-})
-);
+}));
 
 const Chat = AppContext.use(app => StageContext.use(stage => suspend(Stasis, async () => {
 	const initialId = (stage.urlProps?.id || '').trim();
-	if (initialId) app.sync.currentChat.uuid = initialId;
+	if (initialId) app.sync.currentChat.id = initialId;
 
 	const chatsList = await app.modReq('chat/ListChats');
-	const chatUuids = (chatsList || []).map(c => c.uuid).filter(Boolean);
 
-	const chats = chatUuids.length
-		? await app.modReq('chat/GetChats', { uuids: chatUuids })
+	const chatIds = (chatsList || []).map(c => c.id).filter(Boolean);
+
+	// If you still have chat/GetChats, it should accept ids now.
+	// If you don't need this second fetch anymore, you can remove it and just use chatsList.
+
+	const chats = chatIds.length
+		? await app.modReq('chat/GetChats', { ids: chatIds })
 		: [];
 
-	const userUuids = [...new Set(
+	const userIds = [...new Set(
 		chats
 			.flatMap(x => x.participants || [])
-			.map(p => (p ?? "").trim())
+			.map(p => (p ?? '').trim())
 			.filter(Boolean)
 	)];
 
-	const userIndex = userUuids.length
-		? await app.modReq('users/get', { uuids: userUuids })
+	// Update your users/get module to accept ids as well
+	const userIndex = userIds.length
+		? await app.modReq('users/get', { ids: userIds })
 		: [];
 
 	const ChatItem = ({ each }) => {
 		const partSet = new Set(each.participants || []);
-		const participants = (Array.isArray(userIndex) ? userIndex : []).filter(ui => partSet.has(ui.uuid));
+		const participants = (Array.isArray(userIndex) ? userIndex : []).filter(ui => partSet.has(ui.id));
 		const images = participants.map(p => p.image ? `/files/${p.image.slice(1)}` : false);
 
 		return <Button
-			type={stage.observer.path(['urlProps', 'id']).map(id => id === each.uuid ? 'contained' : 'text')}
-			label={each.title || each.uuid}
-			onClick={() => stage.open({ name: 'chat', urlProps: { id: each.uuid } })}
+			type={stage.observer.path(['urlProps', 'id']).map(id => id === each.id ? 'contained' : 'text')}
+			label={each.title || each.id}
+			onClick={() => stage.open({ name: 'chat', urlProps: { id: each.id } })}
 		>
 			<div theme='row'>
 				<UserProfileCircleImage size='50px' borderWidth={0} each:imageUrl={images} />
@@ -333,10 +341,15 @@ const Chat = AppContext.use(app => StageContext.use(stage => suspend(Stasis, asy
 
 	const activeChatId = stage.observer.path(['urlProps', 'id']).map(v => (v || '').trim() || null);
 
+	// keep sync.currentChat.id updated so Get.js reacts
+	activeChatId.watch(() => {
+		app.sync.currentChat.id = activeChatId.get();
+	});
+
 	return <>
 		<div theme='row_fill_spread'>
 			<div theme='column_fill' style={{ minWidth: 280 }}>
-				<Shown value={chats.map(() => chats.length > 0)}>
+				<Shown value={Observer.mutable(chats).map(() => chats.length > 0)}>
 					<mark:then>
 						<ChatItem each={chats} />
 					</mark:then>
@@ -352,7 +365,7 @@ const Chat = AppContext.use(app => StageContext.use(stage => suspend(Stasis, asy
 			{activeChatId.map(id =>
 				id
 					? <CurrentChat
-						chatUuid={stage.observer.path(['urlProps', 'id'])}
+						chatId={stage.observer.path(['urlProps', 'id'])}
 						userIndex={userIndex}
 					/>
 					: <div theme='column_fill_contentContainer' style={{ marginTop: 16, padding: 12 }}>
