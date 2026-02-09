@@ -1,8 +1,6 @@
 import { OObject, OArray } from 'destam';
 import { Obridge } from 'destam-web-core';
 
-const normalizeTitle = (v) => (typeof v === 'string' ? v.trim() : '');
-
 export default () => ({
 	authenticated: false,
 
@@ -33,11 +31,9 @@ export default () => ({
 
 			if (!chat) return;
 
-			chat.observer.path('seq').watch(() => {
+			chat.observer.path('seq').watch(() => { });
 
-			})
-
-			sync.currentChat.title = normalizeTitle(chat.title ?? '');
+			sync.currentChat.title = typeof chat.title === 'string' ? chat.title.trim() : '';
 
 			const userId = user.observer.id.toHex();
 			const isCreator = chat.creatorId === userId;
@@ -52,7 +48,12 @@ export default () => ({
 				allowBtoA: [['title']],
 				transform: (delta) => {
 					if (!delta?.path || delta.path[0] !== 'title') return delta;
-					return { ...delta, value: normalizeTitle(delta.value) };
+
+					const v = delta.value;
+					return {
+						...delta,
+						value: typeof v === 'string' ? v.trim() : '',
+					};
 				},
 				flushA: isCreator ? () => chat.$odb.flush() : null,
 			});
@@ -96,6 +97,6 @@ export default () => ({
 
 				sync.currentChat.messages.push(mirror);
 			}
-		})
+		});
 	},
 });
