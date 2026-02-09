@@ -5,16 +5,16 @@ export default () => ({
 		const now = new Date();
 
 		const list = Array.isArray(participants) ? [...participants] : [participants];
-		const creator = user.observer.id.toHex();
+		const userId = user.observer.id.toHex();
 
-		if (!list.includes(creator)) list.push(creator);
+		if (!list.includes(userId)) list.push(userId);
 
 		const chat = await odb.open({
 			collection: 'chats',
 			value: OObject({
 				title,
 				participants: OArray(list),
-				creator,
+				userId,
 				seq: 0,
 				createdAt: now,
 				modifiedAt: now,

@@ -13,7 +13,7 @@ export default () => ({
 			collection: 'messages',
 			value: OObject({
 				chatId,
-				creator: user.observer.id.toHex(),
+				userId: user.observer.id.toHex(),
 				text: String(text),
 				createdAt: now,
 				modifiedAt: now,
