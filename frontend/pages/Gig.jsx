@@ -33,7 +33,7 @@ const Gig = AppContext.use(app => StageContext.use(stage => suspend(Stasis, asyn
 
 		const text = msgText.get().trim();
 		if (text) {
-			await app.modReq('chat/CreateMsg', { chatUuid: res, text });
+			await app.modReq('chat/CreateMsg', { chatId: res, text });
 		}
 
 		stage.open({ name: 'chat', urlProps: { id: res } });
