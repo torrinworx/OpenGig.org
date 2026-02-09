@@ -2,6 +2,7 @@ import { OArray, OObject } from 'destam';
 
 export default () => ({
 	onMsg: async ({ participants, title = 'New Chat' }, { odb, user }) => {
+		const now = new Date();
 
 		const list = Array.isArray(participants) ? [...participants] : [participants];
 		const creator = user.observer.id.toHex();
@@ -13,8 +14,10 @@ export default () => ({
 			value: OObject({
 				title,
 				participants: OArray(list),
-				creator: creator,
-				seq: 0
+				creator,
+				seq: 0,
+				createdAt: now,
+				modifiedAt: now,
 			}),
 		});
 
