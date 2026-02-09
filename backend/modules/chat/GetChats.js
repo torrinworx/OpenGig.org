@@ -12,14 +12,12 @@ export default () => {
 				modifiedAt: chat.modifiedAt,
 			});
 
-			// single
 			if (typeof id === 'string' && id.length) {
 				const chat = await odb.findOne({ collection: 'chats', query: { id } });
 				if (!chat) return { error: 'Chat not found.' };
 				return toChatInfo(chat);
 			}
 
-			// many
 			if (Array.isArray(ids)) {
 				const cleaned = ids.filter(v => typeof v === 'string' && v.length);
 				if (cleaned.length === 0) return { error: 'Invalid ids.' };

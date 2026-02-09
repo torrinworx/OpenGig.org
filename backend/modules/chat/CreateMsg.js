@@ -33,7 +33,6 @@ export default () => ({
 
 		await msg.$odb.flush();
 
-		// bump chat seq + changes so clients can refresh pagination when follow=true
 		pushChange(chat, { type: 'create', msgId: msg.observer.id.toHex() });
 		await chat.$odb.flush();
 
