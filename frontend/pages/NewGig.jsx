@@ -155,7 +155,6 @@ const NewGig = ThemeContext.use(h => StageContext.use(stage => (_, cleanup) => {
 		// create/revoke object url for preview
 		file.observer.path('file').effect(f => {
 			const prev = previewUrl.get();
-			console.log(prev)
 			if (prev) URL.revokeObjectURL(prev);
 
 			if (f && isImageFile({ file: f })) {
