@@ -152,7 +152,7 @@ const Chat = AppContext.use(app => StageContext.use(stage => suspend(Stasis, asy
 	];
 	console.log(userIds);
 	const userIndex = userIds.length
-		? await app.modReq('users/get', { uuids: userIds })
+		? await app.modReq('users/Get', { uuids: userIds })
 		: [];
 
 	console.log(userIndex);
