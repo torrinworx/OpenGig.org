@@ -3,9 +3,8 @@ import { Obridge } from 'destam-web-core';
 
 export default () => ({
 	authenticated: false,
-
 	onCon: async ({ sync, odb, user }) => {
-		let removeChatScoped = () => { };
+		const userId = user.observer.id.toHex();
 
 		sync.currentChat = OObject({
 			id: null,
@@ -14,9 +13,6 @@ export default () => ({
 		});
 
 		sync.observer.path(['currentChat', 'id']).watch(async () => {
-			removeChatScoped();
-			removeChatScoped = () => { };
-
 			const chatId = sync.currentChat.id;
 
 			sync.currentChat.title = '';
@@ -31,11 +27,8 @@ export default () => ({
 
 			if (!chat) return;
 
-			chat.observer.path('seq').watch(() => { });
-
 			sync.currentChat.title = typeof chat.title === 'string' ? chat.title.trim() : '';
 
-			const userId = user.observer.id.toHex();
 			const isCreator = chat.creatorId === userId;
 
 			Obridge({
@@ -58,45 +51,56 @@ export default () => ({
 				flushA: isCreator ? () => chat.$odb.flush() : null,
 			});
 
-			const docs = await odb.findMany({
-				collection: 'messages',
-				query: { chatId },
-				options: { sort: { createdAt: -1, id: -1 }, limit: 200 },
+			const getMsgs = async () => {
+				const docs = await odb.findMany({
+					collection: 'messages',
+					query: { chatId },
+					options: { sort: { createdAt: -1, id: -1 }, limit: 200 },
+				});
+
+				sync.currentChat.messages.splice(0, sync.currentChat.messages.length);
+
+				for (const msg of docs) {
+					const isOwner = msg.userId === userId;
+
+					const mirror = OObject({
+						id: msg.observer.id.toHex(),
+						userId: msg?.userId ?? null,
+						chatId: msg?.chatId ?? null,
+						createdAt: msg?.createdAt ?? null,
+						modifiedAt: msg?.modifiedAt ?? null,
+						text: msg?.text ?? '',
+					});
+
+					Obridge({
+						a: msg.observer,
+						b: mirror.observer,
+						aToB: true,
+						bToA: false,
+						allowAtoB: [['userId'], ['chatId'], ['createdAt'], ['modifiedAt']],
+					});
+
+					Obridge({
+						a: msg.observer,
+						b: mirror.observer,
+						aToB: true,
+						bToA: isOwner,
+						throttle: 50,
+						allowAtoB: [['text']],
+						allowBtoA: [['text']],
+						flushA: isOwner ? () => msg.$odb.flush() : null,
+					});
+
+					sync.currentChat.messages.push(mirror);
+				}
+				return
+			};
+
+			chat.observer.path('seq').watch(async () => {
+				await getMsgs();
 			});
 
-			for (const msg of docs) {
-				const isOwner = msg.userId === userId;
-
-				const mirror = OObject({
-					id: msg.observer.id.toHex(),
-					userId: msg?.userId ?? null,
-					chatId: msg?.chatId ?? null,
-					createdAt: msg?.createdAt ?? null,
-					modifiedAt: msg?.modifiedAt ?? null,
-					text: msg?.text ?? '',
-				});
-
-				Obridge({
-					a: msg.observer,
-					b: mirror.observer,
-					aToB: true,
-					bToA: false,
-					allowAtoB: [['userId'], ['chatId'], ['createdAt'], ['modifiedAt']],
-				});
-
-				Obridge({
-					a: msg.observer,
-					b: mirror.observer,
-					aToB: true,
-					bToA: isOwner,
-					throttle: 50,
-					allowAtoB: [['text']],
-					allowBtoA: [['text']],
-					flushA: isOwner ? () => msg.$odb.flush() : null,
-				});
-
-				sync.currentChat.messages.push(mirror);
-			}
+			await getMsgs();
 		});
 	},
 });
