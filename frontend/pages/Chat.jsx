@@ -13,17 +13,13 @@ import AppContext from '../utils/appContext.js';
 import Stasis from '../components/Stasis.jsx';
 import UserProfileCircleImage from '../components/UserProfileCircleImage.jsx';
 
-const hexId = (thing) => thing?.observer?.id?.toHex?.() ?? null;
-
 const MessageItem = ({ msg, userIndex }) => {
-	console.log('msg', msg)
-	if (!msg) return null; 
+	if (!msg) return null;
 
-	// new format
-	const userId = msg?.userId;
-	const user = (Array.isArray(userIndex) ? userIndex : []).find(u => u.id === userId);
+	const userId = (msg?.userId ?? '').trim();
+	const users = Array.isArray(userIndex) ? userIndex : [];
+	const user = users.find(u => (u?.id ?? '').trim() === userId);
 
-	console.log(user);
 	return <div theme="row" style={{ padding: 8, gap: 10, alignItems: 'flex-start' }}>
 		<div theme="column" style={{ gap: 4, alignItems: 'center', width: 60 }}>
 			<UserProfileCircleImage
@@ -49,11 +45,13 @@ const CurrentChat = ThemeContext.use(h => AppContext.use(app => (props, cleanup,
 
 	const msgText = Observer.mutable('');
 
+	// NEW paginate signal shape
 	const page = app.observer.path(['sync', 'currentChat', 'page']);
-	const after = page.path('after');
-	const before = page.path('before');
 	const follow = page.path('follow');
-	const anchor = page.path('anchor');
+	const want = page.path('want');
+	const pageSize = page.path('pageSize');
+	const cap = page.path('cap');
+	const anchor = page.path('anchor'); // (unused unless you implement source.around)
 
 	const scroller = Observer.mutable(null);
 	const olderSentinel = Observer.mutable(null);
@@ -61,8 +59,9 @@ const CurrentChat = ThemeContext.use(h => AppContext.use(app => (props, cleanup,
 	const dbg = Observer.mutable({
 		len: 0,
 		follow: false,
-		after: 0,
-		before: 0,
+		want: null,
+		pageSize: 0,
+		cap: 0,
 		anchor: null,
 
 		scrollTop: 0,
@@ -70,12 +69,13 @@ const CurrentChat = ThemeContext.use(h => AppContext.use(app => (props, cleanup,
 		clientHeight: 0,
 		max: 0,
 		pos: 0,
-		distToOlder: 0,
+		distToNewest: 0,
+		reason: '',
 	});
 
 	const normScroll = (el) => {
 		const max = Math.max(0, el.scrollHeight - el.clientHeight);
-		const pos = el.scrollTop < 0 ? -el.scrollTop : el.scrollTop; // firefox column-reverse weirdness
+		const pos = el.scrollTop;
 		return { max, pos };
 	};
 
@@ -88,8 +88,9 @@ const CurrentChat = ThemeContext.use(h => AppContext.use(app => (props, cleanup,
 		dbg.set({
 			len: msgs?.length ?? 0,
 			follow: !!follow.get(),
-			after: after.get(),
-			before: before.get(),
+			want: want.get(),
+			pageSize: pageSize.get(),
+			cap: cap.get(),
 			anchor: anchor.get(),
 
 			scrollTop: el.scrollTop,
@@ -97,7 +98,7 @@ const CurrentChat = ThemeContext.use(h => AppContext.use(app => (props, cleanup,
 			clientHeight: el.clientHeight,
 			max,
 			pos,
-			distToOlder: max - pos,
+			distToNewest: max - pos,
 			reason,
 		});
 	};
@@ -106,6 +107,8 @@ const CurrentChat = ThemeContext.use(h => AppContext.use(app => (props, cleanup,
 	const STEP = 50;
 
 	let loadingOlder = false;
+	let loadingNewer = false;
+	let wantSeq = 0;
 
 	const loadOlder = (why) => {
 		if (loadingOlder) return;
@@ -114,73 +117,96 @@ const CurrentChat = ThemeContext.use(h => AppContext.use(app => (props, cleanup,
 		loadingOlder = true;
 		setTimeout(() => (loadingOlder = false), 150);
 
-		const msgs = app.sync.currentChat.messages;
-		const curAfter = after.get() ?? 0;
+		// ask paginator for one page of older
+		pageSize.set(STEP);
+		wantSeq++;
+		want.set({ dir: 'older', seq: wantSeq });
 
-		console.log('[chat] loadOlder()', { why, curAfter, len: msgs?.length });
-
-		// Grow until we hit WINDOW
-		if (curAfter < WINDOW - 1) {
-			after.set(Math.min(WINDOW - 1, curAfter + STEP));
-			return;
-		}
-
-		// Slide window by setting anchor (drops some newest)
-		const anchorMsg = msgs?.[STEP];
-
-		// paginate_odb expects anchor like { cursor, id }
-		const id = hexId(anchorMsg) ?? anchorMsg?.id ?? null;
-		const cursor = anchorMsg?.createdAt ?? null;
-
-		if (id && cursor != null) {
-			anchor.set({ id, cursor });
-			after.set(WINDOW - 1);
-			before.set(0);
-		} else {
-			console.log('[chat] no anchorMsg at STEP', { STEP, len: msgs?.length, id, cursor });
-		}
+		readDbg('loadOlder:' + why);
 	};
 
-	// reset paging on chat change
+	const loadNewer = (why) => {
+		if (loadingNewer) return;
+		if (follow.get()) return;
+
+		loadingNewer = true;
+		setTimeout(() => (loadingNewer = false), 150);
+
+		pageSize.set(STEP);
+		wantSeq++;
+		want.set({ dir: 'newer', seq: wantSeq });
+
+		readDbg('loadNewer:' + why);
+	};
+
+	// reset paging on chat change (match new signal shape)
 	cleanup(chatId.watch(() => {
 		follow.set(true);
-		after.set(50);
-		before.set(0);
+		want.set(null);
+		pageSize.set(STEP);
+		cap.set(WINDOW);
 		anchor.set(null);
 		queueMicrotask(() => readDbg('chatId reset'));
 	}));
 
 	let prevScrollHeight = 0;
 	let prevWasNearOlder = false;
+	let prevWasNearNewest = false;
 
 	const nearOlderEdge = () => {
 		const el = scroller.get();
 		if (!el) return false;
+		const { pos } = normScroll(el);
+		return pos <= 200; // near top
+	};
+
+	const nearNewestEdge = () => {
+		const el = scroller.get();
+		if (!el) return false;
 		const { max, pos } = normScroll(el);
-		return (max - pos) <= 200;
+		return (max - pos) <= 200; // near bottom
+	};
+
+	const scrollToNewest = () => {
+		const el = scroller.get();
+		if (!el) return;
+		const { max } = normScroll(el);
+		el.scrollTop = max;
 	};
 
 	mounted(() => {
 		const el = scroller.get();
 		if (!el) return;
 		prevScrollHeight = el.scrollHeight;
+		// on first mount, if follow=true, be at bottom
+		if (follow.get()) queueMicrotask(scrollToNewest);
 		readDbg('mounted');
 	});
 
+	// keep scroll stable when older prepends happen (near top)
+	// and keep pinned to bottom when follow=true.
 	cleanup(app.observer.path(['sync', 'currentChat', 'messages']).watch(() => {
 		const el = scroller.get();
 		if (!el) return;
 
-		const wasNear = prevWasNearOlder;
+		const wasNearOlder = prevWasNearOlder;
+		const wasNearNewest = prevWasNearNewest;
 		const oldH = prevScrollHeight;
 
 		requestAnimationFrame(() => {
 			const el2 = scroller.get();
 			if (!el2) return;
 
-			if (!follow.get() && wasNear) {
+			// If we were near top and we're unfollowed, compensate prepend growth
+			if (!follow.get() && wasNearOlder) {
 				const deltaH = el2.scrollHeight - oldH;
 				if (deltaH > 0) el2.scrollTop += deltaH;
+			}
+
+			// If follow=true (or we were near bottom), stay pinned to newest
+			if (follow.get() || wasNearNewest) {
+				const max = Math.max(0, el2.scrollHeight - el2.clientHeight);
+				el2.scrollTop = max;
 			}
 
 			prevScrollHeight = el2.scrollHeight;
@@ -221,23 +247,32 @@ const CurrentChat = ThemeContext.use(h => AppContext.use(app => (props, cleanup,
 					borderRadius: 8,
 
 					display: 'flex',
-					flexDirection: 'column-reverse',
+					flexDirection: 'column', // IMPORTANT: paginator is oldest->newest
 				}}
 				onScroll={(e) => {
 					const el = e.currentTarget;
 					const { max, pos } = normScroll(el);
 
+					// newest is bottom
 					const ENTER_NEWEST = 40;
 					const LEAVE_NEWEST = 120;
 					const isFollow = !!follow.get();
 
-					const atNewest = pos <= (isFollow ? LEAVE_NEWEST : ENTER_NEWEST);
+					const distToNewest = max - pos;
+					const atNewest = distToNewest <= (isFollow ? LEAVE_NEWEST : ENTER_NEWEST);
 					if (atNewest !== isFollow) follow.set(atNewest);
 
-					const nearOlder = (max - pos) <= 200;
-					prevWasNearOlder = nearOlder;
+					const nearOlder = pos <= 200;
+					const nearNewest = distToNewest <= 200;
 
+					prevWasNearOlder = nearOlder;
+					prevWasNearNewest = nearNewest;
+
+					// Pull older when near top and unfollowed
 					if (!follow.get() && nearOlder) loadOlder('scroll');
+
+					// If unfollowed and drifting toward bottom, page newer a bit
+					if (!follow.get() && nearNewest && !atNewest) loadNewer('scroll');
 
 					prevScrollHeight = el.scrollHeight;
 					readDbg('scroll');
@@ -247,14 +282,19 @@ const CurrentChat = ThemeContext.use(h => AppContext.use(app => (props, cleanup,
 						prevWasNearOlder = nearOlderEdge();
 						if (prevWasNearOlder && !follow.get()) loadOlder('wheel@edge');
 					}
+					if (e.deltaY > 0) {
+						prevWasNearNewest = nearNewestEdge();
+						if (prevWasNearNewest && !follow.get()) loadNewer('wheel@edge');
+					}
 				}}
 			>
+				{/* sentinel at TOP for "older" */}
+				<div ref={olderSentinel} style={{ height: 1 }} />
+
 				<MessageItem
 					each:msg={app.observer.path(['sync', 'currentChat', 'messages'])}
 					userIndex={userIndex}
 				/>
-
-				<div ref={olderSentinel} style={{ height: 1 }} />
 			</div>
 
 			<pre
@@ -301,11 +341,7 @@ const Chat = AppContext.use(app => StageContext.use(stage => suspend(Stasis, asy
 	if (initialId) app.sync.currentChat.id = initialId;
 
 	const chatsList = await app.modReq('chat/ListChats');
-
 	const chatIds = (chatsList || []).map(c => c.id).filter(Boolean);
-
-	// If you still have chat/GetChats, it should accept ids now.
-	// If you don't need this second fetch anymore, you can remove it and just use chatsList.
 
 	const chats = chatIds.length
 		? await app.modReq('chat/GetChats', { ids: chatIds })
@@ -318,7 +354,6 @@ const Chat = AppContext.use(app => StageContext.use(stage => suspend(Stasis, asy
 			.filter(Boolean)
 	)];
 
-	// Update your users/get module to accept ids as well
 	const userIndex = userIds.length
 		? await app.modReq('users/get', { ids: userIds })
 		: [];
@@ -341,7 +376,6 @@ const Chat = AppContext.use(app => StageContext.use(stage => suspend(Stasis, asy
 
 	const activeChatId = stage.observer.path(['urlProps', 'id']).map(v => (v || '').trim() || null);
 
-	// keep sync.currentChat.id updated so Get.js reacts
 	activeChatId.watch(() => {
 		app.sync.currentChat.id = activeChatId.get();
 	});
