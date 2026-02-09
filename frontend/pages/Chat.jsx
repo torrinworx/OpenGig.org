@@ -150,12 +150,10 @@ const Chat = AppContext.use(app => StageContext.use(stage => suspend(Stasis, asy
 				.filter(Boolean)
 		),
 	];
-	console.log(userIds);
+
 	const userIndex = userIds.length
 		? await app.modReq('users/Get', { uuids: userIds })
 		: [];
-
-	console.log(userIndex);
 
 	const ChatItem = ({ each }) => {
 		const partSet = new Set(each.participants || []);
@@ -211,8 +209,6 @@ const Chat = AppContext.use(app => StageContext.use(stage => suspend(Stasis, asy
 			)}
 		</div>
 	</>;
-})
-)
-);
+})));
 
 export default Chat;
