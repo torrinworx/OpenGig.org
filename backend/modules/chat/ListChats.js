@@ -1,5 +1,5 @@
 export default () => ({
-	onMsg: async (_props, { odb, user }) => {
+	onMsg: async (_, { odb, user }) => {
 
 		const docs = await odb.findMany({
 			collection: 'chats',
