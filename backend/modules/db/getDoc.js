@@ -20,7 +20,7 @@ export default () => {
 				throw new Error(`props.mode must be one of: ${[...allowed].join(', ')}`);
 			}
 
-			// Always resolve the destam-db query section first (cheap + also acts like existence check)
+			// Always resolve the query section first (cheap + also acts like existence check)
 			const querySection = await DB.query(table, query);
 			if (!querySection) {
 				return { table, query, mode, doc: null };

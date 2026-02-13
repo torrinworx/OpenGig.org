@@ -4,6 +4,8 @@ import { Obridge } from 'destam-web-core';
 export default () => ({
 	authenticated: false,
 	onCon: async ({ sync, odb, user }) => {
+		if (!user) return;
+
 		const userId = user.observer.id.toHex();
 
 		sync.currentChat = OObject({
@@ -27,6 +29,9 @@ export default () => ({
 
 			if (!chat) return;
 
+			chat.observer.watch(() => {
+				console.log(chat.seq, user.email);
+			})
 			sync.currentChat.title = typeof chat.title === 'string' ? chat.title.trim() : '';
 
 			const isCreator = chat.creatorId === userId;

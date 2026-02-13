@@ -11,7 +11,7 @@ export default () => {
 				throw new Error('props.table (string) is required');
 			}
 
-			// destam-db exact match query object, ex: { 'profile.email': 'x@y.com' }
+			// exact match query object, ex: { 'profile.email': 'x@y.com' }
 			const query = (props?.query && typeof props.query === 'object') ? props.query : {};
 
 			let limit = props?.limit;
@@ -21,7 +21,7 @@ export default () => {
 				throw new Error('props.limit must be a number >= 0');
 			}
 
-			// Convert destam-db query shape -> mongo filter on `persistent.*`
+			// Convert query shape -> mongo filter on `persistent.*`
 			// Also ignore deleted docs
 			const filter = {
 				'persistent.deletedAt': { $exists: false },

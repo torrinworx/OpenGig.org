@@ -157,11 +157,7 @@ const Chat = AppContext.use(app => StageContext.use(stage => suspend(Stasis, asy
 
 	const ChatItem = ({ each }) => {
 		const partSet = new Set(each.participants || []);
-		const participants = userIndex.filter(ui => {
-			console.log(ui);
-			return partSet.has(ui.id)
-		}
-		);
+		const participants = userIndex.filter(ui => partSet.has(ui.id));
 		const images = participants.map(p => (p.image ? `/files/${String(p.image).slice(1)}` : false));
 
 		return <Button
